@@ -3164,12 +3164,17 @@ function bahnSearchUrl(item, context) {
 }
 
 function flixbusSearchUrl(item, context) {
-  return searchUrl("https://www.flixbus.de/", {
-    departureCity: context.origin,
-    arrivalCity: item.destination.city,
-    rideDate: formatDate(item.startDate),
-    adult: item.familyPricing?.adults || context.travelers || 1,
-    children: item.familyPricing?.children || 0,
+  const routeSlug = (value) => normalizePlaceName(value)
+    .split(/\s+(?:und|oder|and|or)\s+|&|,|:|\//)[0]
+    .trim()
+    .replace(/\s+/g, "-");
+  const originSlug = routeSlug(context.origin);
+  const destinationSlug = routeSlug(item.destination.city);
+  if (originSlug && destinationSlug) {
+    return `https://www.flixbus.de/busverbindung/fernbus-${originSlug}-${destinationSlug}`;
+  }
+  return searchUrl("https://www.flixbus.de/fernbus", {
+    q: `${context.origin} ${item.destination.city}`,
   });
 }
 
@@ -3299,8 +3304,8 @@ function flightSearchUrl(item, context) {
 function airbnbSearchUrl(query, item) {
   const family = item.familyPricing || { adults: 1, childAges: [], children: 0 };
   const lodgingNeeds = item.lodgingNeeds || { beds: 1, bedrooms: 1 };
-  return searchUrl("https://www.airbnb.de/s/homes", {
-    query,
+  const placeSlug = encodeURIComponent(query.trim().replace(/[,\s]+/g, "-"));
+  return searchUrl(`https://www.airbnb.de/s/${placeSlug}/homes`, {
     checkin: item.startDate,
     checkout: item.checkout,
     adults: family.adults,
@@ -3315,12 +3320,34 @@ function airbnbSearchUrl(query, item) {
   });
 }
 
+function basePlaceQuery(item) {
+  return item.destination.searchQuery || `${item.destination.city} ${item.destination.country}`;
+}
+
+function specialSearchQuery(item) {
+  return item.travelProfile === "unusual" && item.destination.unusual?.search
+    ? item.destination.unusual.search
+    : "";
+}
+
+function lodgingSearchLabel(item, type) {
+  const nightly = euro(Math.round(item.lodgingTotal / Math.max(1, item.nights)));
+  const prefix = type === "booking"
+    ? item.stay.type === "pension"
+      ? "Pensionen"
+      : "Hotels/Pensionen"
+    : item.stay.type === "budget-room"
+      ? "Budgetzimmer"
+      : "Airbnb/Fewo";
+  return `${prefix} ab ${nightly}/Nacht`;
+}
+
 function bookingLinks(item, context) {
+  const placeQuery = basePlaceQuery(item);
+  const specialQuery = specialSearchQuery(item);
   const query = item.travelProfile === "cruise" && item.destination.cruise?.search
     ? item.destination.cruise.search
-    : item.travelProfile === "unusual" && item.destination.unusual?.search
-    ? item.destination.unusual.search
-    : item.destination.searchQuery || `${item.destination.city} ${item.destination.country}`;
+    : placeQuery;
   const routeQuery = routeSearchText(item, context);
   const family = item.familyPricing || { adults: context.travelers, children: 0 };
   const lodgingNeeds = item.lodgingNeeds || { bedrooms: 1 };
@@ -3335,22 +3362,23 @@ function bookingLinks(item, context) {
     car: searchUrl("https://www.google.com/maps/dir/", {
       api: 1,
       origin: context.origin,
-      destination: query,
+      destination: placeQuery,
       travelmode: "driving",
     }),
-    airbnb: airbnbSearchUrl(query, item),
+    airbnb: airbnbSearchUrl(placeQuery, item),
     booking: searchUrl("https://www.booking.com/searchresults.html", {
-      ss: query,
+      ss: placeQuery,
       group_adults: family.adults,
       group_children: family.children,
       no_rooms: lodgingNeeds.bedrooms,
       checkin: item.startDate,
       checkout: item.checkout,
     }),
+    special: specialQuery ? searchUrl("https://www.google.com/search", { q: specialQuery }) : "",
     cruise: cruiseLineLinks(item),
     maps: searchUrl("https://www.google.com/maps/search/", {
       api: 1,
-      query,
+      query: placeQuery,
     }),
   };
 }
@@ -3449,6 +3477,50 @@ function groupResultsByCountry(items) {
     .sort((a, b) => Number(b.hasBudgetFit) - Number(a.hasBudgetFit) || b.score - a.score || a.minTotal - b.minTotal);
 }
 
+function regionSpecialIdeas(group) {
+  const catalog = {
+    Montenegro: ["Bootstag in der Bucht statt nur Altstadt", "Durmitor als Berg-Kontrast zur Küste", "Küstenorte südlich von Budva gegenprüfen"],
+    Deutschland: ["Kurzurlaub per Bahn mit Deutschlandticket-Anteil", "zweite Reihe an Ostsee/Nordsee statt Promenade", "kleine Städte mit gutem Essen und kurzer Anreise"],
+    Österreich: ["Nachbarort zum Skigebiet statt Tal-Hotspot", "Sommer-Bergbahn plus See statt klassischem Hotelurlaub", "Frühstückspension mit Supermarkt/Bus in Laufnähe"],
+    Schweiz: ["Grenznahe Orte mit Bahnanschluss", "Selbstversorgung statt Restaurantbudget", "kleinere Täler statt bekannter Luxusorte"],
+    Niederlande: ["Kanalzimmer oder kleines Studio an guter Metroachse", "Rad-und-Wasser-Route ab Randlage", "Küste plus Stadt statt Zentrumshotel"],
+    Polen: ["Ostsee-Orte außerhalb der Promenade", "Danzig plus ruhiger Küstenort", "Milchbars, Märkte und Bahn/Tram für niedrige Alltagskosten"],
+    Dänemark: ["Ferienhausgebiet mit Küche statt Hotel", "Nordseeort plus Tagesausflug", "Bahn/Auto-Kombi mit kurzer Fähr- oder Brückenroute"],
+    Schweden: ["Stuga oder einfache Hütte am Wasser", "Schären mit Selbstversorgung", "Nachtzug/Fähre als Teil der Reise prüfen"],
+    England: ["Küste mit Bus-/Bahnpass statt London-Fokus", "Pubzimmer/B&B außerhalb der Hotspots", "Direktflug plus Regionalzug vergleichen"],
+    Schottland: ["Insel- oder Küstenroute mit Fähre", "Hostel/B&B als Basis für Tagesausflüge", "Zugstrecke als Erlebnis statt Mietwagenpflicht"],
+    Kroatien: ["Fähre zu kleineren Inseln", "Kvarner/Istrien statt Dubrovnik", "Apartment mit Küche nahe Markt"],
+    Griechenland: ["Inselhopping nur bei guten Fährzeiten", "Nebenorte statt Hauptstrand", "Studio mit Balkon und Supermarkt in Laufnähe"],
+    Spanien: ["zweite Reihe an der Küste", "Markthallen und Tapasviertel statt Hotelhalbpension", "Bahnfähige Städte-Kombi"],
+    Türkei: ["Pension/Apartment statt All-inclusive, wenn Alltag günstig ist", "Altstadtviertel mit ÖPNV statt Strandresort", "Fähre/Bootsausflug als Tageshighlight"],
+    Frankreich: ["Bahnfähige Nebenstädte statt Paris/Hotspots", "Markt + Apartmentküche", "Küste oder Berge mit regionaler Bahn"],
+    Italien: ["kleine Bahnorte statt Altstadtzentrum", "Agriturismo oder Pension mit Frühstück", "Markt, Aperitivo und Küche statt Restaurantpflicht"],
+    Kreuzfahrt: ["Bordextras vor Buchung einpreisen", "Abfahrtshafen mit Bahn statt Flug bevorzugen", "Innenkabine gegen Balkonpreis bewusst abwägen"],
+  };
+  const ideas = [];
+  group.items.forEach((item) => {
+    if (item.destination.unusual?.label) ideas.push(item.destination.unusual.label);
+    if (item.destination.cruise?.dealWatch) ideas.push(item.destination.cruise.dealWatch);
+  });
+  ideas.push(...(catalog[group.country] || []));
+  group.items.forEach((item) => {
+    if (item.destination.vibes.includes("strand")) ideas.push("Wasserlage außerhalb der teuersten ersten Reihe prüfen");
+    if (item.destination.vibes.includes("stadt")) ideas.push("Randlage mit schneller Bahn-/Metroachse suchen");
+    if (item.destination.vibes.includes("berge")) ideas.push("Talort statt direkt am Lift oder Hotspot prüfen");
+    if (item.destination.vibes.includes("natur")) ideas.push("einfache Unterkunft mit guter Anbindung an Naturziele");
+  });
+  const unique = [...new Set(ideas.filter(Boolean))].slice(0, 4);
+  if (!unique.length) return "";
+  return `
+    <div class="region-ideas" aria-label="Besondere Ideen für ${group.country}">
+      <strong>Besonders vor Ort</strong>
+      <div>
+        ${unique.map((idea) => `<span>${idea}</span>`).join("")}
+      </div>
+    </div>
+  `;
+}
+
 function renderResults(items, context) {
   if (!items.length) {
     results.innerHTML = `<p class="warning">Keine Treffer mit diesen Filtern. Lockere den Ort, die Anreisezeit oder Qualitätsgrenzen etwas. Du kannst Mindeststerne bewusst senken, solltest dann aber aktuelle Reviews genauer prüfen.</p>`;
@@ -3480,6 +3552,7 @@ function renderResults(items, context) {
             </div>
           </div>
           <p class="place-strip">${places}</p>
+          ${regionSpecialIdeas(group)}
           <div class="result-group__cards">
             ${group.items.slice(0, 4).map((item, itemIndex) => renderDestinationCard(item, groupIndex + 1, itemIndex, context)).join("")}
           </div>
@@ -3835,11 +3908,11 @@ function renderTripOption(item, index, context) {
       ? "Konkrete Flüge suchen"
       : `${item.transport.label} prüfen`;
   const primaryStayLink = item.destination.cruise ? links.cruise.primary : ["airbnb", "budget-room"].includes(item.stay.type) ? links.airbnb : links.booking;
-  const primaryStayLabel = item.destination.cruise ? links.cruise.primaryLabel : "Diese Unterkunft suchen";
+  const primaryStayLabel = item.destination.cruise ? links.cruise.primaryLabel : `${lodgingSearchLabel(item, ["airbnb", "budget-room"].includes(item.stay.type) ? "airbnb" : "booking")} suchen`;
   const stayCostLabel = item.destination.cruise ? "Kabine" : stayName;
   const transportPriceLabel = `${euro(item.transportTotal)} gesamt`;
   const busLinkNote = item.transport.mode === "bus"
-    ? `<p class="link-note">FlixBus zeigt konkrete Plätze/Sitzplatzreservierung erst nach gewählter Verbindung im Buchungsprozess. Deshalb zuerst Busvergleich öffnen und FlixBus danach dort oder direkt gegenprüfen.</p>`
+    ? `<p class="link-note">Omio öffnet die datierte Bus-Suche. Der FlixBus-Direktlink öffnet die stabile Streckenseite; Datum und Rückfahrt dort final wählen, weil FlixBus einfache URL-Parameter für Start/Ziel nicht zuverlässig übernimmt.</p>`
     : "";
   const flightLinkNote = item.transport.mode === "flight"
     ? `<p class="link-note">${item.transport.advisory ? "Flug war nicht als Hauptanreise ausgewählt, wird hier aber als prüfenswerte Alternative gezeigt, weil Preis/Reisezeit mithalten können. " : ""}${hasFlightCodes ? "Der Fluglink nutzt erkannte Flughafen-Codes und öffnet eine konkrete Hin-/Rückflug-Suche. Kinderpreise, Gepäck und alternative Flughäfen bitte in der Buchungsseite final prüfen." : "Für diese Start-/Zielkombination fehlt noch ein sicherer Flughafen-Code; der Link öffnet deshalb eine gezielte Websuche statt einer leeren Flugseite."}</p>`
@@ -3901,7 +3974,8 @@ function renderTripOption(item, index, context) {
         <a href="${transportLink}" target="_blank" rel="noreferrer">${transportLinkLabel}</a>
         <a href="${primaryStayLink}" target="_blank" rel="noreferrer">${primaryStayLabel}</a>
         ${item.transport.mode === "bus" ? `<a href="${links.flixbus}" target="_blank" rel="noreferrer">FlixBus direkt öffnen</a>` : ""}
-        ${item.destination.cruise ? links.cruise.compare.map((link) => `<a href="${link.href}" target="_blank" rel="noreferrer">${link.label}</a>`).join("") : `<a href="${links.booking}" target="_blank" rel="noreferrer">Hotels/Pensionen</a><a href="${links.airbnb}" target="_blank" rel="noreferrer">Airbnb/Fewo</a>`}
+        ${item.destination.cruise ? links.cruise.compare.map((link) => `<a href="${link.href}" target="_blank" rel="noreferrer">${link.label}</a>`).join("") : `<a href="${links.booking}" target="_blank" rel="noreferrer">${lodgingSearchLabel(item, "booking")}</a><a href="${links.airbnb}" target="_blank" rel="noreferrer">${lodgingSearchLabel(item, "airbnb")}</a>`}
+        ${links.special ? `<a href="${links.special}" target="_blank" rel="noreferrer">Besondere Idee suchen</a>` : ""}
         <a href="${links.maps}" target="_blank" rel="noreferrer">Karte öffnen</a>
       </nav>
       ${flightLinkNote}

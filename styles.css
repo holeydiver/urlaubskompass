@@ -521,6 +521,36 @@ dd {
   border-color: #d3e5ea;
 }
 
+.region-ideas {
+  display: grid;
+  gap: 8px;
+  border: 1px solid #d6dccb;
+  border-radius: 7px;
+  padding: 10px 12px;
+  background: #fbfcf5;
+}
+
+.region-ideas strong {
+  color: #4c5a43;
+  font-size: 0.82rem;
+}
+
+.region-ideas div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.region-ideas span {
+  border: 1px solid #dce4d3;
+  border-radius: 999px;
+  padding: 6px 9px;
+  background: #fff;
+  color: #334239;
+  font-size: 0.82rem;
+  font-weight: 750;
+}
+
 .result-group__cards {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
