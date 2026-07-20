@@ -3569,6 +3569,7 @@ function bookingSearchUrl(query, item, context) {
     src: "searchresults",
     src_elem: "sb",
     order: "price",
+    nflt: bookingPriceFilter(item),
   };
   childAges.forEach((age, index) => {
     params[`age${index + 1}`] = age;
@@ -3576,6 +3577,20 @@ function bookingSearchUrl(query, item, context) {
   return searchUrl("https://www.booking.com/searchresults.html", {
     ...params,
   });
+}
+
+function bookingNightlyCap(item) {
+  const lodgingTarget = Math.max(1, item.lodgingTotal || item.estimatedLodgingTotal || 1);
+  const targetNightly = lodgingTarget / Math.max(1, item.nights || 1);
+  return Math.max(40, Math.ceil(targetNightly / 10) * 10);
+}
+
+function bookingPriceFilter(item) {
+  return `price=EUR-0-${bookingNightlyCap(item)}-1`;
+}
+
+function bookingTargetLabel(item) {
+  return `bis ca. ${euro(item.lodgingTotal)} Unterkunft`;
 }
 
 function bookingLinks(item, context) {
@@ -4295,13 +4310,16 @@ function renderTripOption(item, index, context) {
       : `${item.transport.label} prüfen`;
   const hasDirectStay = Boolean(links.directStay);
   const primaryStayLink = item.destination.cruise ? links.cruise.primary : hasDirectStay ? links.directStay : links.favoriteStay;
+  const bookingLabel = `Booking ${bookingTargetLabel(item)}`;
   const primaryStayLabel = item.destination.cruise
     ? links.cruise.primaryLabel
     : item.verifiedLodging
       ? "Geprüfte Unterkunft öffnen"
       : hasDirectStay
         ? "Konkretes Angebot prüfen"
-        : "Favorisierte Suche öffnen";
+        : ["hotel", "pension"].includes(item.stay.type)
+          ? bookingLabel
+          : "Favorisierte Suche öffnen";
   const stayCostLabel = item.destination.cruise ? "Kabine" : stayName;
   const transportPriceLabel = `${euro(item.transportTotal)} gesamt`;
   const totalLabel = item.liveLodgingRequired && !item.verifiedLodging ? `ca. ${euro(item.total)} Planwert` : `${euro(item.total)} gesamt`;
@@ -4378,7 +4396,7 @@ function renderTripOption(item, index, context) {
         <a href="${transportLink}" target="_blank" rel="noreferrer">${transportLinkLabel}</a>
         <a href="${primaryStayLink}" target="_blank" rel="noreferrer">${primaryStayLabel}</a>
         ${item.transport.mode === "bus" && links.flixbus !== transportLink ? `<a href="${links.flixbus}" target="_blank" rel="noreferrer">FlixBus direkt öffnen</a>` : ""}
-        ${item.destination.cruise ? links.cruise.compare.map((link) => `<a href="${link.href}" target="_blank" rel="noreferrer">${link.label}</a>`).join("") : `<a href="${links.booking}" target="_blank" rel="noreferrer">Booking-Alternativen</a><a href="${links.airbnb}" target="_blank" rel="noreferrer">Airbnb-Alternativen</a>`}
+        ${item.destination.cruise ? links.cruise.compare.map((link) => `<a href="${link.href}" target="_blank" rel="noreferrer">${link.label}</a>`).join("") : `<a href="${links.booking}" target="_blank" rel="noreferrer">${bookingLabel}</a><a href="${links.airbnb}" target="_blank" rel="noreferrer">Airbnb-Alternativen</a>`}
         ${links.special ? `<a href="${links.special}" target="_blank" rel="noreferrer">Besondere Idee suchen</a>` : ""}
         <a href="${links.maps}" target="_blank" rel="noreferrer">Karte öffnen</a>
       </nav>
