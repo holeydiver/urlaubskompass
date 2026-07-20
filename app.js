@@ -3430,18 +3430,42 @@ function lodgingSearchLabel(item, type) {
     : item.stay.type === "budget-room"
       ? "Budgetzimmer"
       : "Airbnb/Fewo";
-  return `${prefix} ab ${nightly}/Nacht`;
+  return `${prefix} geschätzt ca. ${nightly}/Nacht`;
+}
+
+function favoriteStayQuery(item) {
+  const plan = concreteStayPlan(item);
+  const place = `${item.destination.city} ${item.destination.country}`;
+  const stayTerms = {
+    airbnb: "Ferienwohnung Küche",
+    "budget-room": "Budgetzimmer Privatzimmer",
+    hotel: "Hotel",
+    pension: "Pension Gästehaus",
+  };
+  const area = plan.area.replace(/\boder\b/gi, " ").replace(/[·,]/g, " ");
+  return `${place} ${area} ${stayTerms[item.stay.type] || "Unterkunft"}`.replace(/\s+/g, " ").trim();
+}
+
+function bookingSearchUrl(query, item, context) {
+  const family = item.familyPricing || { adults: context.travelers, children: 0 };
+  const lodgingNeeds = item.lodgingNeeds || { bedrooms: 1 };
+  return searchUrl("https://www.booking.com/searchresults.html", {
+    ss: query,
+    group_adults: family.adults,
+    group_children: family.children,
+    no_rooms: lodgingNeeds.bedrooms,
+    checkin: item.startDate,
+    checkout: item.checkout,
+  });
 }
 
 function bookingLinks(item, context) {
   const placeQuery = basePlaceQuery(item);
+  const favoriteQuery = favoriteStayQuery(item);
   const specialQuery = specialSearchQuery(item);
   const query = item.travelProfile === "cruise" && item.destination.cruise?.search
     ? item.destination.cruise.search
     : placeQuery;
-  const routeQuery = routeSearchText(item, context);
-  const family = item.familyPricing || { adults: context.travelers, children: 0 };
-  const lodgingNeeds = item.lodgingNeeds || { bedrooms: 1 };
   return {
     flights: flightSearchUrl(item, context),
     train: bahnSearchUrl(item, context),
@@ -3455,14 +3479,10 @@ function bookingLinks(item, context) {
       travelmode: "driving",
     }),
     airbnb: airbnbSearchUrl(placeQuery, item),
-    booking: searchUrl("https://www.booking.com/searchresults.html", {
-      ss: placeQuery,
-      group_adults: family.adults,
-      group_children: family.children,
-      no_rooms: lodgingNeeds.bedrooms,
-      checkin: item.startDate,
-      checkout: item.checkout,
-    }),
+    booking: bookingSearchUrl(placeQuery, item, context),
+    favoriteStay: ["airbnb", "budget-room"].includes(item.stay.type)
+      ? airbnbSearchUrl(favoriteQuery, item)
+      : bookingSearchUrl(favoriteQuery, item, context),
     special: specialQuery ? searchUrl("https://www.google.com/search", { q: specialQuery }) : "",
     cruise: cruiseLineLinks(item),
     maps: searchUrl("https://www.google.com/maps/search/", {
@@ -3855,7 +3875,7 @@ function renderBestTripPreview(item, context) {
         <div>
           <span>${item.destination.cruise ? "Kabine / Route" : "Unterkunft"}</span>
           <strong>${item.destination.cruise ? stayPlan.title : stayTypeLabel(item.stay.type)} · ${stayPlan.area}</strong>
-          <p>${stayPlan.bedsLabel}, Zielpreis ca. ${nightlyPrice}/Nacht.</p>
+          <p>${stayPlan.bedsLabel}, grober Zielpreis ca. ${nightlyPrice}/Nacht.</p>
         </div>
         <div>
           <span>Anreise</span>
@@ -4006,8 +4026,8 @@ function renderTripOption(item, index, context) {
     : item.transport.mode === "flight"
       ? "Konkrete Flüge suchen"
       : `${item.transport.label} prüfen`;
-  const primaryStayLink = item.destination.cruise ? links.cruise.primary : ["airbnb", "budget-room"].includes(item.stay.type) ? links.airbnb : links.booking;
-  const primaryStayLabel = item.destination.cruise ? links.cruise.primaryLabel : `${lodgingSearchLabel(item, ["airbnb", "budget-room"].includes(item.stay.type) ? "airbnb" : "booking")} suchen`;
+  const primaryStayLink = item.destination.cruise ? links.cruise.primary : links.favoriteStay;
+  const primaryStayLabel = item.destination.cruise ? links.cruise.primaryLabel : `Favorisierte Unterkunft geschätzt ca. ${stayPlan.price}/Nacht`;
   const stayCostLabel = item.destination.cruise ? "Kabine" : stayName;
   const transportPriceLabel = `${euro(item.transportTotal)} gesamt`;
   const busLinkNote = item.transport.mode === "bus"
@@ -4025,9 +4045,9 @@ function renderTripOption(item, index, context) {
       </div>
       <div class="concrete-plan">
         <div>
-          <span>Konkrete Unterkunft</span>
+          <span>Favorisierte Unterkunftssuche</span>
           <strong>${stayPlan.title} · ${stayPlan.area}</strong>
-          <p>${stayPlan.focus}, ${stayPlan.bedsLabel}, Zielpreis ca. ${stayPlan.price}/Nacht. ${stayPlan.note}.</p>
+          <p>${stayPlan.focus}, ${stayPlan.bedsLabel}, grober Zielpreis ca. ${stayPlan.price}/Nacht. ${stayPlan.note}. Den echten Preis immer im Buchungsportal prüfen.</p>
         </div>
         <div>
           <span>Konkrete Anreise</span>
@@ -4043,7 +4063,7 @@ function renderTripOption(item, index, context) {
       </div>
       <div class="costs costs--compact">
         <div><span>Anreise</span><strong>${item.transport.label} ${transportPriceLabel}</strong></div>
-        <div><span>${item.destination.cruise ? "Kabine" : "Unterkunft"}</span><strong>${stayCostLabel} ${euro(Math.round(item.lodgingTotal / item.nights))}/Nacht</strong></div>
+        <div><span>${item.destination.cruise ? "Kabine" : "Unterkunft"}</span><strong>${stayCostLabel} ca. ${euro(Math.round(item.lodgingTotal / item.nights))}/Nacht</strong></div>
         <div><span>${item.destination.cruise ? "Bordextras" : "Alltag"}</span><strong>${euro(item.effectiveDaily)} p. P./Tag</strong></div>
       </div>
       <div class="quality-line">
@@ -4073,7 +4093,7 @@ function renderTripOption(item, index, context) {
         <a href="${transportLink}" target="_blank" rel="noreferrer">${transportLinkLabel}</a>
         <a href="${primaryStayLink}" target="_blank" rel="noreferrer">${primaryStayLabel}</a>
         ${item.transport.mode === "bus" && links.flixbus !== transportLink ? `<a href="${links.flixbus}" target="_blank" rel="noreferrer">FlixBus direkt öffnen</a>` : ""}
-        ${item.destination.cruise ? links.cruise.compare.map((link) => `<a href="${link.href}" target="_blank" rel="noreferrer">${link.label}</a>`).join("") : `<a href="${links.booking}" target="_blank" rel="noreferrer">${lodgingSearchLabel(item, "booking")}</a><a href="${links.airbnb}" target="_blank" rel="noreferrer">${lodgingSearchLabel(item, "airbnb")}</a>`}
+        ${item.destination.cruise ? links.cruise.compare.map((link) => `<a href="${link.href}" target="_blank" rel="noreferrer">${link.label}</a>`).join("") : `<a href="${links.booking}" target="_blank" rel="noreferrer">Booking-Alternativen ${lodgingSearchLabel(item, "booking")}</a><a href="${links.airbnb}" target="_blank" rel="noreferrer">Airbnb-Alternativen ${lodgingSearchLabel(item, "airbnb")}</a>`}
         ${links.special ? `<a href="${links.special}" target="_blank" rel="noreferrer">Besondere Idee suchen</a>` : ""}
         <a href="${links.maps}" target="_blank" rel="noreferrer">Karte öffnen</a>
       </nav>
