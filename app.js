@@ -1905,6 +1905,36 @@ function searchUrl(base, params) {
   return url.toString();
 }
 
+function routeSearchText(item, context) {
+  const family = item.familyPricing || { adults: context.travelers || 1, children: 0 };
+  const travelers = family.adults + family.children;
+  return `${context.origin} nach ${item.destination.city} am ${formatDate(item.startDate)} ${travelers} Person${travelers > 1 ? "en" : ""}`;
+}
+
+function bahnSearchUrl(item, context) {
+  const params = new URLSearchParams({
+    sts: "true",
+    so: context.origin,
+    zo: item.destination.city,
+    hd: `${item.startDate}T08:00:00`,
+    hza: "D",
+    ar: "false",
+    s: "true",
+    d: "false",
+  });
+  return `https://www.bahn.de/buchung/fahrplan/suche#${params.toString()}`;
+}
+
+function flixbusSearchUrl(item, context) {
+  return searchUrl("https://www.flixbus.de/", {
+    departureCity: context.origin,
+    arrivalCity: item.destination.city,
+    rideDate: formatDate(item.startDate),
+    adult: item.familyPricing?.adults || context.travelers || 1,
+    children: item.familyPricing?.children || 0,
+  });
+}
+
 function airbnbSearchUrl(query, item) {
   const family = item.familyPricing || { adults: 1, childAges: [], children: 0 };
   const lodgingNeeds = item.lodgingNeeds || { beds: 1, bedrooms: 1 };
@@ -1926,27 +1956,21 @@ function airbnbSearchUrl(query, item) {
 
 function bookingLinks(item, context) {
   const query = item.destination.searchQuery || `${item.destination.city} ${item.destination.country}`;
-  const routeQuery = `${context.origin} nach ${item.destination.airport} ${item.startDate}`;
+  const routeQuery = routeSearchText(item, context);
   const family = item.familyPricing || { adults: context.travelers, children: 0 };
   const lodgingNeeds = item.lodgingNeeds || { bedrooms: 1 };
   return {
     flights: searchUrl("https://www.google.com/travel/flights", {
       q: `${context.origin} to ${item.destination.airport} ${item.startDate}`,
     }),
-    train: searchUrl("https://www.thetrainline.com/de/suchen", {
-      from: context.origin,
-      to: item.destination.city,
-      journeySearchType: "single",
-    }),
+    train: bahnSearchUrl(item, context),
     nightTrain: searchUrl("https://www.google.com/search", {
-      q: `Nachtzug ${context.origin} ${item.destination.city} ${item.startDate}`,
+      q: `Nachtzug ${routeQuery}`,
     }),
     bus: searchUrl("https://www.omio.de/suchen", {
-      q: routeQuery,
+      q: `Bus ${routeQuery}`,
     }),
-    flixbus: searchUrl("https://www.flixbus.de/suche", {
-      q: `${context.origin} ${item.destination.city} ${item.startDate}`,
-    }),
+    flixbus: flixbusSearchUrl(item, context),
     car: searchUrl("https://www.google.com/maps/dir/", {
       api: 1,
       origin: context.origin,
@@ -2149,9 +2173,13 @@ function renderTripOption(item, index, context) {
         ? links.nightTrain
         : item.transport.mode === "car"
           ? links.car
-          : links.flixbus;
+          : links.bus;
+  const transportLinkLabel = item.transport.mode === "bus" ? "Bus bei Omio suchen" : `${item.transport.label} prüfen`;
   const primaryStayLink = ["airbnb", "budget-room"].includes(item.stay.type) ? links.airbnb : links.booking;
   const transportPriceLabel = `${euro(item.transportTotal)} gesamt`;
+  const busLinkNote = item.transport.mode === "bus"
+    ? `<p class="link-note">FlixBus zeigt konkrete Plätze/Sitzplatzreservierung erst nach gewählter Verbindung im Buchungsprozess. Deshalb zuerst Busvergleich öffnen und FlixBus danach dort oder direkt gegenprüfen.</p>`
+    : "";
   return `
     <section class="trip-option">
       <div class="trip-option__top">
@@ -2198,13 +2226,14 @@ function renderTripOption(item, index, context) {
       ` : ""}
       <p class="trip-combo">${item.nights} Nächte · ${item.transport.label}, ca. ${formatHours(item.transport.hours)} pro Strecke · Reisezeit ${item.timePreference?.label || "bewertet"}${item.overBudget ? " · über Budget, aber als Vergleich nützlich" : ""}</p>
       <nav class="links" aria-label="Buchungslinks für ${item.destination.city}, Reise ${index + 1}">
-        <a href="${transportLink}" target="_blank" rel="noreferrer">${item.transport.label} prüfen</a>
+        <a href="${transportLink}" target="_blank" rel="noreferrer">${transportLinkLabel}</a>
         <a href="${primaryStayLink}" target="_blank" rel="noreferrer">Diese Unterkunft suchen</a>
-        ${item.transport.mode === "bus" ? `<a href="${links.bus}" target="_blank" rel="noreferrer">Omio vergleichen</a>` : ""}
+        ${item.transport.mode === "bus" ? `<a href="${links.flixbus}" target="_blank" rel="noreferrer">FlixBus direkt öffnen</a>` : ""}
         <a href="${links.booking}" target="_blank" rel="noreferrer">Hotels/Pensionen</a>
         <a href="${links.airbnb}" target="_blank" rel="noreferrer">Airbnb/Fewo</a>
         <a href="${links.maps}" target="_blank" rel="noreferrer">Karte öffnen</a>
       </nav>
+      ${busLinkNote}
     </section>
   `;
 }
