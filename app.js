@@ -2642,8 +2642,53 @@ function matchesPlaceFilters(destination, includes, excludes) {
   return placeMatchStrength(destination, includes) > 0;
 }
 
+function updateFeedbackLinks() {
+  const links = [document.querySelector("#feedback-link"), document.querySelector("#feedback-link-footer")].filter(Boolean);
+  if (!links.length) return;
+  const profile = profileLabels[document.querySelector("#travel-profile")?.value] || "Individuell";
+  const origin = document.querySelector("#origin")?.value || "";
+  const budget = document.querySelector("#budget")?.value || "";
+  const travelers = document.querySelector("#travelers")?.value || "";
+  const start = document.querySelector("#start-date")?.value || "";
+  const end = document.querySelector("#end-date")?.value || "";
+  const includes = document.querySelector("#include-countries")?.value || "(leer, beliebte Ziele)";
+  const excludes = document.querySelector("#exclude-countries")?.value || "-";
+  const title = "Feedback Urlaubskompass";
+  const body = [
+    "Was ist dir aufgefallen?",
+    "",
+    "- ",
+    "",
+    "Aktuelle Suche:",
+    `Profil: ${profile}`,
+    `Startort: ${origin}`,
+    `Budget: ${budget} EUR`,
+    `Reisende: ${travelers}`,
+    `Zeitraum: ${start} bis ${end}`,
+    `Gewuenscht: ${includes}`,
+    `Ausgeschlossen: ${excludes}`,
+    "",
+    "Link zur Seite:",
+    window.location.href,
+  ].join("\n");
+  const href = `https://github.com/holeydiver/urlaubskompass/issues/new?title=${encodeURIComponent(title)}&body=${encodeURIComponent(body)}`;
+  links.forEach((link) => {
+    link.href = href;
+  });
+}
+
+function updateLocalVisitCount() {
+  const counter = document.querySelector("#local-visit-count");
+  if (!counter) return;
+  const key = "urlaubskompass-local-visit-count";
+  const visits = Math.max(0, Number(localStorage.getItem(key)) || 0) + 1;
+  localStorage.setItem(key, String(visits));
+  counter.textContent = String(visits);
+}
+
 function planTrip(event) {
   if (event) event.preventDefault();
+  updateFeedbackLinks();
   const budget = Number(document.querySelector("#budget").value);
   const travelers = Number(document.querySelector("#travelers").value);
   const minBedsInput = document.querySelector("#min-beds");
@@ -2671,7 +2716,8 @@ function planTrip(event) {
   const travelProfile = document.querySelector("#travel-profile").value;
   const keywordTags = keywordTagsFromInput(document.querySelector("#keyword-input").value);
   const rawIncludes = listFromInput("#include-countries");
-  const includes = expandPlaceIncludes(rawIncludes);
+  const searchIncludes = rawIncludes.length ? rawIncludes : ["beliebte ziele"];
+  const includes = expandPlaceIncludes(searchIncludes);
   const excludes = listFromInput("#exclude-countries");
   const hiddenFactor = Number(document.querySelector("#hidden-factor").value) / 100;
   const comfortFactor = Number(document.querySelector("#comfort-factor").value) / 100;
@@ -2711,9 +2757,10 @@ function planTrip(event) {
   const nightsWindowNote = displayNights < targetNights
     ? ` Dein Datumsfenster lässt maximal ${displayNights} Nächte zu; die App sucht deshalb passende Kurzvarianten.`
     : "";
+  const defaultPlaceNote = rawIncludes.length ? "" : "Ohne Wunschort nutzt die App beliebte Budgetziele als Startpunkt. ";
   document.querySelector("#summary-note").textContent = dateIsFarFuture(startDate)
-    ? "Der Zeitraum liegt mehr als ca. 330 Tage in der Zukunft. Preise werden deshalb als historische Durchschnittswerte behandelt."
-    : `Die App testet Starttage, Reisedauer und Anreisearten. Reisezeit wird ${timePreference.label}; ${travelLogicNote} Reisende: ${pricing.label}.${nightsWindowNote}`;
+    ? `${defaultPlaceNote}Der Zeitraum liegt mehr als ca. 330 Tage in der Zukunft. Preise werden deshalb als historische Durchschnittswerte behandelt.`
+    : `${defaultPlaceNote}Die App testet Starttage, Reisedauer und Anreisearten. Reisezeit wird ${timePreference.label}; ${travelLogicNote} Reisende: ${pricing.label}.${nightsWindowNote}`;
 
   try {
     const baseOptions = {
@@ -2742,7 +2789,7 @@ function planTrip(event) {
       keywordTags,
       travelProfile,
     };
-    const scored = scoreDestinations(destinationsForSearch(rawIncludes), includes, excludes, baseOptions);
+    const scored = scoreDestinations(destinationsForSearch(searchIncludes), includes, excludes, baseOptions);
 
     const bestDuration = scored[0] ? `${scored[0].nights} Nächte` : "-";
     document.querySelector("#best-duration").textContent = bestDuration;
@@ -4018,6 +4065,7 @@ function schedulePlan() {
 initDates();
 const restoredState = restoreFormState();
 renderTravelerDetails();
+updateLocalVisitCount();
 form.addEventListener("submit", planTrip);
 form.addEventListener("input", schedulePlan);
 form.addEventListener("change", schedulePlan);

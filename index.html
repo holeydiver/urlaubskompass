@@ -19,6 +19,10 @@
             Entdecker-Modus passen. Die App bewertet Anreise, Unterkunft,
             Lebenshaltung, flexible Reisedauer und Geheimtipp-Potenzial.
           </p>
+          <div class="hero__actions" aria-label="Schnellzugriff">
+            <a id="feedback-link" class="secondary-button secondary-button--on-dark" href="https://github.com/holeydiver/urlaubskompass/issues/new" target="_blank" rel="noreferrer">Feedback geben</a>
+            <a class="secondary-button secondary-button--on-dark" href="#disclaimer">Disclaimer</a>
+          </div>
         </div>
       </section>
 
@@ -159,6 +163,7 @@
             <label>
               Länder, Städte oder Regionen, die du möchtest
               <input id="include-countries" placeholder="z. B. Montenegro, Hamburg, Ostsee" />
+              <span class="field-hint">Leer lassen = beliebte Budgetziele als Startpunkt.</span>
             </label>
 
             <label>
@@ -316,6 +321,39 @@
           </p>
         </div>
         <div id="results" class="results"></div>
+      </section>
+
+      <section id="disclaimer" class="public-info" aria-labelledby="disclaimer-title">
+        <div>
+          <p class="eyebrow eyebrow--plain">Öffentliche Preview</p>
+          <h2 id="disclaimer-title">Disclaimer, Feedback & Zähler</h2>
+          <p>
+            Der Urlaubskompass arbeitet mit kuratierten Schätzungen und Suchlinks.
+            Preise, Verfügbarkeit, Bewertungen, Einreise, Sicherheit und Buchungsbedingungen
+            musst du vor der Buchung direkt beim Anbieter prüfen. Wenn ein Zeitraum sehr weit
+            in der Zukunft liegt, werden Durchschnittspreise statt aktueller Livepreise genutzt.
+          </p>
+        </div>
+
+        <div class="public-info__grid">
+          <article>
+            <h3>Feedback</h3>
+            <p>Fehlt ein Ziel, ist ein Link schief oder wirkt ein Preis unrealistisch? Schreib es direkt als GitHub-Issue.</p>
+            <a id="feedback-link-footer" class="secondary-button" href="https://github.com/holeydiver/urlaubskompass/issues/new" target="_blank" rel="noreferrer">Feedback öffnen</a>
+          </article>
+          <article>
+            <h3>Zähler</h3>
+            <p>Der externe Badge zählt öffentliche Seitenaufrufe. Lokal auf diesem Gerät wird nur eine kleine Besuchszahl im Browser gespeichert.</p>
+            <div class="counter-row">
+              <img src="https://hits.sh/holeydiver.github.io/urlaubskompass.svg?style=flat-square&label=Besuche&color=176b87" alt="Besucherzähler" loading="lazy" />
+              <span>Dieses Gerät: <strong id="local-visit-count">-</strong></span>
+            </div>
+          </article>
+          <article>
+            <h3>Datenschutz</h3>
+            <p>Die App speichert deine Eingaben nur lokal in deinem Browser, damit sie beim Zurückgehen nicht verschwinden. Der Zähler-Badge wird extern von hits.sh geladen.</p>
+          </article>
+        </div>
       </section>
     </main>
 
