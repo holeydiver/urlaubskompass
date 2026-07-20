@@ -1723,6 +1723,7 @@ function bestPlanForDestination(destination, options) {
         for (const transport of transports) {
           if (options.tripMode === "ski" && !isSkiSeason(startDate)) continue;
           const deal = dealProfile(startDate, nights, options.budgetLevers);
+          const averagePriceEstimate = dateIsFarFuture(startDate);
           const shoulder = isShoulderMonth(destination, startDate);
           const shoulderMultiplier = hasLever(options.budgetLevers, "shoulder") && shoulder ? 0.86 : 1;
           const localMultiplier = hasLever(options.budgetLevers, "local") ? 0.92 : 1;
@@ -1811,6 +1812,7 @@ function bestPlanForDestination(destination, options) {
             board,
             keywordMatches: keyword.matches,
             transportNotes: transport.notes || [],
+            averagePriceEstimate,
           });
           candidates.push({
             destination,
@@ -1837,6 +1839,7 @@ function bestPlanForDestination(destination, options) {
             familyPricing: options.familyPricing,
             lodgingNeeds: options.lodgingNeeds,
             timePreference: options.timePreference,
+            averagePriceEstimate,
             score,
             overBudget: total > options.budget,
           });
@@ -1870,6 +1873,7 @@ function makeLeverNotes(destination, state) {
   if (state.keywordMatches?.length) notes.push(...state.keywordMatches.slice(0, 3).map((tag) => `passt: ${keywordLabel(tag)}`));
   if (state.dealNotes) notes.push(...state.dealNotes);
   if (state.transportNotes) notes.push(...state.transportNotes);
+  if (state.averagePriceEstimate) notes.push("Durchschnittspreise");
   return notes;
 }
 
@@ -2050,10 +2054,17 @@ function stayTypeLabel(type) {
   }[type] || "Unterkunft";
 }
 
+function averagePriceNote(item) {
+  return item.averagePriceEstimate
+    ? "Preise sind Durchschnitts-/Saisonwerte, weil der Zeitraum zu weit in der Zukunft liegt. Aktuelle Verfügbarkeit und Aktionen bitte über die Buchungslinks prüfen."
+    : "";
+}
+
 function renderBestTripPreview(item, context) {
   const stayPlan = concreteStayPlan(item);
   const transportPlan = concreteTransportPlan(item, context);
   const nightlyPrice = euro(Math.round(item.lodgingTotal / Math.max(1, item.nights)));
+  const priceNote = averagePriceNote(item);
   return `
     <div class="best-trip">
       <div class="best-trip__head">
@@ -2072,6 +2083,7 @@ function renderBestTripPreview(item, context) {
           <p>${euro(item.transportTotal)} gesamt, ca. ${formatHours(item.transport.hours)} pro Strecke.</p>
         </div>
       </div>
+      ${priceNote ? `<p class="price-note">${priceNote}</p>` : ""}
     </div>
   `;
 }
@@ -2180,6 +2192,7 @@ function renderTripOption(item, index, context) {
   const busLinkNote = item.transport.mode === "bus"
     ? `<p class="link-note">FlixBus zeigt konkrete Plätze/Sitzplatzreservierung erst nach gewählter Verbindung im Buchungsprozess. Deshalb zuerst Busvergleich öffnen und FlixBus danach dort oder direkt gegenprüfen.</p>`
     : "";
+  const priceNote = averagePriceNote(item);
   return `
     <section class="trip-option">
       <div class="trip-option__top">
@@ -2224,7 +2237,8 @@ function renderTripOption(item, index, context) {
         <span>Skipass ${euro(item.destination.ski.pass)}/Tag</span>
       </div>
       ` : ""}
-      <p class="trip-combo">${item.nights} Nächte · ${item.transport.label}, ca. ${formatHours(item.transport.hours)} pro Strecke · Reisezeit ${item.timePreference?.label || "bewertet"}${item.overBudget ? " · über Budget, aber als Vergleich nützlich" : ""}</p>
+      <p class="trip-combo">${item.nights} Nächte · ${item.transport.label}, ca. ${formatHours(item.transport.hours)} pro Strecke · Reisezeit ${item.timePreference?.label || "bewertet"}${item.overBudget ? " · über Budget, aber als Vergleich nützlich" : ""}${priceNote ? " · Durchschnittspreise" : ""}</p>
+      ${priceNote ? `<p class="price-note">${priceNote}</p>` : ""}
       <nav class="links" aria-label="Buchungslinks für ${item.destination.city}, Reise ${index + 1}">
         <a href="${transportLink}" target="_blank" rel="noreferrer">${transportLinkLabel}</a>
         <a href="${primaryStayLink}" target="_blank" rel="noreferrer">Diese Unterkunft suchen</a>
