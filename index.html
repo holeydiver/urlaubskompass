@@ -1,0 +1,324 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Urlaubskompass</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="hero" aria-labelledby="page-title">
+        <img src="./travel-planner-hero.png" alt="" class="hero__image" />
+        <div class="hero__overlay"></div>
+        <div class="hero__content">
+          <p class="eyebrow">Budget, Geheimtipps, beste Anreise</p>
+          <h1 id="page-title">Urlaubskompass</h1>
+          <p class="intro">
+            Finde Reiseziele, die zu deinem Budget, deiner Stimmung und deinem
+            Entdecker-Modus passen. Die App bewertet Anreise, Unterkunft,
+            Lebenshaltung, flexible Reisedauer und Geheimtipp-Potenzial.
+          </p>
+        </div>
+      </section>
+
+      <section class="planner" aria-label="Reiseparameter">
+        <form id="trip-form" class="control-panel">
+          <fieldset class="holiday-mode">
+            <legend>Ferienmodus</legend>
+            <div class="form-grid form-grid--compact">
+              <label>
+                Bundesland
+                <select id="holiday-state">
+                  <option value="SH" selected>Schleswig-Holstein</option>
+                  <option value="HH">Hamburg</option>
+                  <option value="NI">Niedersachsen</option>
+                  <option value="MV">Mecklenburg-Vorpommern</option>
+                </select>
+              </label>
+              <label>
+                Ferienart
+                <select id="holiday-type">
+                  <option value="autumn" selected>Herbstferien</option>
+                  <option value="summer">Sommerferien</option>
+                  <option value="christmas">Weihnachtsferien</option>
+                  <option value="spring">Frühjahr/Ostern</option>
+                </select>
+              </label>
+              <label>
+                Jahr
+                <select id="holiday-year">
+                  <option value="2026" selected>2026</option>
+                  <option value="2027">2027</option>
+                  <option value="2028">2028</option>
+                  <option value="2029">2029</option>
+                  <option value="2030">2030</option>
+                </select>
+              </label>
+              <button type="button" id="apply-holiday" class="secondary-button">Ferien übernehmen</button>
+            </div>
+            <p id="holiday-note" class="form-note">Schleswig-Holstein Herbstferien 2026: 12.10.2026 bis 24.10.2026.</p>
+          </fieldset>
+
+          <fieldset class="mode-panel">
+            <legend>Reiseprofil</legend>
+            <div class="form-grid form-grid--compact">
+              <label>
+                Was suchst du?
+                <select id="travel-profile">
+                  <option value="budget-anywhere" selected>Budget egal wo</option>
+                  <option value="budget-hunter">Sparfuchs</option>
+                  <option value="short-trip">Kurzurlaub</option>
+                  <option value="city-trip">Städtereise</option>
+                  <option value="ski">Skiferien</option>
+                  <option value="beach-summer">Sommerurlaub am Strand</option>
+                  <option value="city-summer">Sommerurlaub in der Stadt</option>
+                  <option value="active">Aktivurlaub</option>
+                  <option value="custom">Individuell</option>
+                </select>
+              </label>
+              <label>
+                Stichworte
+                <input id="keyword-input" placeholder="z. B. günstig, sicher, wasser, warm" />
+              </label>
+            </div>
+            <p id="profile-note" class="form-note">Sucht breit nach dem besten Gegenwert und lässt Länder offen.</p>
+          </fieldset>
+
+          <div class="form-grid">
+            <label>
+              Reiseart
+              <select id="trip-mode">
+                <option value="general" selected>Allgemein / Sonne / Stadt / Natur</option>
+                <option value="ski">Winter / Ski</option>
+              </select>
+            </label>
+
+            <label>
+              Startort
+              <input id="origin" value="Berlin" placeholder="z. B. Berlin, München, Wien" />
+            </label>
+
+            <label>
+              Reisebudget gesamt
+              <div class="money-input">
+                <input id="budget" type="number" min="250" step="50" value="1800" />
+                <span>EUR</span>
+              </div>
+            </label>
+
+            <label>
+              Personen
+              <input id="travelers" type="number" min="1" max="8" value="2" />
+            </label>
+
+            <label>
+              Mindestbetten
+              <input id="min-beds" type="number" min="1" max="8" value="2" />
+            </label>
+
+            <label>
+              Schlafzimmer/Zimmer
+              <input id="min-bedrooms" type="number" min="1" max="6" value="1" />
+            </label>
+
+            <label>
+              Wunschnächte
+              <input id="nights" type="number" min="1" max="60" value="7" />
+            </label>
+
+            <label>
+              Frühester Start
+              <input id="start-date" type="date" />
+            </label>
+
+            <label>
+              Spätestes Enddatum
+              <input id="end-date" type="date" />
+            </label>
+
+            <label>
+              Max. Anreisezeit/Strecke
+              <div class="money-input">
+                <input id="max-travel-hours" type="number" min="2" max="36" step="1" value="12" />
+                <span>Std.</span>
+              </div>
+            </label>
+
+            <label>
+              Anreisezeit
+              <select id="time-value">
+                <option value="auto" selected>Automatisch bewerten</option>
+                <option value="cheap">Sparfuchs</option>
+                <option value="relaxed">Entspannt</option>
+                <option value="balanced">Ausgewogen</option>
+                <option value="strict">Zeitsparend</option>
+              </select>
+            </label>
+
+            <label>
+              Länder, Städte oder Regionen, die du möchtest
+              <input id="include-countries" placeholder="z. B. Montenegro, Hamburg, Ostsee" />
+            </label>
+
+            <label>
+              Länder, Städte oder Regionen ausschließen
+              <input id="exclude-countries" placeholder="z. B. Spanien, Mallorca, Berlin" />
+            </label>
+          </div>
+
+          <fieldset>
+            <legend>Reisende</legend>
+            <div id="traveler-details" class="traveler-details" aria-label="Details pro reisender Person"></div>
+            <input id="traveler-details-state" type="hidden" value="" />
+            <input id="child-ages" type="hidden" value="" />
+            <input id="bahncard-count" type="hidden" value="0" />
+            <input id="deutschlandticket-count" type="hidden" value="0" />
+            <p class="form-note">Alter hilft bei Kinder- und Jugendpreisen. BahnCard und Deutschlandticket werden pro Person in die Bahnkosten eingerechnet.</p>
+          </fieldset>
+
+          <fieldset id="ski-options" class="mode-panel is-hidden">
+            <legend>Winter- und Skimodus</legend>
+            <div class="form-grid form-grid--compact">
+              <label>
+                Skitage
+                <input id="ski-days" type="number" min="0" max="21" value="5" />
+              </label>
+              <label>
+                Ausrüstung
+                <select id="ski-rental">
+                  <option value="needed" selected>Leihen einrechnen</option>
+                  <option value="own">Eigene Ausrüstung</option>
+                  <option value="none">Kein Ski, nur Winterort</option>
+                </select>
+              </label>
+              <label>
+                Level
+                <select id="ski-level">
+                  <option value="beginner">Anfänger</option>
+                  <option value="mixed" selected>Gemischt</option>
+                  <option value="advanced">Fortgeschritten</option>
+                </select>
+              </label>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Anreise</legend>
+            <div class="chips" id="transport-options">
+              <label><input type="checkbox" value="flight" checked /> Flug</label>
+              <label><input type="checkbox" value="train" checked /> Bahn</label>
+              <label><input type="checkbox" value="bus" checked /> FlixBus/Bus</label>
+              <label><input type="checkbox" value="car" checked /> Auto</label>
+              <label><input id="flex-dates" type="checkbox" checked /> Datum optimieren</label>
+              <label><input id="flex-nights" type="checkbox" checked /> Nächte optimieren</label>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Bahnvorteile</legend>
+            <div class="chips">
+              <label><input id="night-train" type="checkbox" checked /> Nachtzüge in Europa prüfen</label>
+            </div>
+            <p class="form-note">Bahn wird gegenüber Auto bevorzugt, wenn Preis und Reisezeit sinnvoll mithalten. Tickets senken die geschätzten Bahnkosten.</p>
+          </fieldset>
+
+          <fieldset>
+            <legend>Budget-Hebel</legend>
+            <div class="chips" id="budget-levers">
+              <label><input type="checkbox" value="shoulder" checked /> Nebensaison bevorzugen</label>
+              <label><input type="checkbox" value="kitchen" checked /> Küche/Selbstversorgung</label>
+              <label><input type="checkbox" value="local" checked /> Lokale Viertel</label>
+              <label><input type="checkbox" value="nearby-airports" checked /> Alternative Flughäfen</label>
+              <label><input type="checkbox" value="weather" checked /> Gutes Wetter sichern</label>
+              <label><input type="checkbox" value="last-minute" checked /> Last-Minute-Deals</label>
+              <label><input type="checkbox" value="flash-sale" checked /> Aktionen/Flash Sales</label>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Urlaubsgefühl</legend>
+            <div class="chips" id="vibe-options">
+              <label><input type="checkbox" value="strand" checked /> Strand</label>
+              <label><input type="checkbox" value="stadt" checked /> Stadt</label>
+              <label><input type="checkbox" value="berge" /> Berge</label>
+              <label><input type="checkbox" value="natur" checked /> Natur</label>
+              <label><input type="checkbox" value="essen" /> Essen</label>
+              <label><input type="checkbox" value="kultur" /> Kultur</label>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Unterkunft</legend>
+            <div class="chips" id="stay-options">
+              <label><input type="checkbox" value="airbnb" checked /> Airbnb/Fewo</label>
+              <label><input type="checkbox" value="budget-room" checked /> Budgetzimmer</label>
+              <label><input type="checkbox" value="hotel" checked /> Hotel</label>
+              <label><input type="checkbox" value="pension" checked /> Pension</label>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Verpflegung</legend>
+            <div class="chips" id="board-options">
+              <label><input type="radio" name="board" value="auto" checked /> Automatisch optimieren</label>
+              <label><input type="radio" name="board" value="self" /> Selbstversorgung</label>
+              <label><input type="radio" name="board" value="breakfast" /> Frühstück</label>
+              <label><input type="radio" name="board" value="half-board" /> Halbpension</label>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Unterkunft prüfen</legend>
+            <div class="form-grid form-grid--compact">
+              <label>
+                Mindestens Sterne
+                <input id="min-rating" type="number" min="2.5" max="5" step="0.1" value="4.3" />
+              </label>
+              <label>
+                Wie verlässlich?
+                <input id="min-trust" type="number" min="0" max="100" step="5" value="50" />
+              </label>
+              <label>
+                Max. Warnsignale
+                <input id="max-stay-risk" type="number" min="5" max="60" step="1" value="35" />
+              </label>
+            </div>
+            <p class="form-note">Du kannst die Mindeststerne bewusst senken, z. B. auf 2,5. Aktuelle schlechte Reviews und Warnsignale werden trotzdem separat berücksichtigt.</p>
+          </fieldset>
+
+          <input id="quality-weight" type="hidden" value="80" />
+          <input id="hidden-factor" type="hidden" value="75" />
+          <input id="comfort-factor" type="hidden" value="45" />
+          <input id="snow-weight" type="hidden" value="75" />
+
+          <button type="submit" class="primary-button">Beste Reisen finden</button>
+        </form>
+
+        <aside class="summary" aria-live="polite">
+          <h2>Budget-Check</h2>
+          <dl>
+            <div><dt>Pro Person</dt><dd id="per-person">-</dd></div>
+            <div><dt>Pro Nacht</dt><dd id="per-night">-</dd></div>
+            <div><dt>Beste Dauer</dt><dd id="best-duration">-</dd></div>
+            <div><dt>Profil</dt><dd id="search-mode">-</dd></div>
+          </dl>
+          <p id="summary-note"></p>
+        </aside>
+      </section>
+
+      <section class="results-section" aria-labelledby="results-title">
+        <div class="section-heading">
+          <h2 id="results-title">Konkrete Vorschläge</h2>
+          <p>
+            Jede Karte zeigt sofort die beste konkrete Reise. Aufklappen zeigt
+            weitere Varianten mit Unterkunft, Anreise, Kosten und Buchungslinks.
+          </p>
+        </div>
+        <div id="results" class="results"></div>
+      </section>
+    </main>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
