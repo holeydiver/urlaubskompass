@@ -675,6 +675,8 @@ const destinations = [
     city: "Zeeland & Südholland Küste",
     country: "Niederlande",
     airport: "Amsterdam oder Rotterdam",
+    searchQuery: "Noordwijk Niederlande",
+    region: "Südholland Küste",
     vibes: ["strand", "stadt", "natur", "essen"],
     hidden: 60,
     comfort: 86,
@@ -687,6 +689,23 @@ const destinations = [
     kitchenSavings: 18,
     localSavings: 11,
     nearbyAirport: true,
+    directStays: [
+      {
+        platform: "booking",
+        stayTypes: ["pension", "budget-room"],
+        label: "The Flying Pig Beach Hostel Noordwijk",
+        url: "https://www.booking.com/hotel/nl/the-flying-pig-beach-hostel.de.html",
+        note: "Hostel mit Altersregel 18 bis 40; Zimmer-/Bettenart, Gemeinschaftsbad und Storno vor Buchung prüfen.",
+        verified: {
+          checked: "2026-07-20",
+          checkin: "2026-07-24",
+          checkout: "2026-07-26",
+          adults: 2,
+          total: 178,
+          note: "Booking zeigte am 20.07.2026 ca. 178 EUR fuer 2 Naechte / 2 Erwachsene; Hostel, Altersregel 18 bis 40.",
+        },
+      },
+    ],
     unusual: {
       label: "Hausboot, Kanalzimmer oder Rad-und-Wasser-Trip",
       search: "Zeeland Südholland Hausboot Kanal Unterkunft Radurlaub",
@@ -3489,6 +3508,8 @@ function directStayUrl(item) {
     url.searchParams.set("req_adults", String(Math.max(1, family.adults || 1)));
     url.searchParams.set("req_children", String(family.children || 0));
     url.searchParams.set("room1", Array.from({ length: Math.max(1, family.adults || 1) }, () => "A").join(","));
+    url.searchParams.set("selected_currency", "EUR");
+    url.searchParams.set("lang", "de");
   }
   return url.toString();
 }
