@@ -2354,6 +2354,20 @@ function passesQuality(quality, thresholds) {
   return quality.rating >= thresholds.minRating && quality.trust >= thresholds.minTrust && quality.risk <= thresholds.maxRisk && enoughSignal && noFreshAlarm;
 }
 
+function budgetAwareQualityThresholds(options) {
+  const shortestNights = Math.max(1, Math.min(...options.candidateNights));
+  const perPersonNight = options.budget / Math.max(1, options.familyPricing.adults + options.familyPricing.children) / shortestNights;
+  const tightBudget = options.budgetRescue || options.travelProfile === "budget-hunter" || perPersonNight < 95;
+  if (!tightBudget) return options.qualityThresholds;
+  return {
+    ...options.qualityThresholds,
+    budgetFlexible: true,
+    budgetMinRating: Math.min(options.qualityThresholds.budgetMinRating || 4.2, perPersonNight < 70 ? 3.55 : 3.75),
+    budgetMinTrust: Math.min(options.qualityThresholds.budgetMinTrust || 50, perPersonNight < 70 ? 32 : 38),
+    budgetMaxRisk: Math.max(options.qualityThresholds.budgetMaxRisk || 35, perPersonNight < 70 ? 60 : 52),
+  };
+}
+
 function dealProfile(startDate, nights, levers) {
   const daysOut = daysBetween(toInputDate(today), startDate);
   const weekday = localDate(startDate).getDay();
@@ -2491,6 +2505,12 @@ function skiCostBreakdown(destination, options, nights) {
 function transportOptions(destination, startDate, nights, allowedModes, maxTravelHours, railPrefs, familyPricing, origin, preferredModes = allowedModes) {
   const profile = routeProfile(destination);
   const options = [];
+  const surfaceReach = Math.min(
+    profile.trainHours || Infinity,
+    profile.busHours || Infinity,
+    profile.carHours || Infinity
+  );
+  const nearSurfaceBeatsFlight = ["Deutschland", "Niederlande", "Dänemark", "Polen"].includes(destination.country) && surfaceReach <= maxTravelHours + 3;
   if (allowedModes.includes("flight") && profile.flightHours <= maxTravelHours) {
     const baseFlightPrice = seasonalFlight(destination, startDate) * weekdayDealFactor(startDate, nights, "flight") * bookingWindowFactor(startDate, "flight");
     const airportOptions = airportAccessOptions(origin);
@@ -2517,7 +2537,7 @@ function transportOptions(destination, startDate, nights, allowedModes, maxTrave
           ...(!preferredModes.includes("flight") ? ["Flug als Alternative geprüft"] : []),
         ],
       };
-    }).filter((flight) => flight.hours <= maxTravelHours);
+    }).filter((flight) => flight.hours <= maxTravelHours && (!nearSurfaceBeatsFlight || flight.price < (profile.train || profile.car || 999) * 0.55));
     const nearest = rawFlights.find((flight) => flight.originAirport.nearbyRank === 1);
     rawFlights.forEach((flight) => {
       const role = flightAirportRole(flight, nearest);
@@ -2793,7 +2813,7 @@ function planTrip(event) {
 
     const bestDuration = scored[0] ? `${scored[0].nights} Nächte` : "-";
     document.querySelector("#best-duration").textContent = bestDuration;
-    renderResults(scored, { origin, travelers });
+    renderResults(scored, { origin, travelers, budget });
   } catch (error) {
     results.innerHTML = `<p class="warning">Berechnung konnte nicht abgeschlossen werden: ${error.message}</p>`;
     console.error(error);
@@ -2805,6 +2825,11 @@ function scoreDestinations(allDestinations, includes, excludes, options) {
   if (includes.length) {
     attempts.push({ ...options, maxTravelHours: Math.max(options.maxTravelHours, options.maxTravelHours + 6) });
   }
+  attempts.push({
+    ...options,
+    maxTravelHours: Math.min(36, Math.max(options.maxTravelHours + 6, options.maxTravelHours * 1.7)),
+    budgetRescue: true,
+  });
   if (options.tripMode === "ski") {
     attempts.push({ ...options, maxTravelHours: Math.max(options.maxTravelHours, 16) });
     attempts.push({
@@ -2826,7 +2851,11 @@ function scoreDestinations(allDestinations, includes, excludes, options) {
       .sort((a, b) => (b.placeMatchStrength || 0) - (a.placeMatchStrength || 0) || b.score - a.score || a.total - b.total)
       .slice(0, 12);
     const targetCount = includes.length ? Math.min(12, includes.length) : 3;
-    if (scored.length >= targetCount || attempt === attempts[attempts.length - 1]) return scored;
+    const budgetFits = scored.filter((item) => item.total <= options.budget);
+    if (budgetFits.length >= Math.min(targetCount, 3)) return scored;
+    if (scored.length >= targetCount && attempt.budgetRescue) return scored;
+    if (scored.length >= targetCount && scored.some((item) => item.total <= options.budget * 1.12)) return scored;
+    if (attempt === attempts[attempts.length - 1]) return scored;
   }
   return [];
 }
@@ -2850,7 +2879,8 @@ function makeCandidateNights(targetNights, optimizeNights, travelProfile = "cust
 function bestPlanForDestination(destination, options) {
   if (options.tripMode === "ski" && !destination.ski) return null;
   if (options.travelProfile === "cruise" && !destination.cruise) return null;
-  const stays = stayOptionsForDestination(destination, options.stayTypes, options.comfortFactor, options.qualityThresholds).slice(0, 3);
+  const qualityThresholds = budgetAwareQualityThresholds(options);
+  const stays = stayOptionsForDestination(destination, options.stayTypes, options.comfortFactor, qualityThresholds).slice(0, 4);
   if (!stays.length) return null;
   const vibeMatches = options.vibes.filter((vibe) => destination.vibes.includes(vibe)).length;
   const vibeScore = options.vibes.length ? (vibeMatches / options.vibes.length) * 100 : 70;
@@ -2891,7 +2921,9 @@ function bestPlanForDestination(destination, options) {
           const effectiveTotal = total + timeCost;
           const weather = weatherScore(destination, startDate);
           if (hasLever(options.budgetLevers, "weather") && weather < 55) continue;
-          const budgetScore = Math.max(0, 100 - Math.max(0, effectiveTotal - options.budget) / Math.max(options.budget, 1) * 140);
+          const overBudgetAmount = Math.max(0, total - options.budget);
+          const overBudgetRatio = overBudgetAmount / Math.max(options.budget, 1);
+          const budgetScore = Math.max(0, 100 - Math.max(0, effectiveTotal - options.budget) / Math.max(options.budget, 1) * 180);
           const valueScore = Math.max(0, 100 - effectiveTotal / Math.max(options.budget, 1) * 45);
           const durationBonus = options.travelProfile === "short-trip" ? (nights <= 2 ? 5 : 2) : nights === 8 || nights === 9 ? 4 : 0;
           const travelTimePenalty = Math.max(0, transport.hours - options.timePreference.toleranceHours) * options.timePreference.penaltyWeight;
@@ -2925,11 +2957,15 @@ function bestPlanForDestination(destination, options) {
           const cruiseBonus = options.travelProfile === "cruise" && destination.cruise
             ? Math.min(20, destination.cruise.fit * 0.18 + board.convenience * 0.35)
             : 0;
+          const hardBudgetPenalty = overBudgetRatio <= 0
+            ? 0
+            : overBudgetRatio * 145 + (overBudgetRatio > 0.12 ? 18 : 0) + (overBudgetRatio > 0.35 ? 42 : 0) + (overBudgetRatio > 0.7 ? 60 : 0);
+          const budgetRescueBonus = options.budgetRescue && total <= options.budget * 1.08 ? 10 : 0;
           const score = Math.round(
             budgetScore * 0.34 +
               valueScore * 0.12 +
               vibeScore * 0.2 +
-              qualityScore * options.qualityThresholds.weight * 0.14 +
+              qualityScore * qualityThresholds.weight * 0.14 +
               destination.hidden * options.hiddenFactor * 0.24 +
               (destination.comfort + transport.comfort) / 2 * options.comfortFactor * 0.1 +
               durationBonus -
@@ -2948,7 +2984,9 @@ function bestPlanForDestination(destination, options) {
               keyword.score -
               advisoryModePenalty +
               unusualBonus +
-              cruiseBonus
+              cruiseBonus +
+              budgetRescueBonus -
+              hardBudgetPenalty
           );
           const leverNotes = makeLeverNotes(destination, {
             shoulder,
@@ -2958,7 +2996,7 @@ function bestPlanForDestination(destination, options) {
             weather,
             dealNotes: deal.notes,
             stayQuality: stay.quality,
-            budgetFlexibleQuality: options.qualityThresholds.budgetFlexible,
+            budgetFlexibleQuality: qualityThresholds.budgetFlexible,
             dailyBreakdown: board,
             skiCosts,
             board,
@@ -2997,6 +3035,9 @@ function bestPlanForDestination(destination, options) {
             averagePriceEstimate,
             score,
             overBudget: total > options.budget,
+            overBudgetAmount,
+            overBudgetRatio,
+            budgetRescue: Boolean(options.budgetRescue),
           });
         }
       }
@@ -3007,7 +3048,13 @@ function bestPlanForDestination(destination, options) {
     return `${item.stay.type}-${item.transport.mode}-${airportCode}-${item.startDate}-${item.nights}`;
   };
   const rankedCandidates = candidates
-    .sort((a, b) => b.score - a.score || a.effectiveTotal - b.effectiveTotal)
+    .sort((a, b) => {
+      const bucket = (item) => item.total <= options.budget ? 0 : item.total <= options.budget * 1.08 ? 1 : item.total <= options.budget * 1.25 ? 2 : 3;
+      const bucketDiff = bucket(a) - bucket(b);
+      if (bucketDiff) return bucketDiff;
+      if (bucket(a) >= 2) return a.total - b.total || b.score - a.score;
+      return b.score - a.score || a.effectiveTotal - b.effectiveTotal;
+    })
     .filter((item, index, all) => all.findIndex((other) => candidateKey(other) === candidateKey(item)) === index);
   const bestByMode = ["train", "bus", "flight", "night-train", "car"]
     .map((mode) => rankedCandidates.find((item) => item.transport.mode === mode))
@@ -3384,8 +3431,9 @@ function groupResultsByCountry(items) {
       best: group.items[0],
       score: Math.max(...group.items.map((item) => item.score)),
       minTotal: Math.min(...group.items.map((item) => item.total)),
+      hasBudgetFit: group.items.some((item) => !item.overBudget),
     }))
-    .sort((a, b) => b.score - a.score || a.minTotal - b.minTotal);
+    .sort((a, b) => Number(b.hasBudgetFit) - Number(a.hasBudgetFit) || b.score - a.score || a.minTotal - b.minTotal);
 }
 
 function renderResults(items, context) {
@@ -3396,6 +3444,10 @@ function renderResults(items, context) {
 
   const initiallyVisible = 3;
   const groups = groupResultsByCountry(items);
+  const cheapest = items.reduce((best, item) => item.total < best.total ? item : best, items[0]);
+  const budgetAlert = cheapest.total > context.budget
+    ? `<p class="warning warning--budget">Mit den aktuellen Vorgaben liegt selbst der günstigste Treffer bei ${euro(cheapest.total)} und damit ${euro(cheapest.total - context.budget)} über deinem Budget. Die App zeigt deshalb nur Prüfideen. Mehr Budget, weniger Nächte, mehr Anreisezeit oder einfachere Unterkunft könnten es passend machen.</p>`
+    : "";
   const cards = groups
     .map((group, groupIndex) => {
       const extraClass = groupIndex >= initiallyVisible ? " extra-result is-hidden" : "";
@@ -3425,7 +3477,7 @@ function renderResults(items, context) {
   const showMore = groups.length > initiallyVisible
     ? `<button type="button" class="secondary-button show-more-results">Weitere ${groups.length - initiallyVisible} Länder/Regionen anzeigen</button>`
     : "";
-  results.innerHTML = `${cards}${showMore}`;
+  results.innerHTML = `${budgetAlert}${cards}${showMore}`;
 }
 
 function renderDestinationCard(item, groupRank, itemIndex, context) {
@@ -3520,7 +3572,10 @@ function tripVerdict(item) {
   const rating = item.stay.quality.rating;
 
   if (!item.overBudget) strengths.push("passt ins Budget");
-  if (item.overBudget) cautions.push("liegt ueber Budget");
+  if (item.overBudget) {
+    const percent = Math.round(item.overBudgetRatio * 100);
+    cautions.push(`${euro(item.overBudgetAmount)} ueber Budget${percent >= 8 ? ` (${percent}%)` : ""}`);
+  }
 
   if (item.transport.mode === "bus" && item.transport.hours > 14 && timeMode !== "cheap") {
     cautions.push("sehr lange Busfahrt");
@@ -3543,7 +3598,9 @@ function tripVerdict(item) {
   if (item.averagePriceEstimate) cautions.push("Durchschnittspreis statt Livepreis");
 
   const seriousCaution = item.overBudget || risk > 55 || (item.transport.mode === "bus" && item.transport.hours > 18 && timeMode !== "cheap");
-  const label = seriousCaution
+  const label = item.overBudget
+    ? "Über Budget"
+    : seriousCaution
     ? "Eher pruefen"
     : item.score >= 110 && cautions.length <= 1
       ? "Top-Kandidat"
