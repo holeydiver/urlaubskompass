@@ -3908,6 +3908,63 @@ function bookingReadiness(item) {
   };
 }
 
+function unitNumber(value) {
+  return Number.isInteger(value) ? String(value) : value.toFixed(1).replace(".", ",");
+}
+
+function costBreakdownRows(item) {
+  const family = item.familyPricing || { livingUnits: 1 };
+  const rows = [
+    {
+      label: item.destination.cruise ? "Kabine/Route" : "Unterkunft",
+      amount: item.lodgingTotal,
+      formula: item.verifiedLodging
+        ? `${item.verifiedLodging.label}, live geprüft`
+        : item.liveLodgingRequired
+          ? "Planwert, Livepreis offen"
+          : "Saison-/Durchschnittswert",
+    },
+    {
+      label: "Anreise",
+      amount: item.transportTotal,
+      formula: `${item.transport.label}, Gesamtansatz für Hin/Rück bzw. Reisegruppe`,
+    },
+    {
+      label: item.destination.cruise ? "Bordextras" : "Alltag vor Ort",
+      amount: item.livingTotal,
+      formula: `${euro(item.effectiveDaily)} p. P./Tag × ${unitNumber(family.livingUnits || 1)} Kosten-Einheiten × ${item.nights} Tag${item.nights === 1 ? "" : "e"}`,
+    },
+  ];
+  if (item.skiTotal) {
+    rows.push({
+      label: "Ski/Winter",
+      amount: item.skiTotal,
+      formula: "Skipass, Ausrüstung und lokale Skikosten",
+    });
+  }
+  return rows;
+}
+
+function renderCostBreakdown(item) {
+  const rows = costBreakdownRows(item);
+  return `
+    <div class="cost-breakdown" aria-label="Kostenrechnung">
+      <strong>So rechnet die App</strong>
+      ${rows.map((row) => `
+        <div>
+          <span>${row.label}</span>
+          <em>${row.formula}</em>
+          <b>${euro(row.amount)}</b>
+        </div>
+      `).join("")}
+      <div class="cost-breakdown__total">
+        <span>Gesamt</span>
+        <b>${euro(item.total)}</b>
+      </div>
+    </div>
+  `;
+}
+
 function tripVerdict(item) {
   const strengths = [];
   const cautions = [];
@@ -4042,6 +4099,7 @@ function renderBestTripPreview(item, context) {
           ${transportNotes}
         </div>
       </div>
+      ${renderCostBreakdown(item)}
       ${specialExperience(item)}
       ${cruiseExperience(item)}
       <div class="trip-verdict trip-verdict--${verdict.tone}">
@@ -4238,6 +4296,7 @@ function renderTripOption(item, index, context) {
         <div><span>${item.destination.cruise ? "Kabine" : "Unterkunft"}</span><strong>${lodgingPriceLabel}</strong></div>
         <div><span>${item.destination.cruise ? "Bordextras" : "Alltag"}</span><strong>${euro(item.effectiveDaily)} p. P./Tag</strong></div>
       </div>
+      ${renderCostBreakdown(item)}
       <div class="quality-line">
         <span>${item.stay.quality.rating.toFixed(1)}★</span>
         <span>${item.stay.quality.reviews} Reviews</span>

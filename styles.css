@@ -812,6 +812,57 @@ dd {
   line-height: 1.35;
 }
 
+.cost-breakdown {
+  border: 1px solid #d8e5df;
+  border-radius: 6px;
+  padding: 10px;
+  background: #fff;
+  display: grid;
+  gap: 7px;
+}
+
+.cost-breakdown > strong {
+  color: var(--ink);
+  font-size: 0.9rem;
+}
+
+.cost-breakdown div {
+  display: grid;
+  grid-template-columns: minmax(84px, 0.8fr) minmax(0, 2fr) auto;
+  gap: 8px;
+  align-items: baseline;
+  border-top: 1px solid #edf2ef;
+  padding-top: 7px;
+}
+
+.cost-breakdown span {
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 850;
+}
+
+.cost-breakdown em {
+  color: #405044;
+  font-style: normal;
+  font-size: 0.82rem;
+  line-height: 1.3;
+}
+
+.cost-breakdown b {
+  color: var(--ink);
+  text-align: right;
+}
+
+.cost-breakdown .cost-breakdown__total {
+  border-top: 2px solid #d8e5df;
+}
+
+.cost-breakdown__total span,
+.cost-breakdown__total b {
+  color: var(--blue);
+  font-size: 0.95rem;
+}
+
 .mini-note--budget {
   border-left: 4px solid var(--rose);
   padding: 8px 10px;
@@ -932,6 +983,16 @@ dd {
   color: #405044;
   font-size: 0.84rem;
   line-height: 1.35;
+}
+
+@media (max-width: 640px) {
+  .cost-breakdown div {
+    grid-template-columns: 1fr auto;
+  }
+
+  .cost-breakdown em {
+    grid-column: 1 / -1;
+  }
 }
 
 .cruise-advisor__note {
