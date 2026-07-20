@@ -2502,6 +2502,65 @@ function skiCostBreakdown(destination, options, nights) {
   return { total: Math.round(total), passTotal: Math.round(passTotal), rentalTotal: Math.round(rentalTotal), transferTotal: Math.round(transferTotal), dailyEquivalent: Math.round(total / Math.max(nights * family.skiPassUnits, 1)), notes, score, skiDays };
 }
 
+function normalizeDisplayPlace(value) {
+  const trimmed = String(value || "").trim();
+  if (!trimmed) return "";
+  const aliases = {
+    lubeck: "Lübeck",
+    lübeck: "Lübeck",
+    hamburg: "Hamburg",
+    berlin: "Berlin",
+    kiel: "Kiel",
+    rostock: "Rostock",
+    bremen: "Bremen",
+    hannover: "Hannover",
+    munchen: "München",
+    muenchen: "München",
+    koln: "Köln",
+    koeln: "Köln",
+  };
+  const normalized = normalizePlaceName(trimmed);
+  return aliases[normalized] || trimmed.replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
+
+function busOriginGateway(origin) {
+  const normalized = normalizePlaceName(origin);
+  const gateways = [
+    { match: ["lubeck", "lübeck"], city: "Hamburg", accessLabel: "Zubringer Bahn Lübeck → Hamburg ZOB", accessCost: 14, accessHours: 1.1 },
+    { match: ["kiel"], city: "Hamburg", accessLabel: "Zubringer Bahn Kiel → Hamburg ZOB", accessCost: 18, accessHours: 1.4 },
+    { match: ["rostock"], city: "Berlin", accessLabel: "Zubringer Bahn Rostock → Berlin ZOB", accessCost: 22, accessHours: 2.5 },
+    { match: ["schwerin"], city: "Hamburg", accessLabel: "Zubringer Bahn Schwerin → Hamburg ZOB", accessCost: 16, accessHours: 1.5 },
+    { match: ["potsdam"], city: "Berlin", accessLabel: "Zubringer Bahn Potsdam → Berlin ZOB", accessCost: 5, accessHours: 0.8 },
+  ];
+  const gateway = gateways.find((entry) => entry.match.some((term) => normalized.includes(term)));
+  if (gateway) return gateway;
+  return { city: normalizeDisplayPlace(origin) || "Hamburg", accessLabel: "", accessCost: 0, accessHours: 0 };
+}
+
+function busDestinationGateway(destination) {
+  const cityMap = {
+    Bansko: { city: "Sofia", accessLabel: "Transfer Sofia → Bansko", accessCost: 14, accessHours: 3 },
+    Plovdiv: { city: "Sofia", accessLabel: "Bahn/Bus Sofia → Plovdiv", accessCost: 8, accessHours: 2 },
+    Sarajevo: { city: "Sarajevo", accessLabel: "", accessCost: 0, accessHours: 0 },
+    Amsterdam: { city: "Amsterdam", accessLabel: "", accessCost: 0, accessHours: 0 },
+    "Zeeland & Südholland Küste": { city: "Rotterdam", accessLabel: "Regionalzug Rotterdam → Küste/Zeeland", accessCost: 12, accessHours: 1.3 },
+    "Polnische Ostsee": { city: "Danzig", accessLabel: "Regionalzug/Bus Danzig → Küstenort", accessCost: 8, accessHours: 1 },
+    Zakopane: { city: "Krakau", accessLabel: "Bus/Bahn Krakau → Zakopane", accessCost: 9, accessHours: 2.4 },
+  };
+  if (cityMap[destination.city]) return cityMap[destination.city];
+  const countryMap = {
+    Bulgarien: { city: "Sofia", accessLabel: `Transfer Sofia → ${destination.city}`, accessCost: 14, accessHours: 3 },
+    Kroatien: { city: "Zagreb", accessLabel: `Weiterfahrt Zagreb → ${destination.city}`, accessCost: 16, accessHours: 2.5 },
+    Montenegro: { city: "Podgorica", accessLabel: `Weiterfahrt Podgorica → ${destination.city}`, accessCost: 14, accessHours: 2.5 },
+    Albanien: { city: "Tirana", accessLabel: `Weiterfahrt Tirana → ${destination.city}`, accessCost: 14, accessHours: 2.5 },
+    Serbien: { city: "Belgrad", accessLabel: `Weiterfahrt Belgrad → ${destination.city}`, accessCost: 10, accessHours: 1.5 },
+    Polen: { city: "Danzig", accessLabel: `Weiterfahrt Danzig → ${destination.city}`, accessCost: 9, accessHours: 1.5 },
+    Österreich: { city: "Wien", accessLabel: `Bahn/Bus Wien → ${destination.city}`, accessCost: 18, accessHours: 2.5 },
+    Schweiz: { city: "Zürich", accessLabel: `Bahn Zürich → ${destination.city}`, accessCost: 28, accessHours: 2.5 },
+  };
+  return countryMap[destination.country] || { city: destination.city, accessLabel: "", accessCost: 0, accessHours: 0 };
+}
+
 function transportOptions(destination, startDate, nights, allowedModes, maxTravelHours, railPrefs, familyPricing, origin, preferredModes = allowedModes, travelPolicy = {}) {
   const profile = routeProfile(destination);
   const options = [];
@@ -2578,18 +2637,37 @@ function transportOptions(destination, startDate, nights, allowedModes, maxTrave
       notes: railPricing.notes,
     });
   }
-  if (allowedModes.includes("bus") && profile.bus && profile.busHours <= busHourLimit) {
+  if (allowedModes.includes("bus") && profile.bus) {
+    const busOrigin = busOriginGateway(origin);
+    const busDestination = busDestinationGateway(destination);
+    const busHours = Number((profile.busHours + busOrigin.accessHours + busDestination.accessHours).toFixed(1));
+    const busPrice = Math.round(profile.bus * weekdayDealFactor(startDate, nights, "bus") * bookingWindowFactor(startDate, "bus") + busOrigin.accessCost + busDestination.accessCost);
+    if (busHours > busHourLimit) {
+      // Too long even for the current time policy.
+    } else {
+    const busLabel = busOrigin.accessLabel && busDestination.accessLabel
+      ? "Bahn + FlixBus + Transfer"
+      : busOrigin.accessLabel
+        ? "Bahn + FlixBus/Bus"
+        : busDestination.accessLabel
+          ? "FlixBus + Transfer"
+          : "FlixBus/Bus";
     options.push({
       mode: "bus",
-      label: "FlixBus/Bus",
-      price: Math.round(profile.bus * weekdayDealFactor(startDate, nights, "bus") * bookingWindowFactor(startDate, "bus")),
-      hours: profile.busHours,
+      label: busLabel,
+      price: busPrice,
+      hours: busHours,
       comfort: profile.busComfort,
+      originHub: busOrigin,
+      destinationHub: busDestination,
       notes: [
-        "FlixBus prüfen",
-        ...(profile.busHours > maxTravelHours ? ["über Zeitlimit, aber Budget-Rettung"] : []),
+        `FlixBus ${busOrigin.city} → ${busDestination.city}`,
+        ...(busOrigin.accessLabel ? [busOrigin.accessLabel] : []),
+        ...(busDestination.accessLabel ? [busDestination.accessLabel] : []),
+        ...(busHours > maxTravelHours ? ["über Zeitlimit, aber Budget-Rettung"] : []),
       ],
     });
+    }
   }
   if (allowedModes.includes("car") && profile.car && profile.carHours <= maxTravelHours) {
     options.push({
@@ -3168,8 +3246,8 @@ function flixbusSearchUrl(item, context) {
     .split(/\s+(?:und|oder|and|or)\s+|&|,|:|\//)[0]
     .trim()
     .replace(/\s+/g, "-");
-  const originSlug = routeSlug(context.origin);
-  const destinationSlug = routeSlug(item.destination.city);
+  const originSlug = routeSlug(item.transport.originHub?.city || context.origin);
+  const destinationSlug = routeSlug(item.transport.destinationHub?.city || item.destination.city);
   if (originSlug && destinationSlug) {
     return `https://www.flixbus.de/busverbindung/fernbus-${originSlug}-${destinationSlug}`;
   }
@@ -3355,9 +3433,7 @@ function bookingLinks(item, context) {
     flights: flightSearchUrl(item, context),
     train: bahnSearchUrl(item, context),
     nightTrain: bahnSearchUrl(item, context),
-    bus: searchUrl("https://www.omio.de/suchen", {
-      q: `Bus ${routeQuery}`,
-    }),
+    bus: flixbusSearchUrl(item, context),
     flixbus: flixbusSearchUrl(item, context),
     car: searchUrl("https://www.google.com/maps/dir/", {
       api: 1,
@@ -3875,8 +3951,15 @@ function concreteTransportPlan(item, context) {
       detail: "Liege-/Schlafwagen und Ankunftszeit prüfen; spart ggf. eine Hotelnacht, kostet aber Komfort",
     },
     bus: {
-      title: `FlixBus ${context.origin} → ${destination}`,
-      detail: "Abfahrts-/Ankunftszeit, Pausen und Lage des Busbahnhofs prüfen",
+      title: item.transport.originHub || item.transport.destinationHub
+        ? `${item.transport.originHub?.city || context.origin} → ${item.transport.destinationHub?.city || destination} per FlixBus`
+        : `FlixBus ${context.origin} → ${destination}`,
+      detail: [
+        item.transport.originHub?.accessLabel,
+        `Fernbus ${item.transport.originHub?.city || context.origin} → ${item.transport.destinationHub?.city || destination}`,
+        item.transport.destinationHub?.accessLabel,
+        "Abfahrts-/Ankunftszeit, Pausen und Lage des Busbahnhofs prüfen",
+      ].filter(Boolean).join("; "),
     },
     car: {
       title: `Auto ${context.origin} → ${destination}`,
@@ -3902,8 +3985,11 @@ function renderTripOption(item, index, context) {
         : item.transport.mode === "car"
           ? links.car
           : links.bus;
+  const busPerPerson = item.transport.mode === "bus"
+    ? euro(Math.round(item.transport.price))
+    : "";
   const transportLinkLabel = item.transport.mode === "bus"
-    ? "Bus bei Omio suchen"
+    ? `FlixBus-Strecke ab ca. ${busPerPerson} p. P.`
     : item.transport.mode === "flight"
       ? "Konkrete Flüge suchen"
       : `${item.transport.label} prüfen`;
@@ -3912,7 +3998,7 @@ function renderTripOption(item, index, context) {
   const stayCostLabel = item.destination.cruise ? "Kabine" : stayName;
   const transportPriceLabel = `${euro(item.transportTotal)} gesamt`;
   const busLinkNote = item.transport.mode === "bus"
-    ? `<p class="link-note">Omio öffnet die datierte Bus-Suche. Der FlixBus-Direktlink öffnet die stabile Streckenseite; Datum und Rückfahrt dort final wählen, weil FlixBus einfache URL-Parameter für Start/Ziel nicht zuverlässig übernimmt.</p>`
+    ? `<p class="link-note">Bus-Schätzung: ${item.transport.notes.join(" · ")}. Der Link öffnet die stabile FlixBus-Streckenseite; Datum, Rückfahrt und verfügbare Plätze dort final wählen.</p>`
     : "";
   const flightLinkNote = item.transport.mode === "flight"
     ? `<p class="link-note">${item.transport.advisory ? "Flug war nicht als Hauptanreise ausgewählt, wird hier aber als prüfenswerte Alternative gezeigt, weil Preis/Reisezeit mithalten können. " : ""}${hasFlightCodes ? "Der Fluglink nutzt erkannte Flughafen-Codes und öffnet eine konkrete Hin-/Rückflug-Suche. Kinderpreise, Gepäck und alternative Flughäfen bitte in der Buchungsseite final prüfen." : "Für diese Start-/Zielkombination fehlt noch ein sicherer Flughafen-Code; der Link öffnet deshalb eine gezielte Websuche statt einer leeren Flugseite."}</p>`
@@ -3973,7 +4059,7 @@ function renderTripOption(item, index, context) {
       <nav class="links" aria-label="Buchungslinks für ${item.destination.city}, Reise ${index + 1}">
         <a href="${transportLink}" target="_blank" rel="noreferrer">${transportLinkLabel}</a>
         <a href="${primaryStayLink}" target="_blank" rel="noreferrer">${primaryStayLabel}</a>
-        ${item.transport.mode === "bus" ? `<a href="${links.flixbus}" target="_blank" rel="noreferrer">FlixBus direkt öffnen</a>` : ""}
+        ${item.transport.mode === "bus" && links.flixbus !== transportLink ? `<a href="${links.flixbus}" target="_blank" rel="noreferrer">FlixBus direkt öffnen</a>` : ""}
         ${item.destination.cruise ? links.cruise.compare.map((link) => `<a href="${link.href}" target="_blank" rel="noreferrer">${link.label}</a>`).join("") : `<a href="${links.booking}" target="_blank" rel="noreferrer">${lodgingSearchLabel(item, "booking")}</a><a href="${links.airbnb}" target="_blank" rel="noreferrer">${lodgingSearchLabel(item, "airbnb")}</a>`}
         ${links.special ? `<a href="${links.special}" target="_blank" rel="noreferrer">Besondere Idee suchen</a>` : ""}
         <a href="${links.maps}" target="_blank" rel="noreferrer">Karte öffnen</a>
