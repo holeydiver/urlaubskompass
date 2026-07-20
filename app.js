@@ -1044,6 +1044,71 @@ const today = new Date("2026-07-20T00:00:00");
 const form = document.querySelector("#trip-form");
 const results = document.querySelector("#results");
 const storageKey = "urlaubskompass-form-v11";
+
+const regionIncludeAliases = {
+  balkan: ["Montenegro", "Albanien", "Bosnien und Herzegowina", "Kroatien", "Serbien", "Kosovo", "Nordmazedonien", "Bulgarien", "Rumänien", "Slowenien"],
+  balkans: ["Montenegro", "Albanien", "Bosnien und Herzegowina", "Kroatien", "Serbien", "Kosovo", "Nordmazedonien", "Bulgarien", "Rumänien", "Slowenien"],
+  osteuropa: ["Polen", "Tschechien", "Slowakei", "Ungarn", "Rumänien", "Bulgarien", "Serbien", "Ukraine", "Moldau", "Litauen", "Lettland", "Estland"],
+  "osteuropa": ["Polen", "Tschechien", "Slowakei", "Ungarn", "Rumänien", "Bulgarien", "Serbien", "Ukraine", "Moldau", "Litauen", "Lettland", "Estland"],
+  "ost-europa": ["Polen", "Tschechien", "Slowakei", "Ungarn", "Rumänien", "Bulgarien", "Serbien", "Ukraine", "Moldau", "Litauen", "Lettland", "Estland"],
+  nordafrika: ["Marokko", "Tunesien", "Ägypten", "Algerien"],
+  "nord-afrika": ["Marokko", "Tunesien", "Ägypten", "Algerien"],
+  skandinavien: ["Dänemark", "Schweden", "Norwegen", "Finnland"],
+  nordeuropa: ["Dänemark", "Schweden", "Norwegen", "Finnland", "Island", "Estland", "Lettland", "Litauen"],
+  baltikum: ["Estland", "Lettland", "Litauen"],
+  benelux: ["Niederlande", "Belgien", "Luxemburg"],
+  alpen: ["Österreich", "Schweiz", "Deutschland", "Italien", "Slowenien", "Frankreich"],
+  uk: ["England", "Schottland", "Wales", "Irland"],
+  grossbritannien: ["England", "Schottland", "Wales"],
+  großbritannien: ["England", "Schottland", "Wales"],
+  "vereinigtes königreich": ["England", "Schottland", "Wales"],
+  "vereinigtes konigreich": ["England", "Schottland", "Wales"],
+  kaukasus: ["Georgien", "Armenien", "Aserbaidschan"],
+};
+
+const fallbackRegionDefaults = {
+  "Nordafrika": { daily: 42, lodging: { airbnb: 58, hotel: 82, pension: 48 }, flightBase: 230, season: 1.28, route: { flightHours: 7, train: null, trainHours: null, bus: null, busHours: null, car: null, carHours: null, railComfort: 0, busComfort: 0, carComfort: 0 } },
+  "Balkan": { daily: 38, lodging: { airbnb: 54, hotel: 74, pension: 44 }, flightBase: 190, season: 1.22, route: { flightHours: 6.2, train: 155, trainHours: 18, nightTrain: 140, nightTrainHours: 20, bus: 82, busHours: 24, car: 260, carHours: 16, railComfort: 50, nightComfort: 60, busComfort: 42, carComfort: 54 } },
+  "Osteuropa": { daily: 44, lodging: { airbnb: 62, hotel: 86, pension: 52 }, flightBase: 155, season: 1.16, route: { flightHours: 5, train: 125, trainHours: 12, nightTrain: 115, nightTrainHours: 13.5, bus: 70, busHours: 15, car: 165, carHours: 9, railComfort: 68, nightComfort: 70, busComfort: 50, carComfort: 62 } },
+  "Nordeuropa": { daily: 78, lodging: { airbnb: 118, hotel: 155, pension: 102 }, flightBase: 185, season: 1.3, route: { flightHours: 5, train: 165, trainHours: 13, nightTrain: 150, nightTrainHours: 15, bus: 95, busHours: 18, car: 230, carHours: 13, railComfort: 68, nightComfort: 68, busComfort: 44, carComfort: 58 } },
+  "Westeuropa": { daily: 76, lodging: { airbnb: 112, hotel: 148, pension: 94 }, flightBase: 165, season: 1.24, route: { flightHours: 5, train: 145, trainHours: 10, nightTrain: 130, nightTrainHours: 12, bus: 82, busHours: 15, car: 210, carHours: 10, railComfort: 72, nightComfort: 70, busComfort: 48, carComfort: 60 } },
+  "Südeuropa": { daily: 58, lodging: { airbnb: 84, hotel: 112, pension: 70 }, flightBase: 185, season: 1.3, route: { flightHours: 5.5, train: 165, trainHours: 13, nightTrain: 140, nightTrainHours: 15, bus: 92, busHours: 20, car: 245, carHours: 14, railComfort: 62, nightComfort: 66, busComfort: 44, carComfort: 56 } },
+  "Fernziel": { daily: 52, lodging: { airbnb: 74, hotel: 104, pension: 62 }, flightBase: 520, season: 1.18, route: { flightHours: 13, train: null, trainHours: null, bus: null, busHours: null, car: null, carHours: null, railComfort: 0, busComfort: 0, carComfort: 0 } },
+};
+
+const fallbackCountryCatalog = [
+  ["Belgien", "Westeuropa", "Brüssel, Antwerpen, Gent oder Küste", "Brüssel oder Antwerpen", ["stadt", "kultur", "essen"], ["belgium", "flandern", "brügge", "bruegge"]],
+  ["Luxemburg", "Westeuropa", "Luxemburg Stadt oder Müllerthal", "Luxemburg", ["stadt", "natur", "kultur"], ["luxembourg", "mullerthal", "müllerthal"]],
+  ["Frankreich", "Westeuropa", "Elsass, Bretagne, Normandie oder Okzitanien", "Paris, Basel, Nizza oder regional", ["strand", "stadt", "natur", "essen"], ["france", "elsass", "bretagne", "normandie"]],
+  ["Spanien", "Südeuropa", "Nordspanien, Andalusien, Valencia oder Kanaren", "Madrid, Barcelona, Málaga oder Valencia", ["strand", "stadt", "natur", "essen"], ["spain", "andalusien", "valencia", "kanaren", "mallorca"]],
+  ["Malta", "Südeuropa", "Malta und Gozo", "Malta", ["strand", "stadt", "kultur", "essen"], ["gozo"]],
+  ["Zypern", "Südeuropa", "Larnaka, Paphos oder Polis", "Larnaka oder Paphos", ["strand", "natur", "kultur"], ["cyprus", "paphos", "larnaka"]],
+  ["Türkei", "Südeuropa", "Lykische Küste, Izmir oder Kappadokien", "Antalya, Izmir oder Istanbul", ["strand", "stadt", "natur", "essen"], ["turkei", "türkei", "turkey", "lykien", "kappadokien"]],
+  ["Tschechien", "Osteuropa", "Prag, Brünn, Böhmisches Paradies oder Südböhmen", "Prag", ["stadt", "natur", "kultur", "essen"], ["tschechei", "czech", "prag", "brno", "brünn"]],
+  ["Slowakei", "Osteuropa", "Bratislava, Hohe Tatra oder Košice", "Bratislava oder Wien", ["berge", "natur", "stadt"], ["slovakia", "tatra", "bratislava"]],
+  ["Ungarn", "Osteuropa", "Budapest, Balaton oder Pécs", "Budapest", ["stadt", "wasser", "essen", "kultur"], ["hungary", "budapest", "balaton"]],
+  ["Rumänien", "Osteuropa", "Transsilvanien, Bukarest oder Donaudelta", "Bukarest, Cluj oder Sibiu", ["berge", "natur", "stadt", "kultur"], ["romania", "siebenbürgen", "transsilvanien"]],
+  ["Serbien", "Balkan", "Belgrad, Novi Sad oder Tara-Nationalpark", "Belgrad", ["stadt", "natur", "essen"], ["serbia", "belgrad", "novi sad"]],
+  ["Kosovo", "Balkan", "Prizren, Peja oder Rugova", "Pristina", ["berge", "stadt", "kultur"], ["prizren", "pristina"]],
+  ["Moldau", "Osteuropa", "Chișinău und Weinregionen", "Chișinău", ["stadt", "essen", "kultur"], ["moldova", "moldawien"]],
+  ["Ukraine", "Osteuropa", "Lwiw, Karpaten oder Kyjiw", "Krakau/Rzeszów plus Bahn oder Kyjiw", ["stadt", "kultur", "natur"], ["ukraine", "lwiw", "lviv", "kiew", "kyiv"]],
+  ["Litauen", "Osteuropa", "Vilnius, Kaunas oder Kurische Nehrung", "Vilnius oder Kaunas", ["stadt", "natur", "wasser"], ["lithuania", "vilnius", "kurische nehrung"]],
+  ["Lettland", "Osteuropa", "Riga, Gauja oder Ostseeküste", "Riga", ["stadt", "natur", "wasser"], ["latvia", "riga"]],
+  ["Estland", "Osteuropa", "Tallinn, Inseln oder Lahemaa", "Tallinn", ["stadt", "natur", "wasser"], ["estonia", "tallinn", "saaremaa"]],
+  ["Norwegen", "Nordeuropa", "Bergen, Fjorde, Lofoten oder Südnorwegen", "Oslo, Bergen oder Stavanger", ["berge", "natur", "wasser"], ["norway", "fjorde", "lofoten"]],
+  ["Finnland", "Nordeuropa", "Helsinki, Seenplatte oder Lappland", "Helsinki", ["natur", "wasser", "stadt"], ["finland", "seenplatte", "lappland"]],
+  ["Island", "Nordeuropa", "Reykjavík, Südküste oder Westfjorde", "Keflavík", ["natur", "berge", "wasser"], ["iceland", "reykjavik", "westfjorde"]],
+  ["Wales", "Westeuropa", "Snowdonia, Pembrokeshire oder Cardiff", "Manchester, Bristol oder Cardiff", ["berge", "natur", "strand"], ["cymru", "snowdonia", "pembrokeshire"]],
+  ["Irland", "Westeuropa", "Galway, Kerry, Cork oder Dublin", "Dublin, Cork oder Shannon", ["natur", "stadt", "kultur"], ["ireland", "galway", "kerry"]],
+  ["Tunesien", "Nordafrika", "Tunis, Hammamet, Djerba oder Sousse", "Tunis, Monastir oder Djerba", ["strand", "stadt", "kultur"], ["tunisia", "djerba", "sousse"]],
+  ["Ägypten", "Nordafrika", "Alexandria, Luxor, Rotes Meer oder Kairo", "Kairo, Hurghada oder Luxor", ["strand", "kultur", "stadt"], ["aegypten", "egypt", "rotes meer", "luxor"]],
+  ["Algerien", "Nordafrika", "Algier, Oran oder Mittelmeerküste", "Algier oder Oran", ["stadt", "strand", "kultur"], ["algeria", "algier", "oran"]],
+  ["Armenien", "Fernziel", "Jerewan, Dilidschan oder Sewansee", "Jerewan", ["berge", "natur", "kultur"], ["armenia", "yerevan", "jerewan"]],
+  ["Aserbaidschan", "Fernziel", "Baku, Kaukasus oder Kaspisches Meer", "Baku", ["stadt", "kultur", "wasser"], ["azerbaijan", "baku"]],
+  ["Japan", "Fernziel", "Kyushu, Kansai, Hokkaido oder Setouchi", "Tokio, Osaka oder Fukuoka", ["stadt", "natur", "essen"], ["kyushu", "hokkaido", "kansai"]],
+  ["Thailand", "Fernziel", "Chiang Mai, Krabi, Koh Lanta oder Bangkok", "Bangkok, Phuket oder Krabi", ["strand", "stadt", "essen", "natur"], ["thai", "krabi", "koh lanta"]],
+  ["Vietnam", "Fernziel", "Da Nang, Hoi An, Hanoi oder Mekongdelta", "Hanoi, Da Nang oder Ho-Chi-Minh-Stadt", ["strand", "stadt", "essen", "natur"], ["hoi an", "danang", "mekong"]],
+].map(([country, region, focus, airport, vibes, aliases]) => ({ country, region, focus, airport, vibes, aliases }));
 const holidayPresets = {
   SH: {
     label: "Schleswig-Holstein",
@@ -1357,6 +1422,72 @@ function listFromInput(id) {
     .filter(Boolean);
 }
 
+function expandPlaceIncludes(includes) {
+  const expanded = new Set(includes);
+  includes.forEach((item) => {
+    (regionIncludeAliases[item] || []).forEach((country) => expanded.add(country.toLowerCase()));
+  });
+  return [...expanded];
+}
+
+function fallbackCountriesForIncludes(includes) {
+  if (!includes.length) return [];
+  const requested = new Set(expandPlaceIncludes(includes));
+  const requestedList = [...requested];
+  return fallbackCountryCatalog.filter((entry) => {
+    const terms = [entry.country, entry.region, entry.focus, ...(entry.aliases || [])].map((item) => item.toLowerCase());
+    return terms.some((term) => requested.has(term) || requestedList.some((item) => term.includes(item) || item.includes(term)));
+  });
+}
+
+function destinationsForSearch(includes) {
+  const existingCountries = new Set(destinations.map((destination) => destination.country.toLowerCase()));
+  const generated = fallbackCountriesForIncludes(includes)
+    .filter((entry) => !existingCountries.has(entry.country.toLowerCase()))
+    .map((entry) => fallbackDestination(entry));
+  return [...destinations, ...generated];
+}
+
+function fallbackDestination(entry) {
+  const defaults = fallbackRegionDefaults[entry.region] || fallbackRegionDefaults.Fernziel;
+  const lowerCost = ["Balkan", "Osteuropa", "Nordafrika"].includes(entry.region);
+  const highCost = ["Nordeuropa", "Westeuropa"].includes(entry.region);
+  return {
+    city: `${entry.country}: ${entry.focus}`,
+    country: entry.country,
+    region: `${entry.region} · automatisch ergänzt`,
+    searchQuery: `${entry.focus} ${entry.country} Budget Unterkunft`,
+    airport: entry.airport,
+    vibes: entry.vibes,
+    hidden: lowerCost ? 76 : highCost ? 62 : 68,
+    comfort: highCost ? 78 : lowerCost ? 64 : 70,
+    daily: defaults.daily,
+    living: {
+      groceries: Math.round(defaults.daily * 0.52),
+      restaurants: Math.round(defaults.daily * 0.78),
+      localTransport: Math.max(5, Math.round(defaults.daily * 0.14)),
+      activities: Math.max(10, Math.round(defaults.daily * 0.28)),
+    },
+    lodging: defaults.lodging,
+    flightBase: defaults.flightBase,
+    season: defaults.season,
+    shoulderMonths: [4, 5, 6, 9, 10],
+    touristLoad: highCost ? 64 : 48,
+    kitchenSavings: highCost ? 24 : 14,
+    localSavings: lowerCost ? 12 : 10,
+    nearbyAirport: true,
+    route: defaults.route,
+    fallback: true,
+    unusual: {
+      label: `${entry.country} als Suchraum öffnen`,
+      search: `${entry.focus} ${entry.country} ungewöhnliche Unterkunft Budget`,
+      fit: lowerCost ? 78 : 66,
+      note: "automatischer Länder-Vorschlag: gute Kandidaten müssen über Unterkunftsreviews und konkrete Anreise gegengeprüft werden",
+    },
+    why: `Noch keine kuratierte Geheimtipp-Region im Katalog. Die App öffnet ${entry.country} trotzdem als Suchraum und schätzt Unterkunft, Alltag und Anreise grob für ${entry.focus}.`,
+  };
+}
+
 function keywordTagsFromInput(value) {
   return value
     .toLowerCase()
@@ -1598,6 +1729,7 @@ function routeProfile(destination) {
   if (destination.cruise) {
     return { flightHours: 4, train: 95, trainHours: 6.5, nightTrain: 120, nightTrainHours: 10, bus: 62, busHours: 9, car: 115, carHours: 5.5, railComfort: 78, nightComfort: 72, busComfort: 52, carComfort: 70 };
   }
+  if (destination.route) return destination.route;
   const country = destination.country.toLowerCase();
   const profiles = {
     "italien": { flightHours: 5, train: 170, trainHours: 10, nightTrain: 135, nightTrainHours: 13, bus: 95, busHours: 17, car: 230, carHours: 13, railComfort: 74, nightComfort: 76, busComfort: 48, carComfort: 62 },
@@ -2129,6 +2261,10 @@ function stayOptionsForDestination(destination, allowedStayTypes, comfortFactor,
 }
 
 function placeSearchText(destination) {
+  const catalogAliases = fallbackCountryCatalog
+    .filter((entry) => entry.country === destination.country)
+    .flatMap((entry) => [entry.region, ...(entry.aliases || [])])
+    .join(" ");
   const aliases = {
     England: "Großbritannien Grossbritannien UK United Kingdom Vereinigtes Königreich",
     Schottland: "Großbritannien Grossbritannien UK United Kingdom Vereinigtes Königreich Scotland",
@@ -2138,6 +2274,7 @@ function placeSearchText(destination) {
     destination.city,
     destination.country,
     aliases[destination.country],
+    catalogAliases,
     destination.region,
     destination.searchQuery,
     destination.airport,
@@ -2198,7 +2335,8 @@ function planTrip(event) {
   const tripMode = document.querySelector("#trip-mode").value;
   const travelProfile = document.querySelector("#travel-profile").value;
   const keywordTags = keywordTagsFromInput(document.querySelector("#keyword-input").value);
-  const includes = listFromInput("#include-countries");
+  const rawIncludes = listFromInput("#include-countries");
+  const includes = expandPlaceIncludes(rawIncludes);
   const excludes = listFromInput("#exclude-countries");
   const hiddenFactor = Number(document.querySelector("#hidden-factor").value) / 100;
   const comfortFactor = Number(document.querySelector("#comfort-factor").value) / 100;
@@ -2269,7 +2407,7 @@ function planTrip(event) {
       keywordTags,
       travelProfile,
     };
-    const scored = scoreDestinations(destinations, includes, excludes, baseOptions);
+    const scored = scoreDestinations(destinationsForSearch(rawIncludes), includes, excludes, baseOptions);
 
     const bestDuration = scored[0] ? `${scored[0].nights} Nächte` : "-";
     document.querySelector("#best-duration").textContent = bestDuration;
@@ -2282,6 +2420,9 @@ function planTrip(event) {
 
 function scoreDestinations(allDestinations, includes, excludes, options) {
   const attempts = [options];
+  if (includes.length) {
+    attempts.push({ ...options, maxTravelHours: Math.max(options.maxTravelHours, options.maxTravelHours + 6) });
+  }
   if (options.tripMode === "ski") {
     attempts.push({ ...options, maxTravelHours: Math.max(options.maxTravelHours, 16) });
     attempts.push({
@@ -2302,7 +2443,8 @@ function scoreDestinations(allDestinations, includes, excludes, options) {
       .filter(Boolean)
       .sort((a, b) => (b.placeMatchStrength || 0) - (a.placeMatchStrength || 0) || b.score - a.score || a.total - b.total)
       .slice(0, 12);
-    if (attempt.tripMode !== "ski" || scored.length >= 3 || attempt === attempts[attempts.length - 1]) return scored;
+    const targetCount = includes.length ? Math.min(12, includes.length) : 3;
+    if (scored.length >= targetCount || attempt === attempts[attempts.length - 1]) return scored;
   }
   return [];
 }
