@@ -2502,9 +2502,13 @@ function skiCostBreakdown(destination, options, nights) {
   return { total: Math.round(total), passTotal: Math.round(passTotal), rentalTotal: Math.round(rentalTotal), transferTotal: Math.round(transferTotal), dailyEquivalent: Math.round(total / Math.max(nights * family.skiPassUnits, 1)), notes, score, skiDays };
 }
 
-function transportOptions(destination, startDate, nights, allowedModes, maxTravelHours, railPrefs, familyPricing, origin, preferredModes = allowedModes) {
+function transportOptions(destination, startDate, nights, allowedModes, maxTravelHours, railPrefs, familyPricing, origin, preferredModes = allowedModes, travelPolicy = {}) {
   const profile = routeProfile(destination);
   const options = [];
+  const budgetTravelMode = travelPolicy.budgetRescue || travelPolicy.travelProfile === "budget-hunter" || travelPolicy.timePreference?.mode === "cheap";
+  const busHourLimit = budgetTravelMode
+    ? Math.max(maxTravelHours, travelPolicy.timePreference?.toleranceHours || 18, 36)
+    : maxTravelHours;
   const surfaceReach = Math.min(
     profile.trainHours || Infinity,
     profile.busHours || Infinity,
@@ -2574,14 +2578,17 @@ function transportOptions(destination, startDate, nights, allowedModes, maxTrave
       notes: railPricing.notes,
     });
   }
-  if (allowedModes.includes("bus") && profile.bus && profile.busHours <= maxTravelHours) {
+  if (allowedModes.includes("bus") && profile.bus && profile.busHours <= busHourLimit) {
     options.push({
       mode: "bus",
       label: "FlixBus/Bus",
       price: Math.round(profile.bus * weekdayDealFactor(startDate, nights, "bus") * bookingWindowFactor(startDate, "bus")),
       hours: profile.busHours,
       comfort: profile.busComfort,
-      notes: ["FlixBus prüfen"],
+      notes: [
+        "FlixBus prüfen",
+        ...(profile.busHours > maxTravelHours ? ["über Zeitlimit, aber Budget-Rettung"] : []),
+      ],
     });
   }
   if (allowedModes.includes("car") && profile.car && profile.carHours <= maxTravelHours) {
@@ -2891,7 +2898,11 @@ function bestPlanForDestination(destination, options) {
       for (const nights of options.candidateNights) {
         const checkout = addDays(startDate, nights);
         if (localDate(checkout) > localDate(options.latestEndDate)) continue;
-        const transports = transportOptions(destination, startDate, nights, options.transportTypes, options.maxTravelHours, options.railPrefs, options.familyPricing, options.origin, options.preferredTransportTypes);
+        const transports = transportOptions(destination, startDate, nights, options.transportTypes, options.maxTravelHours, options.railPrefs, options.familyPricing, options.origin, options.preferredTransportTypes, {
+          budgetRescue: options.budgetRescue,
+          travelProfile: options.travelProfile,
+          timePreference: options.timePreference,
+        });
         for (const transport of transports) {
           if (options.tripMode === "ski" && !isSkiSeason(startDate)) continue;
           const deal = dealProfile(startDate, nights, options.budgetLevers);
@@ -3052,6 +3063,8 @@ function bestPlanForDestination(destination, options) {
       const bucket = (item) => item.total <= options.budget ? 0 : item.total <= options.budget * 1.08 ? 1 : item.total <= options.budget * 1.25 ? 2 : 3;
       const bucketDiff = bucket(a) - bucket(b);
       if (bucketDiff) return bucketDiff;
+      const budgetFirst = options.budgetRescue || options.travelProfile === "budget-hunter" || options.timePreference?.mode === "cheap";
+      if (budgetFirst && bucket(a) <= 1) return a.total - b.total || b.score - a.score;
       if (bucket(a) >= 2) return a.total - b.total || b.score - a.score;
       return b.score - a.score || a.effectiveTotal - b.effectiveTotal;
     })
@@ -3484,18 +3497,22 @@ function renderDestinationCard(item, groupRank, itemIndex, context) {
   const tags = item.destination.vibes.map((tag) => `<span class="tag">${tag}</span>`).join("");
   const leverTags = item.leverNotes.slice(0, 8).map((tag) => `<span class="tag tag--lever">${tag}</span>`).join("");
   const variants = item.variants || [item];
+  const budgetStatus = item.overBudget
+    ? `<div class="budget-status budget-status--over"><strong>${euro(item.overBudgetAmount)} über Budget</strong><span>${Math.round(item.overBudgetRatio * 100)}% drüber, nur als Prüfidee</span></div>`
+    : `<div class="budget-status budget-status--fit"><strong>Im Budget</strong><span>${euro(item.total)} gesamt</span></div>`;
   return `
-    <article class="destination-card destination-card--preview">
+    <article class="destination-card destination-card--preview${item.overBudget ? " destination-card--over-budget" : ""}">
       <div class="card-top">
         <div>
           <span class="rank">${groupRank}.${itemIndex + 1}</span>
           <h3>${item.destination.city}</h3>
           <p class="country">${item.destination.region || item.destination.country} · ${item.destination.airport}</p>
         </div>
-        <div class="score">${item.score}<br><span>Score</span></div>
+        <div class="score${item.overBudget ? " score--warn" : ""}">${item.score}<br><span>Score</span></div>
       </div>
       <div class="tags">${tags}</div>
       <p class="why">${item.destination.why}</p>
+      ${budgetStatus}
       ${renderBestTripPreview(item, context)}
       <details class="decision-details">
         <summary>Warum / Kosten kurz prüfen</summary>
@@ -3574,7 +3591,7 @@ function tripVerdict(item) {
   if (!item.overBudget) strengths.push("passt ins Budget");
   if (item.overBudget) {
     const percent = Math.round(item.overBudgetRatio * 100);
-    cautions.push(`${euro(item.overBudgetAmount)} ueber Budget${percent >= 8 ? ` (${percent}%)` : ""}`);
+    cautions.push(`${euro(item.overBudgetAmount)} über Budget${percent >= 8 ? ` (${percent}%)` : ""}`);
   }
 
   if (item.transport.mode === "bus" && item.transport.hours > 14 && timeMode !== "cheap") {
@@ -3588,12 +3605,12 @@ function tripVerdict(item) {
   }
 
   if (item.transport.mode === "flight" && item.transport.advisory) {
-    strengths.push("Flug-Alternative lohnt Pruefung");
+    strengths.push("Flug-Alternative lohnt Prüfung");
   }
 
   if (risk <= 35 && rating >= 4.3) strengths.push("Unterkunft wirkt solide");
-  if (risk > 50 || rating < 3.6) cautions.push("Unterkunft genauer pruefen");
-  if (item.effectiveDaily <= 45) strengths.push("Alltag guenstig");
+  if (risk > 50 || rating < 3.6) cautions.push("Unterkunft genauer prüfen");
+  if (item.effectiveDaily <= 45) strengths.push("Alltag günstig");
   if (item.effectiveDaily >= 75) cautions.push("Alltag teuer");
   if (item.averagePriceEstimate) cautions.push("Durchschnittspreis statt Livepreis");
 
@@ -3601,13 +3618,13 @@ function tripVerdict(item) {
   const label = item.overBudget
     ? "Über Budget"
     : seriousCaution
-    ? "Eher pruefen"
+    ? "Eher prüfen"
     : item.score >= 110 && cautions.length <= 1
       ? "Top-Kandidat"
       : "Guter Kandidat";
   const tone = seriousCaution ? "warn" : label === "Top-Kandidat" ? "good" : "check";
   const reason = [...strengths.slice(0, 2), ...cautions.slice(0, 2)].slice(0, 3).join(" · ");
-  return { label, tone, reason: reason || "gutes Preis-Leistungs-Verhaeltnis, Details bitte gegenpruefen" };
+  return { label, tone, reason: reason || "gutes Preis-Leistungs-Verhältnis, Details bitte gegenprüfen" };
 }
 
 function transportAlternativeStrip(item) {
@@ -3658,15 +3675,20 @@ function renderBestTripPreview(item, context) {
   const nightlyPrice = euro(Math.round(item.lodgingTotal / Math.max(1, item.nights)));
   const priceNote = averagePriceNote(item);
   const verdict = tripVerdict(item);
+  const headline = item.overBudget ? "Günstigste Prüfidee" : "Beste konkrete Reise";
+  const budgetNote = item.overBudget
+    ? `<p class="mini-note mini-note--budget">${euro(item.overBudgetAmount)} über Budget. Diese Variante nur buchen, wenn Budget, Nächte, Anreisezeit oder Unterkunft bewusst gelockert werden.</p>`
+    : "";
   const transportNotes = item.transport.notes?.length
     ? `<p class="mini-note">${item.transport.notes.slice(0, 3).join(" · ")}</p>`
     : "";
   return `
     <div class="best-trip">
       <div class="best-trip__head">
-        <span>Beste konkrete Reise</span>
+        <span>${headline}</span>
         <strong>${formatDate(item.startDate)} bis ${formatDate(item.checkout)} · ${euro(item.total)} gesamt</strong>
       </div>
+      ${budgetNote}
       <div class="best-trip__grid">
         <div>
           <span>${item.destination.cruise ? "Kabine / Route" : "Unterkunft"}</span>

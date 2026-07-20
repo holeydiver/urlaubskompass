@@ -540,6 +540,11 @@ dd {
   background: #fff;
 }
 
+.destination-card--over-budget {
+  border-color: #dfb0b5;
+  background: #fffafa;
+}
+
 .card-top {
   display: flex;
   justify-content: space-between;
@@ -573,6 +578,39 @@ dd {
   text-align: right;
   color: var(--blue);
   font-weight: 900;
+}
+
+.score--warn {
+  color: var(--rose);
+}
+
+.budget-status {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: center;
+  border: 1px solid #cfe4d8;
+  border-radius: 7px;
+  padding: 10px 12px;
+  background: #f2faf5;
+  color: #245b42;
+  font-weight: 850;
+}
+
+.budget-status span {
+  color: var(--muted);
+  font-size: 0.78rem;
+  text-align: right;
+}
+
+.budget-status--over {
+  border-color: #e4b7bd;
+  background: #fff1f2;
+  color: #7d2530;
+}
+
+.budget-status--over span {
+  color: #7d2530;
 }
 
 .tags {
@@ -706,6 +744,16 @@ dd {
   color: #405044;
   font-size: 0.86rem;
   line-height: 1.35;
+}
+
+.mini-note--budget {
+  border-left: 4px solid var(--rose);
+  padding: 8px 10px;
+  margin: 0;
+  border-radius: 6px;
+  background: #fff1f2;
+  color: #7d2530;
+  font-weight: 750;
 }
 
 .trip-verdict {
@@ -1063,7 +1111,10 @@ dd {
 
 .warning {
   border-left: 4px solid var(--rose);
-  padding-left: 10px;
+  padding: 10px 12px;
+  border-radius: 6px;
+  background: #fff1f2;
+  color: #7d2530;
 }
 
 @media (max-width: 980px) {
