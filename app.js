@@ -1556,7 +1556,7 @@ const profileLabels = {
 };
 
 const profileNotes = {
-  "budget-anywhere": "Für „ich habe Urlaub, Budget und keine feste Idee“: sucht breit nach dem besten Gegenwert. Kurzurlaub steuerst du über Wunschnächte und Datumsfenster.",
+  "budget-anywhere": "Für „ich habe Urlaub, Budget und keine feste Idee“: sucht breit nach gutem Gegenwert. Kurzurlaub steuerst du über Wunschnächte und Datumsfenster.",
   "budget-hunter": "Priorisiert den niedrigsten Gesamtpreis: FlixBus, lange Anreise und einfachere Unterkünfte dürfen gewinnen, solange aktuelle Warnsignale nicht kippen.",
   "short-trip": "Optimiert auf 1 bis 3 Nächte, kurze Anreise und wenig verlorene Zeit.",
   "city-trip": "Für Städte, Kultur, Essen, ÖPNV und gute Wochenendpreise. Funktioniert auch innerhalb Deutschlands.",
@@ -2110,7 +2110,13 @@ function seasonalFlight(destination, startDate) {
 
 function routeProfile(destination) {
   if (destination.cruise) {
-    return { flightHours: 4, train: 95, trainHours: 6.5, nightTrain: 120, nightTrainHours: 10, bus: 62, busHours: 9, car: 115, carHours: 5.5, railComfort: 78, nightComfort: 72, busComfort: 52, carComfort: 70 };
+    const cruiseRoutes = {
+      "Ostsee-Kreuzfahrt ab Kiel": { flightHours: 4, train: 42, trainHours: 1.6, bus: 28, busHours: 1.7, car: 45, carHours: 1.3, railComfort: 86, busComfort: 68, carComfort: 82 },
+      "Norwegen-Fjorde ab Hamburg/Kiel": { flightHours: 4, train: 38, trainHours: 1.4, bus: 24, busHours: 1.6, car: 40, carHours: 1.2, railComfort: 86, busComfort: 68, carComfort: 82 },
+      "Mittelmeer-Kreuzfahrt ab Genua/Savona": { flightHours: 5.2, train: 178, trainHours: 13.5, nightTrain: 150, nightTrainHours: 15.5, bus: 96, busHours: 21, car: 275, carHours: 14.5, railComfort: 68, nightComfort: 72, busComfort: 42, carComfort: 50 },
+      "Donau-Flusskreuzfahrt": { flightHours: 4.8, train: 115, trainHours: 8, nightTrain: 112, nightTrainHours: 10.5, bus: 72, busHours: 11, car: 170, carHours: 8.2, railComfort: 78, nightComfort: 74, busComfort: 54, carComfort: 66 },
+    };
+    return cruiseRoutes[destination.city] || { flightHours: 4, train: 95, trainHours: 6.5, nightTrain: 120, nightTrainHours: 10, bus: 62, busHours: 9, car: 115, carHours: 5.5, railComfort: 78, nightComfort: 72, busComfort: 52, carComfort: 70 };
   }
   if (destination.route) return destination.route;
   const country = destination.country.toLowerCase();
@@ -2320,9 +2326,9 @@ function flightAirportRole(flight, nearest) {
   const isDeal = savings >= 70 || (savings >= 45 && extraTime <= 1.8);
   return {
     type: isDeal ? "deal" : "alternative",
-    label: isDeal ? "Günstige Flughafen-Alternative" : "Weitere Flughafen-Alternative",
+    label: isDeal ? "Mögliche günstigere Flughafen-Alternative" : "Weitere Flughafen-Alternative",
     reason: isDeal
-      ? `${euro(savings)} günstiger als ${nearest.originAirport.label}, plus ca. ${formatHours(Number(extraTime.toFixed(1)))} mehr Aufwand.`
+      ? `geschätzt ${euro(savings)} günstiger als ${nearest.originAirport.label}, plus ca. ${formatHours(Number(extraTime.toFixed(1)))} mehr Aufwand.`
       : "kommt in Frage, wenn Verbindung oder Flugzeiten besser passen.",
     savings,
     extraTime,
@@ -2436,12 +2442,12 @@ function dealProfile(startDate, nights, levers) {
   if (lastMinute) {
     lodgingDiscount *= 0.88;
     transportDiscount *= daysOut <= 7 ? 1.08 : 0.96;
-    notes.push("Last-Minute-Deal geprüft");
+    notes.push("Last-Minute-Preise prüfen");
   }
   if (flashSale) {
     lodgingDiscount *= 0.93;
     transportDiscount *= 0.95;
-    notes.push("Aktionspreis möglich");
+    notes.push("Aktionspreis einplanen");
   }
 
   return { lodgingDiscount, transportDiscount, notes, lastMinute, flashSale };
@@ -2607,6 +2613,10 @@ function busOriginGateway(origin) {
 
 function busDestinationGateway(destination) {
   const cityMap = {
+    "Ostsee-Kreuzfahrt ab Kiel": { city: "Kiel", accessLabel: "", accessCost: 0, accessHours: 0 },
+    "Norwegen-Fjorde ab Hamburg/Kiel": { city: "Hamburg", accessLabel: "", accessCost: 0, accessHours: 0 },
+    "Mittelmeer-Kreuzfahrt ab Genua/Savona": { city: "Genua", accessLabel: "Transfer Genua → Hafen/Savona prüfen", accessCost: 18, accessHours: 1.2 },
+    "Donau-Flusskreuzfahrt": { city: "Passau", accessLabel: "Transfer Passau Bahnhof → Anleger prüfen", accessCost: 8, accessHours: 0.4 },
     Bansko: { city: "Sofia", accessLabel: "Transfer Sofia → Bansko", accessCost: 14, accessHours: 3 },
     Plovdiv: { city: "Sofia", accessLabel: "Bahn/Bus Sofia → Plovdiv", accessCost: 8, accessHours: 2 },
     Sarajevo: { city: "Sarajevo", accessLabel: "", accessCost: 0, accessHours: 0 },
@@ -2650,7 +2660,7 @@ function transportOptions(destination, startDate, nights, allowedModes, maxTrave
       const flightOnlyHours = Math.max(1.4, profile.flightHours - 1.2 + adjustment.extraHours);
       const hours = Number((flightOnlyHours + airport.accessHours).toFixed(1));
       const price = Math.round(baseFlightPrice * adjustment.priceFactor + airport.accessCost);
-      const directness = adjustment.stops === 0 ? "Direktflug wahrscheinlich" : adjustment.stops === 1 ? "Umstieg möglich" : "mehrere Umstiege prüfen";
+      const directness = adjustment.stops === 0 ? "Direktflug prüfen" : adjustment.stops === 1 ? "Umstieg möglich" : "mehrere Umstiege prüfen";
       return {
         mode: "flight",
         label: preferredModes.includes("flight") ? `Flug ab ${airport.label}` : `Flug-Alternative ab ${airport.label}`,
@@ -2665,7 +2675,7 @@ function transportOptions(destination, startDate, nights, allowedModes, maxTrave
           `Abflug ${airport.code}`,
           `Zubringer ${airport.accessMode}`,
           directness,
-          ...(!preferredModes.includes("flight") ? ["Flug als Alternative geprüft"] : []),
+          ...(!preferredModes.includes("flight") ? ["Flug als Alternative einbeziehen"] : []),
         ],
       };
     }).filter((flight) => flight.hours <= maxTravelHours && (!nearSurfaceBeatsFlight || flight.price < (profile.train || profile.car || 999) * 0.55));
@@ -3257,7 +3267,7 @@ function makeLeverNotes(destination, state) {
   if (state.transportNotes) notes.push(...state.transportNotes);
   if (state.averagePriceEstimate) notes.push("Durchschnittspreise");
   if (state.verifiedLodging) notes.push("Unterkunft live geprüft");
-  if (state.liveLodgingRequired && !state.verifiedLodging) notes.push("Unterkunftspreis offen");
+  if (state.liveLodgingRequired && !state.verifiedLodging) notes.push("Livepreis offen");
   return notes;
 }
 
@@ -3304,14 +3314,25 @@ function searchUrl(base, params) {
 function routeSearchText(item, context) {
   const family = item.familyPricing || { adults: context.travelers || 1, children: 0 };
   const travelers = family.adults + family.children;
-  return `${context.origin} nach ${item.destination.city} am ${formatDate(item.startDate)} ${travelers} Person${travelers > 1 ? "en" : ""}`;
+  return `${context.origin} nach ${transportDestinationName(item)} am ${formatDate(item.startDate)} ${travelers} Person${travelers > 1 ? "en" : ""}`;
+}
+
+function transportDestinationName(item) {
+  const destination = item.destination;
+  if (!destination.cruise) return destination.city;
+  const text = `${destination.city} ${destination.region || ""} ${destination.cruise.search || ""}`.toLowerCase();
+  if (text.includes("genua") || text.includes("savona") || text.includes("mittelmeer")) return "Genua";
+  if (text.includes("donau") || text.includes("passau")) return "Passau";
+  if (text.includes("norwegen") || text.includes("fjord")) return "Hamburg";
+  if (text.includes("kiel") || text.includes("ostsee")) return "Kiel";
+  return destination.city;
 }
 
 function bahnSearchUrl(item, context) {
   const params = new URLSearchParams({
     sts: "true",
     so: context.origin,
-    zo: item.destination.city,
+    zo: transportDestinationName(item),
     hd: `${item.startDate}T08:00:00`,
     hza: "D",
     ar: "false",
@@ -3327,7 +3348,7 @@ function flixbusSearchUrl(item, context) {
     .trim()
     .replace(/\s+/g, "-");
   const originSlug = routeSlug(item.transport.originHub?.city || context.origin);
-  const destinationSlug = routeSlug(item.transport.destinationHub?.city || item.destination.city);
+  const destinationSlug = routeSlug(item.transport.destinationHub?.city || transportDestinationName(item));
   if (originSlug && destinationSlug) {
     return `https://www.flixbus.de/busverbindung/fernbus-${originSlug}-${destinationSlug}`;
   }
@@ -3630,10 +3651,12 @@ function bookingTargetLabel(item) {
 }
 
 function lodgingStatus(item) {
+  const subject = item.destination.cruise ? "Kabine/Route" : "Unterkunft";
+  const portal = item.destination.cruise ? "Reederei/Portal" : "Airbnb/Booking";
   if (item.verifiedLodging) {
     return {
       level: "verified",
-      label: "Unterkunft live geprüft",
+      label: `${subject} live geprüft`,
       amountLabel: `${euro(item.lodgingTotal)} live geprüft`,
       formula: `${item.verifiedLodging.label}, live geprüft am ${formatDate(item.verifiedLodging.checked)}`,
       note: item.verifiedLodging.note || "Direktangebot mit Datum und Personen hinterlegt.",
@@ -3642,15 +3665,15 @@ function lodgingStatus(item) {
   if (item.liveLodgingRequired) {
     return {
       level: "open",
-      label: "Unterkunft Livepreis offen",
+      label: `${subject} Livepreis offen`,
       amountLabel: "Livepreis offen",
       formula: "ca. Planwert, noch kein echtes Angebot",
-      note: "Für diesen nahen Zeitraum muss Airbnb/Booking einen echten Preis zeigen, bevor das Budget belastbar ist.",
+      note: `Für diesen nahen Zeitraum muss ${portal} einen echten Preis zeigen, bevor das Budget belastbar ist.`,
     };
   }
   return {
     level: "estimate",
-    label: "Unterkunft Schätzwert",
+    label: `${subject} Schätzwert`,
     amountLabel: `${euro(item.lodgingTotal)} Schätzwert`,
     formula: "Saison-/Durchschnittswert",
     note: "Für weiter entfernte Reisen ist der Betrag ein Durchschnittswert bis echte Angebote verfügbar sind.",
@@ -3698,6 +3721,30 @@ function transportStatus(item) {
   };
 }
 
+function hasOpenOrEstimatedCost(item) {
+  return Boolean(
+    item.averagePriceEstimate ||
+      (item.liveLodgingRequired && !item.verifiedLodging) ||
+      !item.verifiedTransport
+  );
+}
+
+function totalPriceLabel(item) {
+  if (item.liveLodgingRequired && !item.verifiedLodging) return `ca. ${euro(item.total)} Planwert`;
+  if (hasOpenOrEstimatedCost(item)) return `ca. ${euro(item.total)} gesamt`;
+  return `${euro(item.total)} gesamt`;
+}
+
+function totalPriceNote(item) {
+  const notes = [];
+  if (item.liveLodgingRequired && !item.verifiedLodging) {
+    notes.push(item.destination.cruise ? "Kabine/Route offen" : "Unterkunft offen");
+  }
+  if (!item.verifiedTransport) notes.push("Anreise geschätzt");
+  if (item.averagePriceEstimate) notes.push("Durchschnittswerte");
+  return notes.join(", ");
+}
+
 function bookingLinks(item, context) {
   const placeQuery = basePlaceQuery(item);
   const favoriteQuery = favoriteStayQuery(item);
@@ -3714,7 +3761,7 @@ function bookingLinks(item, context) {
     car: searchUrl("https://www.google.com/maps/dir/", {
       api: 1,
       origin: context.origin,
-      destination: placeQuery,
+      destination: item.destination.cruise ? transportDestinationName(item) : placeQuery,
       travelmode: "driving",
     }),
     airbnb: airbnbSearchUrl(placeQuery, item),
@@ -3796,13 +3843,13 @@ function countryPitch(country, items) {
   const vibes = [...new Set(items.flatMap((item) => item.destination.vibes || []))].slice(0, 4).join(", ");
   const pitches = {
     Montenegro: "Nicht nur Kotor: Bucht, Riviera, Südküste und Durmitor sind sehr unterschiedliche Reisen mit anderem Preis-/Erlebnisprofil.",
-    Deutschland: "Gut für kurze Anreise, Bahn/Deutschlandticket und Kurzurlaub. Die besten Treffer hängen stark von Stadt, Küste oder Bergen ab.",
+    Deutschland: "Gut für kurze Anreise, Bahn/Deutschlandticket und Kurzurlaub. Sinnvolle Treffer hängen stark von Stadt, Küste oder Bergen ab.",
     Österreich: "Stark für Ski, Berge und planbare Qualität. Oft lohnt der Blick auf Nachbarorte statt bekannte Hotspots.",
     Niederlande: "Gut für Stadt, Küste und kurze Wege aus Norddeutschland. Randlagen an Bahn-/Metroachsen drücken Unterkunftskosten.",
     Polen: "Sehr stark bei Budget und Ostsee-/Städtemix. Besonders interessant, wenn Alltagspreise wichtiger sind als klassische Pauschalziele.",
     Kreuzfahrt: "Kreuzfahrten bündeln Kabine, Route und Verpflegung. Entscheidend sind Hafenanreise, Bordextras, Ausflüge und echte Aktionspreise.",
   };
-  return pitches[country] || `${country} passt hier vor allem wegen ${vibes || "Preis, Anreise und Gesamtpaket"}. Top-Treffer: ${top.destination.city}.`;
+  return pitches[country] || `${country} passt hier vor allem wegen ${vibes || "Preis, Anreise und Gesamtpaket"}. Fokus-Ort: ${top.destination.city}.`;
 }
 
 function groupResultsByCountry(items) {
@@ -3824,6 +3871,7 @@ function groupResultsByCountry(items) {
         score: Math.max(...group.items.map((item) => item.score)),
         minTotal: minItem.total,
         minHasOpenLiveLodging: minItem.liveLodgingRequired && !minItem.verifiedLodging,
+        minHasOpenOrEstimatedCost: hasOpenOrEstimatedCost(minItem),
         hasBudgetFit: group.items.some((item) => !item.overBudget),
       };
     })
@@ -3899,9 +3947,9 @@ function renderResults(items, context) {
               <p>${countryPitch(group.country, group.items)}</p>
             </div>
             <div class="result-group__facts">
-              <span>ab ${group.minHasOpenLiveLodging ? `ca. ${euro(group.minTotal)} Planwert` : `${euro(group.minTotal)} gesamt`}</span>
+              <span>ab ${group.minHasOpenOrEstimatedCost ? `ca. ${euro(group.minTotal)}` : euro(group.minTotal)}</span>
               <span>${group.items.length} konkrete Ort${group.items.length > 1 ? "e" : ""}</span>
-              <span>Top: ${group.best.destination.city}</span>
+              <span>Fokus: ${group.best.destination.city}</span>
             </div>
           </div>
           <p class="place-strip">${places}</p>
@@ -3923,16 +3971,18 @@ function renderDestinationCard(item, groupRank, itemIndex, context) {
   const tags = item.destination.vibes.map((tag) => `<span class="tag">${tag}</span>`).join("");
   const leverTags = item.leverNotes.slice(0, 8).map((tag) => `<span class="tag tag--lever">${tag}</span>`).join("");
   const variants = item.variants || [item];
-  const totalText = item.liveLodgingRequired && !item.verifiedLodging ? `ca. ${euro(item.total)} Planwert` : `${euro(item.total)} gesamt`;
+  const totalText = totalPriceLabel(item);
+  const totalNote = totalPriceNote(item);
   const budgetIsOpen = item.liveLodgingRequired && !item.verifiedLodging;
   const dealbreaker = budgetDealbreaker(item);
+  const pricePortal = item.destination.cruise ? "Reederei/Portal" : "Booking/Airbnb";
   const budgetStatus = budgetIsOpen
-    ? `<div class="budget-status budget-status--over"><strong>Budget offen</strong><span>${totalText}, Unterkunft noch nicht live belegt; Booking/Airbnb kann teurer sein</span></div>`
+    ? `<div class="budget-status budget-status--over"><strong>Budget offen</strong><span>${totalText}, Preis noch nicht live belegt; ${pricePortal} kann teurer sein</span></div>`
     : dealbreaker
-    ? `<div class="budget-status budget-status--over"><strong>Budget-Dealbreaker</strong><span>${euro(item.overBudgetAmount)} über Budget (${Math.round(item.overBudgetRatio * 100)}% drüber)</span></div>`
+    ? `<div class="budget-status budget-status--over"><strong>Budget-Dealbreaker</strong><span>${euro(item.overBudgetAmount)} über Budget (${Math.round(item.overBudgetRatio * 100)}% drüber)${totalNote ? `, ${totalNote}` : ""}</span></div>`
     : item.overBudget
-    ? `<div class="budget-status budget-status--over"><strong>${euro(item.overBudgetAmount)} über Budget</strong><span>${Math.round(item.overBudgetRatio * 100)}% drüber, nur als Prüfidee</span></div>`
-    : `<div class="budget-status budget-status--fit"><strong>Im Budget</strong><span>${totalText}</span></div>`;
+    ? `<div class="budget-status budget-status--over"><strong>${euro(item.overBudgetAmount)} über Budget</strong><span>${Math.round(item.overBudgetRatio * 100)}% drüber, nur als Prüfidee${totalNote ? `, ${totalNote}` : ""}</span></div>`
+    : `<div class="budget-status budget-status--fit"><strong>Im Budget</strong><span>${totalText}${totalNote ? `, ${totalNote}` : ""}</span></div>`;
   return `
     <article class="destination-card destination-card--preview${item.overBudget ? " destination-card--over-budget" : ""}">
       <div class="card-top">
@@ -3941,7 +3991,7 @@ function renderDestinationCard(item, groupRank, itemIndex, context) {
           <h3>${item.destination.city}</h3>
           <p class="country">${item.destination.region || item.destination.country} · ${item.destination.airport}</p>
         </div>
-        <div class="score${item.overBudget ? " score--warn" : ""}">${item.score}<br><span>Score</span></div>
+        <div class="score${item.overBudget ? " score--warn" : ""}">${item.score}<br><span>Match</span></div>
       </div>
       <div class="tags">${tags}</div>
       <p class="why">${item.destination.why}</p>
@@ -3982,11 +4032,12 @@ function averagePriceNote(item) {
 }
 
 function lodgingBudgetText(item) {
+  const subject = item.destination.cruise ? "Kabinen-/Routenpreis" : "Unterkunftspreis";
   if (item.verifiedLodging) {
     return `Livepreis geprüft: ${euro(item.verifiedLodging.total)} gesamt (${item.verifiedLodging.label}, geprüft ${formatDate(item.verifiedLodging.checked)})`;
   }
   if (item.liveLodgingRequired) {
-    return "Livepreis offen - nicht als echter Unterkunftspreis bestätigt";
+    return `Livepreis offen - nicht als echter ${subject} bestätigt`;
   }
   const nightly = Math.round(item.lodgingTotal / Math.max(1, item.nights));
   if (nightly <= 65) return "sehr günstige Unterkunft nötig";
@@ -4038,8 +4089,8 @@ function bookingReadiness(item) {
   if (item.verifiedLodging && !item.overBudget) {
     return {
       tone: "ready",
-      label: "Buchungsnaher Top-Treffer",
-      text: "Konkrete Unterkunft ist mit Datum, Personen und Livepreis hinterlegt. Anreise, Gepäck, Storno und finale Verfügbarkeit direkt beim Anbieter gegenprüfen.",
+      label: "Prüfbarer Unterkunftstreffer",
+      text: "Unterkunft ist mit Datum, Personen und Livepreis hinterlegt. Anreise, Gepäck, Storno und finale Verfügbarkeit direkt beim Anbieter gegenprüfen.",
     };
   }
   if (item.verifiedLodging) {
@@ -4053,7 +4104,7 @@ function bookingReadiness(item) {
     return {
       tone: "search",
       label: "Suchvorschlag statt Angebot",
-      text: "Für diesen nahen Zeitraum fehlt noch ein echtes Unterkunftsangebot. Erst buchen, wenn Airbnb/Booking einen passenden Livepreis zeigt.",
+      text: `Für diesen nahen Zeitraum fehlt noch ein echter ${item.destination.cruise ? "Kabinen-/Routenpreis" : "Unterkunftspreis"}. Erst buchen, wenn ${item.destination.cruise ? "Reederei/Portal" : "Airbnb/Booking"} einen passenden Livepreis zeigt.`,
     };
   }
   return {
@@ -4161,7 +4212,7 @@ function tripVerdict(item) {
   if (item.effectiveDaily <= 45) strengths.push("Alltag günstig");
   if (item.effectiveDaily >= 75) cautions.push("Alltag teuer");
   if (item.averagePriceEstimate) cautions.push("Durchschnittspreis statt Livepreis");
-  if (item.liveLodgingRequired && !item.verifiedLodging) cautions.push("Unterkunftspreis live offen");
+  if (item.liveLodgingRequired && !item.verifiedLodging) cautions.push("Livepreis offen");
 
   const seriousCaution = item.overBudget || budgetIsOpen || risk > 55 || (item.transport.mode === "bus" && item.transport.hours > 18 && timeMode !== "cheap");
   const label = budgetIsOpen
@@ -4173,9 +4224,9 @@ function tripVerdict(item) {
     : seriousCaution
     ? "Eher prüfen"
     : item.score >= 110 && cautions.length <= 1
-      ? "Top-Kandidat"
-      : "Guter Kandidat";
-  const tone = seriousCaution ? "warn" : label === "Top-Kandidat" ? "good" : "check";
+      ? "Starker Kandidat"
+      : "Prüfidee";
+  const tone = seriousCaution ? "warn" : label === "Starker Kandidat" ? "good" : "check";
   const reason = [...strengths.slice(0, 2), ...cautions.slice(0, 2)].slice(0, 3).join(" · ");
   return { label, tone, reason: reason || "gutes Preis-Leistungs-Verhältnis, Details bitte gegenprüfen" };
 }
@@ -4232,17 +4283,17 @@ function renderBestTripPreview(item, context) {
   const routeStatus = transportStatus(item);
   const directStay = directStayFor(item.destination, item.stay.type);
   const stayTitle = item.destination.cruise ? stayPlan.title : item.verifiedLodging ? item.verifiedLodging.label : directStay?.label || stayTypeLabel(item.stay.type);
-  const totalLabel = item.liveLodgingRequired && !item.verifiedLodging ? `ca. ${euro(item.total)} Planwert` : `${euro(item.total)} gesamt`;
+  const totalLabel = totalPriceLabel(item);
   const budgetIsOpen = item.liveLodgingRequired && !item.verifiedLodging;
   const dealbreaker = budgetDealbreaker(item);
-  const headline = budgetIsOpen ? "Suchvorschlag mit offenem Budget" : dealbreaker ? "Belegter Treffer, aber Budget-Dealbreaker" : item.overBudget ? "Günstigste Prüfidee" : "Beste konkrete Reise";
+  const headline = budgetIsOpen ? "Suchvorschlag mit offenem Budget" : dealbreaker ? "Belegter Treffer, aber Budget-Dealbreaker" : item.overBudget ? "Günstigste Prüfidee" : item.verifiedLodging ? "Stärkster belegter Treffer" : "Stärkste Prüfidee";
   const budgetNote = !budgetIsOpen && item.overBudget
     ? dealbreaker
       ? `<p class="mini-note mini-note--budget">${euro(item.overBudgetAmount)} über Budget (${Math.round(item.overBudgetRatio * 100)}% drüber). Das ist kein kleiner Ausreißer, sondern ein Dealbreaker, wenn ${euro(item.total)} nicht realistisch sind.</p>`
       : `<p class="mini-note mini-note--budget">${euro(item.overBudgetAmount)} über Budget. Diese Variante nur buchen, wenn Budget, Nächte, Anreisezeit oder Unterkunft bewusst gelockert werden.</p>`
     : "";
   const liveLodgingNote = item.liveLodgingRequired && !item.verifiedLodging
-    ? `<p class="mini-note mini-note--budget">Unterkunftspreis ist für diesen nahen Zeitraum nicht live bestätigt. Der Betrag ist nur ein ca. Planwert; wenn Booking/Airbnb teurer ist, zählt der Livepreis.</p>`
+    ? `<p class="mini-note mini-note--budget">${item.destination.cruise ? "Kabinen-/Routenpreis" : "Unterkunftspreis"} ist für diesen nahen Zeitraum nicht live bestätigt. Der Betrag ist nur ein ca. Planwert; wenn ${item.destination.cruise ? "Reederei/Portal" : "Booking/Airbnb"} teurer ist, zählt der Livepreis.</p>`
     : "";
   const transportNotes = item.transport.notes?.length
     ? `<p class="mini-note">${item.transport.notes.slice(0, 3).join(" · ")}</p>`
@@ -4351,7 +4402,7 @@ function concreteStayPlan(item) {
 }
 
 function concreteTransportPlan(item, context) {
-  const destination = item.destination.city;
+  const destination = transportDestinationName(item);
   const airport = item.destination.airport;
   const flightAirport = item.transport.originAirport;
   const airportRole = item.transport.airportRole;
@@ -4425,13 +4476,13 @@ function renderTripOption(item, index, context) {
     : item.verifiedLodging
       ? "Geprüfte Unterkunft öffnen"
       : hasDirectStay
-        ? "Konkretes Angebot prüfen"
+        ? "Unterkunfts-Direktlink prüfen"
         : ["hotel", "pension"].includes(item.stay.type)
           ? bookingLabel
           : "Favorisierte Suche öffnen";
   const stayCostLabel = item.destination.cruise ? "Kabine" : stayName;
   const transportPriceLabel = `${euro(item.transportTotal)} gesamt`;
-  const totalLabel = item.liveLodgingRequired && !item.verifiedLodging ? `ca. ${euro(item.total)} Planwert` : `${euro(item.total)} gesamt`;
+  const totalLabel = totalPriceLabel(item);
   const lodgingPriceLabel = item.verifiedLodging
     ? `${stayCostLabel}: ${stayStatus.amountLabel}`
     : item.liveLodgingRequired
@@ -4456,12 +4507,12 @@ function renderTripOption(item, index, context) {
       </div>
       <div class="concrete-plan">
         <div>
-          <span>${hasDirectStay ? "Konkretes Unterkunftsangebot" : "Favorisierte Unterkunftssuche"}</span>
+          <span>${hasDirectStay ? "Unterkunfts-Direktlink" : "Unterkunftssuche"}</span>
           <strong>${stayTitle} · ${stayPlan.area}</strong>
           <p>${stayPlan.focus}, ${stayPlan.bedsLabel}, ${lodgingBudgetText(item)}. ${hasDirectStay ? `Direktangebot hinterlegt.${directNote ? ` ${directNote}` : ""}` : `${stayPlan.note}. Den echten Preis immer im Buchungsportal prüfen.`}</p>
         </div>
         <div>
-          <span>Konkrete Anreise</span>
+          <span>Anreisevorschlag</span>
           <strong>${transportPlan.title}</strong>
           <p>${transportPlan.detail}. ${routeStatus.amountLabel}, ca. ${formatHours(item.transport.hours)} pro Strecke. ${routeStatus.note}</p>
         </div>
@@ -4503,9 +4554,9 @@ function renderTripOption(item, index, context) {
         <span>Skipass ca. ${euro(item.skiCosts.adultPassEstimate)} p. Erw.</span>
       </div>
       ` : ""}
-      <p class="trip-combo">${item.nights} Nächte · ${item.transport.label}, ca. ${formatHours(item.transport.hours)} pro Strecke · Reisezeit ${item.timePreference?.label || "bewertet"}${item.liveLodgingRequired && !item.verifiedLodging ? " · Budget offen, Unterkunft live prüfen" : dealbreaker ? " · Budget-Dealbreaker" : item.overBudget ? " · über Budget, aber als Vergleich nützlich" : ""}${priceNote ? " · Durchschnittspreise" : ""}</p>
+      <p class="trip-combo">${item.nights} Nächte · ${item.transport.label}, ca. ${formatHours(item.transport.hours)} pro Strecke · Reisezeit ${item.timePreference?.label || "bewertet"}${item.liveLodgingRequired && !item.verifiedLodging ? " · Budget offen, Livepreis prüfen" : dealbreaker ? " · Budget-Dealbreaker" : item.overBudget ? " · über Budget, aber als Vergleich nützlich" : ""}${priceNote ? " · Durchschnittspreise" : ""}</p>
       ${priceNote ? `<p class="price-note">${priceNote}</p>` : ""}
-      <nav class="links" aria-label="Buchungslinks für ${item.destination.city}, Reise ${index + 1}">
+      <nav class="links" aria-label="Prüflinks für ${item.destination.city}, Reise ${index + 1}">
         <a href="${transportLink}" target="_blank" rel="noreferrer">${transportLinkLabel}</a>
         <a href="${primaryStayLink}" target="_blank" rel="noreferrer">${primaryStayLabel}</a>
         ${item.transport.mode === "bus" && links.flixbus !== transportLink ? `<a href="${links.flixbus}" target="_blank" rel="noreferrer">FlixBus direkt öffnen</a>` : ""}
