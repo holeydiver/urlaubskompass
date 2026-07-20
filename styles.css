@@ -750,6 +750,42 @@ dd {
   text-align: right;
 }
 
+.booking-readiness {
+  border: 1px solid #d7e3df;
+  border-left: 4px solid var(--blue);
+  border-radius: 6px;
+  padding: 8px 10px;
+  background: #ffffff;
+}
+
+.booking-readiness strong,
+.booking-readiness span {
+  display: block;
+}
+
+.booking-readiness strong {
+  color: var(--ink);
+  font-size: 0.9rem;
+}
+
+.booking-readiness span {
+  margin-top: 3px;
+  color: #405044;
+  font-size: 0.83rem;
+  line-height: 1.35;
+}
+
+.booking-readiness--ready {
+  border-left-color: var(--green);
+  background: #f3fbf6;
+}
+
+.booking-readiness--search,
+.booking-readiness--check {
+  border-left-color: var(--amber);
+  background: #fffaf0;
+}
+
 .best-trip__grid {
   display: grid;
   gap: 8px;
