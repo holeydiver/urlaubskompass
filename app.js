@@ -2,6 +2,8 @@ const destinations = [
   {
     city: "Kotor",
     country: "Montenegro",
+    region: "Bucht von Kotor",
+    searchQuery: "Kotor Bucht Montenegro",
     airport: "Tivat oder Podgorica",
     vibes: ["strand", "stadt", "berge", "natur", "kultur"],
     hidden: 92,
@@ -15,7 +17,106 @@ const destinations = [
     kitchenSavings: 14,
     localSavings: 12,
     nearbyAirport: true,
+    unusual: {
+      label: "Segel- oder Bootstag in der Bucht",
+      search: "Kotor Montenegro Segelboot Bootsausflug Unterkunft",
+      fit: 88,
+      note: "spannend, wenn der Urlaub mehr nach kleiner Expedition als nach Standard-Strandhotel wirken soll",
+    },
     why: "Dramatische Bucht, alte Stadtmauern, Wandern direkt über dem Wasser und oft günstiger als kroatische Klassiker.",
+  },
+  {
+    city: "Petrovac & Budva Riviera",
+    country: "Montenegro",
+    region: "Zentrale Adriaküste",
+    searchQuery: "Petrovac Budva Riviera Montenegro",
+    airport: "Tivat oder Podgorica",
+    vibes: ["strand", "stadt", "natur", "essen"],
+    hidden: 76,
+    comfort: 70,
+    daily: 46, living: { groceries: 23, restaurants: 33, localTransport: 7, activities: 13 },
+    lodging: { airbnb: 72, hotel: 92, pension: 58 },
+    flightBase: 205,
+    season: 1.28,
+    shoulderMonths: [5, 6, 9, 10],
+    touristLoad: 74,
+    kitchenSavings: 13,
+    localSavings: 11,
+    nearbyAirport: true,
+    why: "Mehr klassischer Strandurlaub als Kotor: Petrovac ist ruhiger, Budva lebendiger. Gut, wenn Wasser und einfache Infrastruktur wichtiger sind als Geheimtipp pur.",
+  },
+  {
+    city: "Ulcinj & Ada Bojana",
+    country: "Montenegro",
+    region: "Südküste",
+    searchQuery: "Ulcinj Ada Bojana Montenegro",
+    airport: "Podgorica oder Tivat",
+    vibes: ["strand", "natur", "essen"],
+    hidden: 88,
+    comfort: 62,
+    daily: 40, living: { groceries: 20, restaurants: 28, localTransport: 6, activities: 11 },
+    lodging: { airbnb: 58, hotel: 78, pension: 48 },
+    flightBase: 205,
+    season: 1.22,
+    shoulderMonths: [5, 6, 9, 10],
+    touristLoad: 50,
+    kitchenSavings: 12,
+    localSavings: 12,
+    nearbyAirport: false,
+    unusual: {
+      label: "Flusshuette oder Kite-Camp bei Ada Bojana",
+      search: "Ada Bojana Montenegro river house kite camp Unterkunft",
+      fit: 92,
+      note: "ungewöhnlicher als klassischer Badeort, oft mit einfachen Unterkünften direkt am Wasser",
+    },
+    why: "Langer Sandstrand, Kite-/Naturgefühl und oft niedrigere Unterkunftspreise. Spannend, wenn Montenegro nicht wie Postkarten-Kotor aussehen soll.",
+  },
+  {
+    city: "Durmitor & Žabljak",
+    country: "Montenegro",
+    region: "Berge und Nationalpark",
+    searchQuery: "Žabljak Durmitor Montenegro",
+    airport: "Podgorica",
+    vibes: ["berge", "natur", "aktiv"],
+    hidden: 86,
+    comfort: 64,
+    daily: 38, living: { groceries: 19, restaurants: 27, localTransport: 5, activities: 12 },
+    lodging: { airbnb: 54, hotel: 76, pension: 46 },
+    flightBase: 205,
+    season: 1.08,
+    shoulderMonths: [5, 6, 9],
+    touristLoad: 42,
+    kitchenSavings: 11,
+    localSavings: 10,
+    nearbyAirport: false,
+    ski: { resort: "Savin Kuk / Durmitor", pass: 24, rental: 18, transfer: 22, snow: 58, terrain: 48, beginner: 62 },
+    unusual: {
+      label: "Berghuette und Schluchten-Abenteuer",
+      search: "Žabljak Durmitor mountain cabin rafting Montenegro",
+      fit: 85,
+      note: "fuer Wildnis, Seen und einfache Huetten statt Strandroute",
+    },
+    why: "Ganz anderes Montenegro: Schluchten, Seen und Berge statt Küste. Sehr guter Gegenwert für Aktivurlaub, aber ohne klassische Strandlogik.",
+  },
+  {
+    city: "Bar & Stari Bar",
+    country: "Montenegro",
+    region: "Südliche Küste mit Bahnanschluss",
+    searchQuery: "Bar Stari Bar Montenegro",
+    airport: "Podgorica oder Tivat",
+    vibes: ["strand", "stadt", "kultur", "essen"],
+    hidden: 82,
+    comfort: 66,
+    daily: 42, living: { groceries: 21, restaurants: 30, localTransport: 6, activities: 12 },
+    lodging: { airbnb: 62, hotel: 84, pension: 52 },
+    flightBase: 205,
+    season: 1.18,
+    shoulderMonths: [5, 6, 9, 10],
+    touristLoad: 48,
+    kitchenSavings: 12,
+    localSavings: 11,
+    nearbyAirport: false,
+    why: "Praktischer, weniger glamourös und oft günstiger als die bekannten Küstenorte. Interessant, wenn Preis, Alltag und Ausflüge wichtiger sind als Instagram-Lage.",
   },
   {
     city: "Ohrid",
@@ -214,6 +315,12 @@ const destinations = [
     kitchenSavings: 16,
     localSavings: 10,
     nearbyAirport: true,
+    unusual: {
+      label: "Segeltoern oder einfaches Boot-Wochenende",
+      search: "Ostsee Schleswig-Holstein Segeltoern Mitsegeln Boot Wochenende Unterkunft",
+      fit: 76,
+      note: "gut fuer kurze, spontane Wasser-Abenteuer ohne Flug",
+    },
     why: "Klassischer Nah-Strand ohne Flugpflicht: gute Bahn- und Autooptionen, Ferienwohnungen mit Küche und außerhalb der Hotspots oft deutlich besserer Gegenwert.",
   },
   {
@@ -250,6 +357,12 @@ const destinations = [
     kitchenSavings: 15,
     localSavings: 12,
     nearbyAirport: true,
+    unusual: {
+      label: "Floß, Hausboot oder Naturcamp an der Ostsee",
+      search: "Mecklenburgische Ostsee Hausboot Floß Naturcamp Unterkunft",
+      fit: 82,
+      note: "spannend fuer Wasser, Natur und unkomplizierte Anreise",
+    },
     why: "Ostseegefühl oft günstiger als die ganz bekannten Schleswig-Holstein-Orte: viel Natur, breite Strände und gute Ferienwohnungs-Chancen.",
   },
   {
@@ -289,6 +402,142 @@ const destinations = [
     why: "Nicht billig im Alltag, aber Ferienhäuser und Selbstversorgung können gut funktionieren. Sehr stark für Natur, Ruhe und breite Strände.",
   },
   {
+    city: "Ostsee-Kreuzfahrt ab Kiel",
+    country: "Kreuzfahrt",
+    region: "Kiel, Kopenhagen, Stockholm oder Baltikum je Route",
+    searchQuery: "Kreuzfahrt ab Kiel Ostsee 7 Nächte Angebot",
+    airport: "Kiel/Hamburg Hafen",
+    vibes: ["strand", "stadt", "kultur", "essen"],
+    hidden: 52,
+    comfort: 82,
+    daily: 46, living: { groceries: 0, restaurants: 18, localTransport: 8, activities: 38 },
+    lodging: { hotel: 126, pension: 112 },
+    flightBase: 95,
+    season: 1.26,
+    shoulderMonths: [5, 6, 9, 10],
+    touristLoad: 72,
+    kitchenSavings: 0,
+    localSavings: 4,
+    nearbyAirport: true,
+    cruise: {
+      label: "Ostsee-Kreuzfahrt ab deutschem Hafen",
+      search: "Kreuzfahrt ab Kiel Ostsee 7 Nächte Angebot",
+      fit: 86,
+      dailyExtras: 46,
+      type: "Stressarm ab deutschem Hafen",
+      bestFor: "Eltern, die ohne Flugstress mehrere Städte sehen möchten",
+      bookFirst: "AIDA oder Mein Schiff zuerst prüfen, weil Abfahrt ab Kiel/Hamburg und deutschsprachige Abläufe meist unkompliziert sind",
+      compare: "MSC/Costa nur vergleichen, wenn Preis deutlich niedriger ist oder Route/Termin besser passt",
+      avoidIf: "eher nicht, wenn ein sehr ruhiger Urlaub ohne feste Essenszeiten und große Schiffe gewünscht ist",
+      dealWatch: "auf Wochenendangebote, Bordguthaben, Getränkepaket und Innenkabinen-Aktionen achten",
+      included: "Kabine und Vollpension meist enthalten",
+      caution: "Getränke, Trinkgelder, Ausflüge, Internet und Parken/Anreise zum Hafen extra prüfen",
+    },
+    why: "Sehr elternfreundlich: Start ab Deutschland, wenig Flugstress, viele Städte in einer Reise und planbarer Ablauf.",
+  },
+  {
+    city: "Norwegen-Fjorde ab Hamburg/Kiel",
+    country: "Kreuzfahrt",
+    region: "Nordsee und Fjorde",
+    searchQuery: "Norwegen Fjorde Kreuzfahrt ab Hamburg Kiel Angebot",
+    airport: "Hamburg oder Kiel Hafen",
+    vibes: ["strand", "berge", "natur", "kultur"],
+    hidden: 58,
+    comfort: 84,
+    daily: 54, living: { groceries: 0, restaurants: 20, localTransport: 10, activities: 48 },
+    lodging: { hotel: 148, pension: 132 },
+    flightBase: 105,
+    season: 1.34,
+    shoulderMonths: [5, 6, 9],
+    touristLoad: 70,
+    kitchenSavings: 0,
+    localSavings: 3,
+    nearbyAirport: true,
+    cruise: {
+      label: "Fjordroute ohne Langstreckenflug",
+      search: "Norwegen Fjorde Kreuzfahrt ab Hamburg Kiel 7 Nächte Angebot",
+      fit: 82,
+      dailyExtras: 54,
+      type: "Naturroute mit Komfort",
+      bestFor: "Eltern, die Landschaft, Balkon/Aussicht und wenig Umziehen wichtiger finden als Badewetter",
+      bookFirst: "Mein Schiff und AIDA zuerst prüfen; bei Norwegen sind Service, Route und Hafenliegezeiten wichtiger als der niedrigste Grundpreis",
+      compare: "Costa/MSC nur nehmen, wenn Route ähnlich gut ist und Ausflugskosten realistisch bleiben",
+      avoidIf: "eher nicht, wenn das Budget knapp ist: Norwegen-Ausflüge, Getränke und Balkonwunsch können stark verteuern",
+      dealWatch: "Schultermonate Mai/Juni/September, Innen- oder Außenkabine statt Balkon und inkludierte Getränkepakete prüfen",
+      included: "Kabine und Bordverpflegung, oft sehr entspannter Tagesrhythmus",
+      caution: "Norwegen-Ausflüge und Getränke können stark ins Budget gehen",
+    },
+    why: "Viel Landschaft ohne tägliches Umziehen. Nicht immer billig, aber für Komfort, Aussicht und kurze Anreise oft sehr gutes Gesamtpaket.",
+  },
+  {
+    city: "Mittelmeer-Kreuzfahrt ab Genua/Savona",
+    country: "Kreuzfahrt",
+    region: "Italien, Südfrankreich, Spanien je Route",
+    searchQuery: "Mittelmeer Kreuzfahrt ab Genua Savona Angebot 7 Nächte",
+    airport: "Genua, Mailand oder Nizza",
+    vibes: ["strand", "stadt", "kultur", "essen"],
+    hidden: 50,
+    comfort: 80,
+    daily: 50, living: { groceries: 0, restaurants: 18, localTransport: 9, activities: 42 },
+    lodging: { hotel: 118, pension: 106 },
+    flightBase: 155,
+    season: 1.22,
+    shoulderMonths: [4, 5, 9, 10],
+    touristLoad: 78,
+    kitchenSavings: 0,
+    localSavings: 4,
+    nearbyAirport: true,
+    cruise: {
+      label: "Mittelmeerroute mit Aktionspreisen",
+      search: "Mittelmeer Kreuzfahrt ab Genua Savona Last Minute Angebot",
+      fit: 78,
+      dailyExtras: 50,
+      type: "Sparpreis mit Hafenanreise",
+      bestFor: "Preisbewusste Reisende, wenn Flug oder Bahn zum Hafen günstig klappt",
+      bookFirst: "MSC und Costa zuerst prüfen; im Mittelmeer sind dort oft starke Aktionspreise zu finden",
+      compare: "AIDA/Mein Schiff gegenhalten, wenn deutschsprachiger Komfort oder Getränkepaket wichtiger ist",
+      avoidIf: "eher nicht, wenn die Anreise nach Genua/Savona teuer, lang oder mit vielen Umstiegen wird",
+      dealWatch: "Last-Minute, Innenkabine, Transferpaket und Gepäckkosten beim Flug hart gegenrechnen",
+      included: "Kabine und Vollpension, mehrere Städte ohne Hotelwechsel",
+      caution: "Flug/Zug zum Hafen, Transfers und Landausflüge separat gegenrechnen",
+    },
+    why: "Kann preislich stark sein, wenn Kabinen-Aktionen laufen. Besonders interessant, wenn mehrere Städte ohne Planungsstress gewünscht sind.",
+  },
+  {
+    city: "Donau-Flusskreuzfahrt",
+    country: "Kreuzfahrt",
+    region: "Passau, Wien, Budapest oder Wachau je Route",
+    searchQuery: "Donau Flusskreuzfahrt Passau Wien Budapest Angebot",
+    airport: "Passau, München oder Wien",
+    vibes: ["stadt", "natur", "kultur", "essen"],
+    hidden: 46,
+    comfort: 86,
+    daily: 44, living: { groceries: 0, restaurants: 16, localTransport: 6, activities: 38 },
+    lodging: { hotel: 142, pension: 128 },
+    flightBase: 115,
+    season: 1.18,
+    shoulderMonths: [4, 5, 9, 10],
+    touristLoad: 66,
+    kitchenSavings: 0,
+    localSavings: 3,
+    nearbyAirport: true,
+    cruise: {
+      label: "Flusskreuzfahrt mit kurzer Anreise",
+      search: "Donau Flusskreuzfahrt Passau Wien Budapest Angebot",
+      fit: 80,
+      dailyExtras: 44,
+      type: "Ruhiger Kultururlaub auf dem Fluss",
+      bestFor: "Eltern, die kleine Schiffe, kurze Wege, Städte und planbaren Ablauf mögen",
+      bookFirst: "nicko cruises und A-ROSA zuerst prüfen; das ist ein anderer Markt als Hochseekreuzfahrten",
+      compare: "Hochsee-Reedereien hier ignorieren; wichtiger sind Kabinenlage, Route und inkludierte Ausflüge",
+      avoidIf: "eher nicht, wenn viel Show, Pooldeck und großes Schiff gewünscht sind",
+      dealWatch: "Schnupperreisen, Adventsfahrten, Nebensaison und Bahn-/Buszubringer nach Passau prüfen",
+      included: "Kabine, Mahlzeiten und ruhige Route mit vielen Städten",
+      caution: "Kabinenlage, Ausflugspakete und Getränkepreise genau vergleichen",
+    },
+    why: "Sehr angenehm, wenn Komfort, kurze Wege und Kultur wichtiger sind als Strand. Gute Option für Eltern, die nicht dauernd Koffer packen möchten.",
+  },
+  {
     city: "Amsterdam",
     country: "Niederlande",
     airport: "Amsterdam Schiphol",
@@ -305,6 +554,12 @@ const destinations = [
     kitchenSavings: 20,
     localSavings: 18,
     nearbyAirport: true,
+    unusual: {
+      label: "Hostelboot, Kanalboot oder Randlage am Wasser",
+      search: "Amsterdam hostel boat houseboat budget room",
+      fit: 72,
+      note: "ungewoehnlicher als Standard-Hotel, aber Bewertungen und Lage sehr genau pruefen",
+    },
     why: "Wenn Amsterdam gewünscht ist, wird Amsterdam gesucht: teuer im Zentrum, aber mit Randlagen, Zimmern oder Orten an guter Bahn-/Metro-Achse oft deutlich günstiger.",
   },
   {
@@ -323,6 +578,12 @@ const destinations = [
     kitchenSavings: 18,
     localSavings: 11,
     nearbyAirport: true,
+    unusual: {
+      label: "Hausboot, Kanalzimmer oder Rad-und-Wasser-Trip",
+      search: "Zeeland Südholland Hausboot Kanal Unterkunft Radurlaub",
+      fit: 86,
+      note: "ungewoehnlich, aber mit guter Infrastruktur und Bahn-/Auto-Anreise",
+    },
     why: "Gute Mischung aus Meer, Radwegen und Städten. Für Nordwestdeutschland oft eine echte Bahn-/Auto-Alternative zur Flugreise.",
   },
   {
@@ -341,6 +602,12 @@ const destinations = [
     kitchenSavings: 11,
     localSavings: 12,
     nearbyAirport: true,
+    unusual: {
+      label: "Danzig plus Küstenbahn und einfache Pension",
+      search: "Danzig polnische Ostsee Küstenbahn Pension ungewöhnlicher Urlaub",
+      fit: 74,
+      note: "kein Boot, aber sehr gutes Abenteuer-pro-Euro-Verhaeltnis",
+    },
     why: "Ostsee mit deutlich niedrigeren Alltagskosten: Danzig plus Küste oder ruhigere Orte Richtung Stettin können preislich sehr attraktiv sein.",
   },
   {
@@ -378,6 +645,12 @@ const destinations = [
     kitchenSavings: 17,
     localSavings: 16,
     nearbyAirport: true,
+    unusual: {
+      label: "Inselhopping mit Faehre statt Pauschalstrand",
+      search: "Naxos Inselhopping Fähre Pension Griechenland",
+      fit: 80,
+      note: "fuehlt sich spontaner an, braucht aber Faehren- und Transferpuffer",
+    },
     why: "Kykladen-Gefühl, aber bodenständiger als Santorini oder Mykonos. Gute Strände und Dörfer.",
   },
   {
@@ -396,6 +669,12 @@ const destinations = [
     kitchenSavings: 15,
     localSavings: 13,
     nearbyAirport: true,
+    unusual: {
+      label: "Faehre nach Cres oder kleines Boot in der Kvarner Bucht",
+      search: "Cres Kroatien Fähre Boot Unterkunft Kvarner",
+      fit: 78,
+      note: "Inselgefuehl ohne ganz so prominente Kroatien-Route",
+    },
     why: "Mehr Alltag als Dubrovnik, Inseloptionen direkt vor der Tür und gute Chancen auf bessere Unterkunftspreise.",
   },
   {
@@ -745,23 +1024,27 @@ const profileLabels = {
   "budget-anywhere": "Budget egal wo",
   "budget-hunter": "Sparfuchs",
   "short-trip": "Kurzurlaub",
-  "city-trip": "Städtereise",
+  "city-trip": "Stadt & Kultur",
+  unusual: "Ungewöhnlich & spontan",
+  cruise: "Kreuzfahrt",
   ski: "Skiferien",
-  "beach-summer": "Sommerurlaub am Strand",
+  "beach-summer": "Strand & Wasser",
   "city-summer": "Sommerurlaub in der Stadt",
-  active: "Aktivurlaub",
+  active: "Natur & Aktiv",
   custom: "Individuell",
 };
 
 const profileNotes = {
-  "budget-anywhere": "Für „ich habe Urlaub, Budget und keine feste Idee“: sucht breit nach dem besten Gegenwert über Länder, Reisearten und Anreisewege.",
+  "budget-anywhere": "Für „ich habe Urlaub, Budget und keine feste Idee“: sucht breit nach dem besten Gegenwert. Kurzurlaub steuerst du über Wunschnächte und Datumsfenster.",
   "budget-hunter": "Priorisiert den niedrigsten Gesamtpreis: FlixBus, lange Anreise und einfachere Unterkünfte dürfen gewinnen, solange aktuelle Warnsignale nicht kippen.",
   "short-trip": "Optimiert auf 1 bis 3 Nächte, kurze Anreise und wenig verlorene Zeit.",
-  "city-trip": "Optimiert auf Kultur, Essen, ÖPNV, kurze Anreise und gute Wochenendpreise.",
+  "city-trip": "Für Städte, Kultur, Essen, ÖPNV und gute Wochenendpreise. Funktioniert auch innerhalb Deutschlands.",
+  unusual: "Sucht nach Reisen, die man selten selbst auf dem Schirm hat: Hausboot, Mitsegeln, Inselhopping, Hütte, Nachtzug oder einfache Abenteuer mit gutem Gegenwert.",
+  cruise: "Für organisierte Reisen mit Kabine, Route und Verpflegung an Bord. Rechnet Hafenanreise, Bordextras, Ausflüge, Trinkgelder und Getränkepakete bewusst mit.",
   ski: "Optimiert auf Skikosten, Schneesicherheit, passende Verpflegung und kurze Anreise.",
-  "beach-summer": "Bevorzugt Strand, Wasser, Selbstversorgung und faire Alltagskosten - warm oder nah.",
+  "beach-summer": "Für Meer, See, Küste oder warme Wasserziele. Bewertet Selbstversorgung, Alltagskosten und Anreise mit.",
   "city-summer": "Bevorzugt Stadt, Kultur, Essen, ÖPNV und kurze Wege vor Ort.",
-  active: "Bevorzugt Berge, Natur, moderate Reisezeit und günstige Aktivitäten.",
+  active: "Für Berge, Natur, Wandern, Rad, Seen und günstige Aktivitäten statt klassischem Stadt- oder Strandfokus.",
   custom: "Du steuerst die einzelnen Optionen selbst.",
 };
 
@@ -784,6 +1067,28 @@ const keywordMap = {
   ruhig: ["quiet"],
   entspannt: ["quiet"],
   natur: ["nature"],
+  ungewöhnlich: ["unusual", "hidden"],
+  ungewoehnlich: ["unusual", "hidden"],
+  spontan: ["unusual", "hidden"],
+  abenteuer: ["unusual", "nature"],
+  boot: ["boat", "water", "unusual"],
+  hausboot: ["boat", "water", "unusual"],
+  segeln: ["boat", "water", "unusual"],
+  mitsegeln: ["boat", "water", "unusual"],
+  kreuzfahrt: ["cruise", "water", "comfort"],
+  cruise: ["cruise", "water", "comfort"],
+  schiff: ["cruise", "boat", "water"],
+  fjord: ["cruise", "nature", "water"],
+  fjorde: ["cruise", "nature", "water"],
+  flusskreuzfahrt: ["cruise", "city", "culture"],
+  faehre: ["ferry", "water", "unusual"],
+  fähre: ["ferry", "water", "unusual"],
+  inselhopping: ["ferry", "water", "unusual"],
+  hütte: ["cabin", "nature", "unusual"],
+  huette: ["cabin", "nature", "unusual"],
+  bauernhof: ["farm", "nature", "unusual"],
+  retreat: ["retreat", "quiet", "unusual"],
+  kloster: ["retreat", "quiet", "unusual"],
   wandern: ["hiking", "nature"],
   aktiv: ["active", "hiking"],
   berge: ["mountains", "hiking"],
@@ -906,7 +1211,17 @@ function restoreFormState() {
     const state = JSON.parse(raw);
     Object.entries(state.fields || {}).forEach(([id, value]) => {
       const element = document.getElementById(id);
-      if (element) element.value = value;
+      if (!element) return;
+      if (id === "travel-profile") {
+        const visibleValues = [...element.options].map((option) => option.value);
+        const legacyMap = {
+          "city-summer": "city-trip",
+          "short-trip": "budget-anywhere",
+        };
+        element.value = visibleValues.includes(value) ? value : legacyMap[value] || "budget-anywhere";
+        return;
+      }
+      element.value = value;
     });
     setCheckedValues("#transport-options", state.groups?.transports || []);
     setCheckedValues("#budget-levers", state.groups?.levers || []);
@@ -914,6 +1229,7 @@ function restoreFormState() {
     setCheckedValues("#stay-options", state.groups?.stays || []);
     if (state.groups?.board) setRadioValue("board", state.groups.board);
     if (state.groups?.rail) document.querySelector("#night-train").checked = state.groups.rail.nightTrain;
+    normalizeVisibleTravelProfile();
     const start = document.querySelector("#start-date");
     const end = document.querySelector("#end-date");
     end.min = start.value;
@@ -922,6 +1238,33 @@ function restoreFormState() {
     console.warn("Gespeicherter Formularzustand konnte nicht geladen werden.", error);
     return false;
   }
+}
+
+function normalizeVisibleTravelProfile() {
+  const select = document.querySelector("#travel-profile");
+  if ([...select.options].some((option) => option.value === select.value)) return;
+  select.value = "budget-anywhere";
+}
+
+function resetConflictingPlaceFilterForProfile(profile) {
+  const includeInput = document.querySelector("#include-countries");
+  const current = includeInput.value.trim();
+  if (!current) return;
+  const cruiseTerms = /kreuzfahrt|cruise|fjord|fjorde|flusskreuzfahrt|mittelmeer|donau|ab kiel|ab hamburg|genua|savona|passau|wien|budapest/i;
+  if (profile === "cruise" && !cruiseTerms.test(current)) includeInput.value = "";
+  if (profile !== "cruise" && cruiseTerms.test(current)) includeInput.value = "";
+}
+
+function resetProfileKeywordForProfile(profile) {
+  const keywordInput = document.querySelector("#keyword-input");
+  const current = keywordInput.value.trim().toLowerCase();
+  const autoKeywords = {
+    cruise: "kreuzfahrt komfort wasser kultur",
+    unusual: "ungewöhnlich wasser boot spontan",
+  };
+  Object.entries(autoKeywords).forEach(([autoProfile, value]) => {
+    if (profile !== autoProfile && current === value) keywordInput.value = "";
+  });
 }
 
 function clamp(value, min, max) {
@@ -947,6 +1290,11 @@ function keywordTagsFromInput(value) {
 
 function destinationKeywordTraits(destination, planContext = {}) {
   const traits = new Set(destination.vibes);
+  if (destination.cruise) {
+    traits.add("cruise");
+    traits.add("water");
+    traits.add("comfort");
+  }
   if (destination.daily <= 42) traits.add("cheap");
   if (destination.daily <= 56) traits.add("value");
   if (destination.hidden >= 80) traits.add("hidden");
@@ -962,6 +1310,14 @@ function destinationKeywordTraits(destination, planContext = {}) {
   if (destination.vibes.includes("stadt")) traits.add("city");
   if (destination.vibes.includes("kultur")) traits.add("culture");
   if (destination.vibes.includes("essen")) traits.add("food");
+  if (destination.unusual) {
+    traits.add("unusual");
+    if (/boot|segel/i.test(destination.unusual.label)) traits.add("boat");
+    if (/faehre|fähre|insel/i.test(destination.unusual.label)) traits.add("ferry");
+    if (/huette|hütte/i.test(destination.unusual.label)) traits.add("cabin");
+    if (/bauernhof/i.test(destination.unusual.label)) traits.add("farm");
+    if (/retreat|kloster/i.test(destination.unusual.label)) traits.add("retreat");
+  }
   if (["Kotor", "Ohrid", "Naxos", "Rijeka & Cres", "Ponta Delgada", "Madeira Nordküste", "Essaouira", "Gjirokaster & Himara", "Ostsee Schleswig-Holstein", "Nordsee Schleswig-Holstein", "Mecklenburgische Ostsee", "Usedom & Stettiner Haff", "Dänische Nordsee", "Zeeland & Südholland Küste", "Polnische Ostsee"].includes(destination.city)) traits.add("water");
   if (["Ohrid"].includes(destination.city)) traits.add("lake");
   if (["Montenegro", "Albanien", "Griechenland", "Kroatien", "Portugal", "Marokko", "Italien"].includes(destination.country)) traits.add("warm");
@@ -1161,6 +1517,9 @@ function seasonalFlight(destination, startDate) {
 }
 
 function routeProfile(destination) {
+  if (destination.cruise) {
+    return { flightHours: 4, train: 95, trainHours: 6.5, nightTrain: 120, nightTrainHours: 10, bus: 62, busHours: 9, car: 115, carHours: 5.5, railComfort: 78, nightComfort: 72, busComfort: 52, carComfort: 70 };
+  }
   const country = destination.country.toLowerCase();
   const profiles = {
     "italien": { flightHours: 5, train: 170, trainHours: 10, nightTrain: 135, nightTrainHours: 13, bus: 95, busHours: 17, car: 230, carHours: 13, railComfort: 74, nightComfort: 76, busComfort: 48, carComfort: 62 },
@@ -1248,6 +1607,123 @@ function bookingWindowFactor(startDate, mode) {
   if (daysOut < 14) return 1.18;
   if (daysOut > 300) return 1.08;
   return 1;
+}
+
+function airportAccessOptions(origin) {
+  const normalized = normalizePlaceName(origin);
+  const known = [
+    {
+      match: ["lubeck", "lübeck"],
+      airports: [
+        { code: "HAM", label: "Hamburg", accessMode: "Bahn/Auto", accessHours: 1.2, accessCost: 18, nearbyRank: 1 },
+        { code: "BER", label: "Berlin", accessMode: "Bahn", accessHours: 3.2, accessCost: 34, nearbyRank: 2 },
+        { code: "BRE", label: "Bremen", accessMode: "Bahn/Auto", accessHours: 2.3, accessCost: 26, nearbyRank: 3 },
+        { code: "HAJ", label: "Hannover", accessMode: "Bahn", accessHours: 2.6, accessCost: 30, nearbyRank: 4 },
+      ],
+    },
+    {
+      match: ["hamburg"],
+      airports: [
+        { code: "HAM", label: "Hamburg", accessMode: "ÖPNV/Taxi", accessHours: 0.8, accessCost: 8, nearbyRank: 1 },
+        { code: "BER", label: "Berlin", accessMode: "Bahn", accessHours: 2.3, accessCost: 32, nearbyRank: 2 },
+        { code: "BRE", label: "Bremen", accessMode: "Bahn", accessHours: 1.8, accessCost: 24, nearbyRank: 3 },
+        { code: "HAJ", label: "Hannover", accessMode: "Bahn", accessHours: 2.1, accessCost: 28, nearbyRank: 4 },
+      ],
+    },
+    {
+      match: ["berlin"],
+      airports: [
+        { code: "BER", label: "Berlin", accessMode: "ÖPNV/Taxi", accessHours: 0.8, accessCost: 8, nearbyRank: 1 },
+        { code: "LEJ", label: "Leipzig/Halle", accessMode: "Bahn", accessHours: 1.8, accessCost: 24, nearbyRank: 2 },
+        { code: "DRS", label: "Dresden", accessMode: "Bahn", accessHours: 2.2, accessCost: 28, nearbyRank: 3 },
+        { code: "HAM", label: "Hamburg", accessMode: "Bahn", accessHours: 2.4, accessCost: 32, nearbyRank: 4 },
+      ],
+    },
+    {
+      match: ["kiel"],
+      airports: [
+        { code: "HAM", label: "Hamburg", accessMode: "Bahn/Auto", accessHours: 1.3, accessCost: 18, nearbyRank: 1 },
+        { code: "BER", label: "Berlin", accessMode: "Bahn", accessHours: 3.5, accessCost: 38, nearbyRank: 2 },
+        { code: "BLL", label: "Billund", accessMode: "Auto/Bus", accessHours: 3.1, accessCost: 36, nearbyRank: 3 },
+      ],
+    },
+    {
+      match: ["munchen", "muenchen"],
+      airports: [
+        { code: "MUC", label: "München", accessMode: "S-Bahn/Auto", accessHours: 0.9, accessCost: 10, nearbyRank: 1 },
+        { code: "NUE", label: "Nürnberg", accessMode: "Bahn", accessHours: 1.7, accessCost: 24, nearbyRank: 2 },
+        { code: "SZG", label: "Salzburg", accessMode: "Bahn/Auto", accessHours: 1.9, accessCost: 28, nearbyRank: 3 },
+      ],
+    },
+  ];
+  return known.find((entry) => entry.match.some((name) => normalized.includes(name)))?.airports || [
+    { code: originAirportCode(origin), label: origin || "nächster Flughafen", accessMode: "lokale Anreise", accessHours: 0.9, accessCost: 10, nearbyRank: 1 },
+  ].filter((airport) => airport.code);
+}
+
+function flightAirportAdjustment(airportCode, destination) {
+  const country = destination.country.toLowerCase();
+  const southEast = ["montenegro", "albanien", "nordmazedonien", "bosnien und herzegowina", "bulgarien", "griechenland", "georgien"];
+  const domesticNear = ["deutschland", "dänemark", "niederlande", "polen", "österreich", "schweiz"];
+  let priceFactor = 1;
+  let extraHours = 0;
+  let stops = 1;
+
+  if (southEast.includes(country)) {
+    if (airportCode === "BER") {
+      priceFactor = 0.78;
+      extraHours = -0.7;
+      stops = 0;
+    } else if (["MUC", "VIE"].includes(airportCode)) {
+      priceFactor = 0.88;
+      extraHours = -0.3;
+      stops = 0;
+    } else if (airportCode === "HAM") {
+      priceFactor = 1.28;
+      extraHours = 1.2;
+      stops = 1;
+    } else {
+      priceFactor = 1.08;
+      extraHours = 0.7;
+      stops = 1;
+    }
+  } else if (domesticNear.includes(country)) {
+    if (airportCode === "HAM" || airportCode === "BER" || airportCode === "MUC") {
+      priceFactor = 0.95;
+      extraHours = -0.2;
+      stops = 0;
+    }
+  } else if (["portugal", "marokko"].includes(country)) {
+    if (["BER", "MUC", "HAM"].includes(airportCode)) {
+      priceFactor = airportCode === "BER" ? 0.9 : 0.98;
+      stops = airportCode === "BER" ? 0 : 1;
+      extraHours = airportCode === "BER" ? -0.3 : 0.5;
+    }
+  }
+
+  return { priceFactor, extraHours, stops };
+}
+
+function flightAirportRole(flight, nearest) {
+  if (flight.originAirport.nearbyRank === 1) {
+    return {
+      type: "nearby",
+      label: "Flughafen in der Nähe",
+      reason: `${flight.originAirport.label} ist vom Startort am schnellsten erreichbar.`,
+    };
+  }
+  const savings = nearest ? nearest.price - flight.price : 0;
+  const extraTime = nearest ? Math.max(0, flight.hours - nearest.hours) : flight.originAirport.accessHours;
+  const isDeal = savings >= 70 || (savings >= 45 && extraTime <= 1.8);
+  return {
+    type: isDeal ? "deal" : "alternative",
+    label: isDeal ? "Günstige Flughafen-Alternative" : "Weitere Flughafen-Alternative",
+    reason: isDeal
+      ? `${euro(savings)} günstiger als ${nearest.originAirport.label}, plus ca. ${formatHours(Number(extraTime.toFixed(1)))} mehr Aufwand.`
+      : "kommt in Frage, wenn Verbindung oder Flugzeiten besser passen.",
+    savings,
+    extraTime,
+  };
 }
 
 function monthOf(dateString) {
@@ -1391,6 +1867,24 @@ function dailyCostBreakdown(destination, stay, levers) {
 }
 
 function boardCostBreakdown(destination, stay, boardPreference, levers) {
+  if (destination.cruise) {
+    const extras = destination.cruise.dailyExtras || destination.daily || 45;
+    return {
+      board: "cruise",
+      label: "Vollpension an Bord",
+      boardNightCost: 0,
+      dailyTotal: extras,
+      food: Math.round(extras * 0.34),
+      localTransport: Math.round(extras * 0.16),
+      activities: Math.round(extras * 0.5),
+      groceries: 0,
+      restaurants: extras,
+      kitchen: false,
+      groceryPressure: "Bordextras statt Supermarkt",
+      totalDailyEquivalent: extras,
+      convenience: 10,
+    };
+  }
   const choices = boardPreference === "auto" ? ["self", "breakfast", "half-board"] : [boardPreference];
   const ranked = choices.map((board) => {
     const boardLabel = {
@@ -1446,17 +1940,47 @@ function skiCostBreakdown(destination, options, nights) {
   return { total: Math.round(total), passTotal: Math.round(passTotal), rentalTotal: Math.round(rentalTotal), transferTotal: Math.round(transferTotal), dailyEquivalent: Math.round(total / Math.max(nights * family.skiPassUnits, 1)), notes, score, skiDays };
 }
 
-function transportOptions(destination, startDate, nights, allowedModes, maxTravelHours, railPrefs, familyPricing) {
+function transportOptions(destination, startDate, nights, allowedModes, maxTravelHours, railPrefs, familyPricing, origin, preferredModes = allowedModes) {
   const profile = routeProfile(destination);
   const options = [];
   if (allowedModes.includes("flight") && profile.flightHours <= maxTravelHours) {
-    options.push({
-      mode: "flight",
-      label: "Flug",
-      price: Math.round(seasonalFlight(destination, startDate) * weekdayDealFactor(startDate, nights, "flight") * bookingWindowFactor(startDate, "flight")),
-      hours: profile.flightHours,
-      comfort: 70,
+    const baseFlightPrice = seasonalFlight(destination, startDate) * weekdayDealFactor(startDate, nights, "flight") * bookingWindowFactor(startDate, "flight");
+    const airportOptions = airportAccessOptions(origin);
+    const rawFlights = airportOptions.map((airport) => {
+      const adjustment = flightAirportAdjustment(airport.code, destination);
+      const flightOnlyHours = Math.max(1.4, profile.flightHours - 1.2 + adjustment.extraHours);
+      const hours = Number((flightOnlyHours + airport.accessHours).toFixed(1));
+      const price = Math.round(baseFlightPrice * adjustment.priceFactor + airport.accessCost);
+      const directness = adjustment.stops === 0 ? "Direktflug wahrscheinlich" : adjustment.stops === 1 ? "Umstieg möglich" : "mehrere Umstiege prüfen";
+      return {
+        mode: "flight",
+        label: preferredModes.includes("flight") ? `Flug ab ${airport.label}` : `Flug-Alternative ab ${airport.label}`,
+        price,
+        hours,
+        comfort: clamp(74 - adjustment.stops * 9 - airport.accessHours * 1.3 + (airport.nearbyRank === 1 ? 2 : 0), 42, 82),
+        originAirport: airport,
+        flightOnlyHours,
+        stops: adjustment.stops,
+        advisory: !preferredModes.includes("flight"),
+        notes: [
+          `Abflug ${airport.code}`,
+          `Zubringer ${airport.accessMode}`,
+          directness,
+          ...(!preferredModes.includes("flight") ? ["Flug als Alternative geprüft"] : []),
+        ],
+      };
+    }).filter((flight) => flight.hours <= maxTravelHours);
+    const nearest = rawFlights.find((flight) => flight.originAirport.nearbyRank === 1);
+    rawFlights.forEach((flight) => {
+      const role = flightAirportRole(flight, nearest);
+      flight.airportRole = role;
+      flight.notes.unshift(role.label);
+      if (role.type === "deal") {
+        flight.notes.push(role.reason);
+        flight.comfort += Math.min(4, role.savings / 80);
+      }
     });
+    options.push(...rawFlights.sort((a, b) => (a.price + a.hours * 8) - (b.price + b.hours * 8)).slice(0, 3));
   }
   if (allowedModes.includes("train") && profile.train && profile.trainHours <= maxTravelHours) {
     const railPricing = railPricingUnits(destination, familyPricing, railPrefs, "train");
@@ -1527,6 +2051,8 @@ function placeSearchText(destination) {
   return [
     destination.city,
     destination.country,
+    destination.region,
+    destination.searchQuery,
     destination.airport,
     destination.ski?.resort,
     ...(destination.vibes || []),
@@ -1577,7 +2103,9 @@ function planTrip(event) {
   const latestEndDate = document.querySelector("#end-date").value || addDays(startDate, 14);
   const vibes = getChecked("#vibe-options");
   const stayTypes = getChecked("#stay-options");
-  const transportTypes = getChecked("#transport-options").filter((value) => ["flight", "train", "bus", "car"].includes(value));
+  const selectedTransportTypes = getChecked("#transport-options").filter((value) => ["flight", "train", "bus", "car"].includes(value));
+  const transportTypes = selectedTransportTypes.length ? selectedTransportTypes : ["flight", "train", "bus", "car"];
+  const smartTransportTypes = transportTypes.includes("flight") ? transportTypes : [...transportTypes, "flight"];
   const budgetLevers = getChecked("#budget-levers");
   const boardPreference = document.querySelector('input[name="board"]:checked')?.value || "auto";
   const tripMode = document.querySelector("#trip-mode").value;
@@ -1636,9 +2164,11 @@ function planTrip(event) {
       candidateStarts,
       candidateNights,
       latestEndDate,
+      origin,
       vibes,
       stayTypes,
-      transportTypes: transportTypes.length ? transportTypes : ["flight", "train", "bus", "car"],
+      transportTypes: smartTransportTypes,
+      preferredTransportTypes: transportTypes,
       hiddenFactor,
       comfortFactor,
       maxTravelHours,
@@ -1708,6 +2238,7 @@ function makeCandidateNights(targetNights, optimizeNights, travelProfile = "cust
 
 function bestPlanForDestination(destination, options) {
   if (options.tripMode === "ski" && !destination.ski) return null;
+  if (options.travelProfile === "cruise" && !destination.cruise) return null;
   const stays = stayOptionsForDestination(destination, options.stayTypes, options.comfortFactor, options.qualityThresholds).slice(0, 3);
   if (!stays.length) return null;
   const vibeMatches = options.vibes.filter((vibe) => destination.vibes.includes(vibe)).length;
@@ -1719,7 +2250,7 @@ function bestPlanForDestination(destination, options) {
       for (const nights of options.candidateNights) {
         const checkout = addDays(startDate, nights);
         if (localDate(checkout) > localDate(options.latestEndDate)) continue;
-        const transports = transportOptions(destination, startDate, nights, options.transportTypes, options.maxTravelHours, options.railPrefs, options.familyPricing);
+        const transports = transportOptions(destination, startDate, nights, options.transportTypes, options.maxTravelHours, options.railPrefs, options.familyPricing, options.origin, options.preferredTransportTypes);
         for (const transport of transports) {
           if (options.tripMode === "ski" && !isSkiSeason(startDate)) continue;
           const deal = dealProfile(startDate, nights, options.budgetLevers);
@@ -1775,7 +2306,14 @@ function bestPlanForDestination(destination, options) {
           const selfCateringBonus = board.kitchen && board.groceries <= 24 ? 4 : 0;
           const skiBonus = skiCosts?.score || 0;
           const boardBonus = board.convenience * 0.55;
+          const advisoryModePenalty = transport.advisory ? 5 : 0;
           const keyword = keywordMatch(destination, options.keywordTags || [], { transportHours: transport.hours });
+          const unusualBonus = options.travelProfile === "unusual" && destination.unusual
+            ? Math.min(18, destination.unusual.fit * 0.16 + Math.max(0, destination.hidden - 60) * 0.08)
+            : 0;
+          const cruiseBonus = options.travelProfile === "cruise" && destination.cruise
+            ? Math.min(20, destination.cruise.fit * 0.18 + board.convenience * 0.35)
+            : 0;
           const score = Math.round(
             budgetScore * 0.34 +
               valueScore * 0.12 +
@@ -1796,7 +2334,10 @@ function bestPlanForDestination(destination, options) {
               boardBonus +
               railPreferenceBonus +
               cheapTransportBonus +
-              keyword.score
+              keyword.score -
+              advisoryModePenalty +
+              unusualBonus +
+              cruiseBonus
           );
           const leverNotes = makeLeverNotes(destination, {
             shoulder,
@@ -1813,6 +2354,8 @@ function bestPlanForDestination(destination, options) {
             keywordMatches: keyword.matches,
             transportNotes: transport.notes || [],
             averagePriceEstimate,
+            unusual: options.travelProfile === "unusual" ? destination.unusual : null,
+            cruise: options.travelProfile === "cruise" ? destination.cruise : null,
           });
           candidates.push({
             destination,
@@ -1839,6 +2382,7 @@ function bestPlanForDestination(destination, options) {
             familyPricing: options.familyPricing,
             lodgingNeeds: options.lodgingNeeds,
             timePreference: options.timePreference,
+            travelProfile: options.travelProfile,
             averagePriceEstimate,
             score,
             overBudget: total > options.budget,
@@ -1847,10 +2391,19 @@ function bestPlanForDestination(destination, options) {
       }
     }
   }
-  const variants = candidates
+  const candidateKey = (item) => {
+    const airportCode = item.transport.mode === "flight" ? item.transport.originAirport?.code || "flight" : item.transport.mode;
+    return `${item.stay.type}-${item.transport.mode}-${airportCode}-${item.startDate}-${item.nights}`;
+  };
+  const rankedCandidates = candidates
     .sort((a, b) => b.score - a.score || a.effectiveTotal - b.effectiveTotal)
-    .filter((item, index, all) => all.findIndex((other) => `${other.stay.type}-${other.transport.mode}-${other.startDate}-${other.nights}` === `${item.stay.type}-${item.transport.mode}-${item.startDate}-${item.nights}`) === index)
-    .slice(0, 3);
+    .filter((item, index, all) => all.findIndex((other) => candidateKey(other) === candidateKey(item)) === index);
+  const bestByMode = ["train", "bus", "flight", "night-train", "car"]
+    .map((mode) => rankedCandidates.find((item) => item.transport.mode === mode))
+    .filter(Boolean);
+  const variants = [...rankedCandidates.slice(0, 2), ...bestByMode, ...rankedCandidates]
+    .filter((item, index, all) => all.findIndex((other) => candidateKey(other) === candidateKey(item)) === index)
+    .slice(0, 5);
   return variants.length ? { ...variants[0], variants } : null;
 }
 
@@ -1870,6 +2423,8 @@ function makeLeverNotes(destination, state) {
   if (state.dailyBreakdown?.groceries >= 30) notes.push("Lebenshaltung teuer");
   if (state.board) notes.push(state.board.label);
   if (state.skiCosts) notes.push(...state.skiCosts.notes.slice(0, 2));
+  if (state.unusual) notes.push(state.unusual.label);
+  if (state.cruise) notes.push(state.cruise.label, "Bordextras prüfen");
   if (state.keywordMatches?.length) notes.push(...state.keywordMatches.slice(0, 3).map((tag) => `passt: ${keywordLabel(tag)}`));
   if (state.dealNotes) notes.push(...state.dealNotes);
   if (state.transportNotes) notes.push(...state.transportNotes);
@@ -1894,6 +2449,14 @@ function keywordLabel(tag) {
     city: "Stadt",
     culture: "Kultur",
     food: "Essen",
+    unusual: "ungewöhnlich",
+    boat: "Boot",
+    ferry: "Fähre/Inselhopping",
+    cabin: "Hütte",
+    farm: "Bauernhof",
+    retreat: "Retreat",
+    cruise: "Kreuzfahrt",
+    comfort: "komfortabel",
     "short-travel": "kurze Anreise",
     hidden: "Geheimtipp",
     local: "authentisch",
@@ -1939,6 +2502,110 @@ function flixbusSearchUrl(item, context) {
   });
 }
 
+function normalizePlaceName(value) {
+  return value
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z\s/-]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function originAirportCode(origin) {
+  const normalized = normalizePlaceName(origin);
+  const entries = [
+    ["lubeck", "HAM"],
+    ["lübeck", "HAM"],
+    ["hamburg", "HAM"],
+    ["berlin", "BER"],
+    ["munchen", "MUC"],
+    ["muenchen", "MUC"],
+    ["wien", "VIE"],
+    ["vienna", "VIE"],
+    ["frankfurt", "FRA"],
+    ["koln", "CGN"],
+    ["koeln", "CGN"],
+    ["cologne", "CGN"],
+    ["dusseldorf", "DUS"],
+    ["duesseldorf", "DUS"],
+    ["stuttgart", "STR"],
+    ["hannover", "HAJ"],
+    ["bremen", "BRE"],
+    ["dortmund", "DTM"],
+    ["nurnberg", "NUE"],
+    ["nuernberg", "NUE"],
+  ];
+  return entries.find(([name]) => normalized.includes(name))?.[1] || "";
+}
+
+function destinationAirportCodes(destination) {
+  const byCity = {
+    Kotor: ["TIV", "TGD"],
+    "Petrovac & Budva Riviera": ["TIV", "TGD"],
+    "Ulcinj & Ada Bojana": ["TGD", "TIV"],
+    "Durmitor & Žabljak": ["TGD"],
+    "Bar & Stari Bar": ["TGD", "TIV"],
+    Ohrid: ["OHD", "SKP"],
+    "Gjirokaster & Himara": ["TIA"],
+    "Ponta Delgada": ["PDL"],
+    Tbilisi: ["TBS"],
+    Lucca: ["PSA", "FLR"],
+    Leipzig: ["LEJ", "BER"],
+    Dresden: ["DRS", "BER"],
+    "Hamburg & Lübeck": ["HAM"],
+    Nürnberg: ["NUE"],
+    "Nürnberg & Bamberg": ["NUE"],
+    Münster: ["FMO", "DTM"],
+    Münsterland: ["FMO", "DTM"],
+    "Ostsee Schleswig-Holstein": ["HAM", "LBC"],
+    "Nordsee Schleswig-Holstein": ["HAM"],
+    "Mecklenburgische Ostsee": ["BER", "RLG"],
+    "Usedom & Stettiner Haff": ["BER", "SZZ"],
+    "Dänische Nordsee": ["BLL", "HAM"],
+    "Ostsee-Kreuzfahrt ab Kiel": ["HAM"],
+    "Norwegen-Fjorde ab Hamburg/Kiel": ["HAM"],
+    "Mittelmeer-Kreuzfahrt ab Genua/Savona": ["GOA", "MXP", "NCE"],
+    "Donau-Flusskreuzfahrt": ["MUC", "VIE"],
+    Amsterdam: ["AMS"],
+    "Zeeland & Südholland Küste": ["AMS", "RTM"],
+    "Polnische Ostsee": ["GDN", "SZZ"],
+    Sarajevo: ["SJJ"],
+    Naxos: ["JNX", "ATH"],
+    "Rijeka & Cres": ["RJK", "ZAG"],
+    Plovdiv: ["SOF"],
+    Essaouira: ["RAK", "ESU"],
+    Zakopane: ["KRK"],
+    "Bohinj & Vogel": ["LJU"],
+    "Schladming Umgebung": ["SZG", "GRZ"],
+    Zillertal: ["INN", "MUC"],
+    "Saalbach-Hinterglemm": ["SZG", "MUC"],
+    Gasteinertal: ["SZG"],
+    "Garmisch-Partenkirchen & Zugspitze": ["MUC"],
+    "Oberstdorf & Kleinwalsertal": ["FMM", "MUC"],
+    "Berchtesgaden & Jenner": ["SZG", "MUC"],
+    "Davos Klosters": ["ZRH"],
+    "Arosa Lenzerheide": ["ZRH"],
+    "Engadin & St. Moritz": ["ZRH"],
+    "Madeira Nordküste": ["FNC"],
+  };
+  return byCity[destination.city] || [];
+}
+
+function flightSearchUrl(item, context) {
+  const originCode = item.transport.originAirport?.code || originAirportCode(context.origin);
+  const destinationCode = destinationAirportCodes(item.destination)[0];
+  const family = item.familyPricing || { adults: context.travelers || 1, children: 0 };
+  if (originCode && destinationCode) {
+    const adults = Math.max(1, family.adults || context.travelers || 1);
+    const base = `https://www.kayak.de/flights/${originCode}-${destinationCode}/${item.startDate}/${item.checkout}/${adults}adults`;
+    return searchUrl(base, { sort: "bestflight_a" });
+  }
+  return searchUrl("https://www.google.com/search", {
+    q: `Flüge ${routeSearchText(item, context)} ${item.destination.airport}`,
+  });
+}
+
 function airbnbSearchUrl(query, item) {
   const family = item.familyPricing || { adults: 1, childAges: [], children: 0 };
   const lodgingNeeds = item.lodgingNeeds || { beds: 1, bedrooms: 1 };
@@ -1959,18 +2626,18 @@ function airbnbSearchUrl(query, item) {
 }
 
 function bookingLinks(item, context) {
-  const query = item.destination.searchQuery || `${item.destination.city} ${item.destination.country}`;
+  const query = item.travelProfile === "cruise" && item.destination.cruise?.search
+    ? item.destination.cruise.search
+    : item.travelProfile === "unusual" && item.destination.unusual?.search
+    ? item.destination.unusual.search
+    : item.destination.searchQuery || `${item.destination.city} ${item.destination.country}`;
   const routeQuery = routeSearchText(item, context);
   const family = item.familyPricing || { adults: context.travelers, children: 0 };
   const lodgingNeeds = item.lodgingNeeds || { bedrooms: 1 };
   return {
-    flights: searchUrl("https://www.google.com/travel/flights", {
-      q: `${context.origin} to ${item.destination.airport} ${item.startDate}`,
-    }),
+    flights: flightSearchUrl(item, context),
     train: bahnSearchUrl(item, context),
-    nightTrain: searchUrl("https://www.google.com/search", {
-      q: `Nachtzug ${routeQuery}`,
-    }),
+    nightTrain: bahnSearchUrl(item, context),
     bus: searchUrl("https://www.omio.de/suchen", {
       q: `Bus ${routeQuery}`,
     }),
@@ -1990,11 +2657,105 @@ function bookingLinks(item, context) {
       checkin: item.startDate,
       checkout: item.checkout,
     }),
+    cruise: cruiseLineLinks(item),
     maps: searchUrl("https://www.google.com/maps/search/", {
       api: 1,
       query,
     }),
   };
+}
+
+function cruiseLineLinks(item) {
+  const route = [
+    item.destination.city,
+    item.destination.region,
+    item.destination.cruise?.label,
+    item.destination.cruise?.search,
+  ].filter(Boolean).join(" ");
+  const routeLower = route.toLowerCase();
+  const baseLinks = {
+    aida: "https://www.aida.de/buchung/angebote",
+    meinSchiff: "https://www.meinschiff.com/de/kreuzfahrten-angebote",
+    msc: "https://www.msccruises.de/",
+    costa: "https://www.costakreuzfahrten.de/angebote.html",
+    nicko: "https://www.nicko-cruises.de/flussreisen/donau",
+    arosaDonau: "https://www.a-rosa.de/flusskreuzfahrten/donau/kreuzfahrten.html",
+  };
+  if (routeLower.includes("donau")) {
+    return {
+      primary: baseLinks.nicko,
+      primaryLabel: "nicko Donau öffnen",
+      compare: [
+        { label: "A-ROSA Donau", href: baseLinks.arosaDonau },
+      ],
+      all: baseLinks,
+    };
+  }
+  if (routeLower.includes("mittelmeer")) {
+    return {
+      primary: baseLinks.msc,
+      primaryLabel: "MSC Mittelmeer öffnen",
+      compare: [
+        { label: "Costa Angebote", href: baseLinks.costa },
+        { label: "AIDA gegenprüfen", href: baseLinks.aida },
+      ],
+      all: baseLinks,
+    };
+  }
+  if (routeLower.includes("fjord") || routeLower.includes("norwegen")) {
+    return {
+      primary: baseLinks.meinSchiff,
+      primaryLabel: "Mein Schiff Nordland öffnen",
+      compare: [
+        { label: "AIDA Nordland/Ostsee", href: baseLinks.aida },
+        { label: "Costa nur Preischeck", href: baseLinks.costa },
+      ],
+      all: baseLinks,
+    };
+  }
+  return {
+    primary: baseLinks.aida,
+    primaryLabel: "AIDA ab Deutschland öffnen",
+    compare: [
+      { label: "Mein Schiff vergleichen", href: baseLinks.meinSchiff },
+      { label: "MSC Preischeck", href: baseLinks.msc },
+    ],
+    all: baseLinks,
+  };
+}
+
+function countryPitch(country, items) {
+  const top = items[0];
+  const vibes = [...new Set(items.flatMap((item) => item.destination.vibes || []))].slice(0, 4).join(", ");
+  const pitches = {
+    Montenegro: "Nicht nur Kotor: Bucht, Riviera, Südküste und Durmitor sind sehr unterschiedliche Reisen mit anderem Preis-/Erlebnisprofil.",
+    Deutschland: "Gut für kurze Anreise, Bahn/Deutschlandticket und Kurzurlaub. Die besten Treffer hängen stark von Stadt, Küste oder Bergen ab.",
+    Österreich: "Stark für Ski, Berge und planbare Qualität. Oft lohnt der Blick auf Nachbarorte statt bekannte Hotspots.",
+    Niederlande: "Gut für Stadt, Küste und kurze Wege aus Norddeutschland. Randlagen an Bahn-/Metroachsen drücken Unterkunftskosten.",
+    Polen: "Sehr stark bei Budget und Ostsee-/Städtemix. Besonders interessant, wenn Alltagspreise wichtiger sind als klassische Pauschalziele.",
+    Kreuzfahrt: "Kreuzfahrten bündeln Kabine, Route und Verpflegung. Entscheidend sind Hafenanreise, Bordextras, Ausflüge und echte Aktionspreise.",
+  };
+  return pitches[country] || `${country} passt hier vor allem wegen ${vibes || "Preis, Anreise und Gesamtpaket"}. Top-Treffer: ${top.destination.city}.`;
+}
+
+function groupResultsByCountry(items) {
+  const groups = [];
+  items.forEach((item) => {
+    let group = groups.find((entry) => entry.country === item.destination.country);
+    if (!group) {
+      group = { country: item.destination.country, items: [] };
+      groups.push(group);
+    }
+    group.items.push(item);
+  });
+  return groups
+    .map((group) => ({
+      ...group,
+      best: group.items[0],
+      score: Math.max(...group.items.map((item) => item.score)),
+      minTotal: Math.min(...group.items.map((item) => item.total)),
+    }))
+    .sort((a, b) => b.score - a.score || a.minTotal - b.minTotal);
 }
 
 function renderResults(items, context) {
@@ -2004,45 +2765,73 @@ function renderResults(items, context) {
   }
 
   const initiallyVisible = 3;
-  const cards = items
-    .map((item, index) => {
-      const tags = item.destination.vibes.map((tag) => `<span class="tag">${tag}</span>`).join("");
-      const leverTags = item.leverNotes.map((tag) => `<span class="tag tag--lever">${tag}</span>`).join("");
-      const extraClass = index >= initiallyVisible ? " extra-result is-hidden" : "";
-      const variants = item.variants || [item];
+  const groups = groupResultsByCountry(items);
+  const cards = groups
+    .map((group, groupIndex) => {
+      const extraClass = groupIndex >= initiallyVisible ? " extra-result is-hidden" : "";
+      const places = group.items.map((item) => item.destination.city).join(" · ");
       return `
-        <article class="destination-card${extraClass}">
-          <div class="card-top">
+        <section class="result-group${extraClass}">
+          <div class="result-group__top">
             <div>
-              <span class="rank">${index + 1}</span>
-              <h3>${item.destination.city}</h3>
-              <p class="country">${item.destination.country} · ${item.destination.airport}</p>
+              <span class="eyebrow">Land / Großregion ${groupIndex + 1}</span>
+              <h3>${group.country}</h3>
+              <p>${countryPitch(group.country, group.items)}</p>
             </div>
-            <div class="score">${item.score}<br><span>Score</span></div>
+            <div class="result-group__facts">
+              <span>ab ${euro(group.minTotal)} gesamt</span>
+              <span>${group.items.length} konkrete Ort${group.items.length > 1 ? "e" : ""}</span>
+              <span>Top: ${group.best.destination.city}</span>
+            </div>
           </div>
-          <div class="tags">${tags}</div>
-          <div class="tags">${leverTags}</div>
-          <p class="why">${item.destination.why}</p>
-          ${renderBestTripPreview(variants[0], context)}
-          <div class="region-glance">
-            <span>ab ${euro(item.total)} gesamt</span>
-            <span>${formatDate(item.startDate)} · ${item.nights} Nächte</span>
-            <span>${item.transport.label}, ca. ${formatHours(item.transport.hours)} pro Strecke</span>
-            <span>Alltag ${euro(item.effectiveDaily)} p. P./Tag</span>
-            ${item.familyPricing?.children ? `<span>${item.familyPricing.label}</span>` : ""}
+          <p class="place-strip">${places}</p>
+          <div class="result-group__cards">
+            ${group.items.slice(0, 4).map((item, itemIndex) => renderDestinationCard(item, groupIndex + 1, itemIndex, context)).join("")}
           </div>
-          <button type="button" class="region-toggle" aria-expanded="false">Weitere Reisevarianten anzeigen</button>
-          <div class="trip-options is-hidden">
-            ${variants.map((variant, variantIndex) => renderTripOption(variant, variantIndex, context)).join("")}
-          </div>
-        </article>
+        </section>
       `;
     })
     .join("");
-  const showMore = items.length > initiallyVisible
-    ? `<button type="button" class="secondary-button show-more-results">Weitere ${items.length - initiallyVisible} Vorschläge anzeigen</button>`
+  const showMore = groups.length > initiallyVisible
+    ? `<button type="button" class="secondary-button show-more-results">Weitere ${groups.length - initiallyVisible} Länder/Regionen anzeigen</button>`
     : "";
   results.innerHTML = `${cards}${showMore}`;
+}
+
+function renderDestinationCard(item, groupRank, itemIndex, context) {
+  const tags = item.destination.vibes.map((tag) => `<span class="tag">${tag}</span>`).join("");
+  const leverTags = item.leverNotes.slice(0, 8).map((tag) => `<span class="tag tag--lever">${tag}</span>`).join("");
+  const variants = item.variants || [item];
+  return `
+    <article class="destination-card destination-card--preview">
+      <div class="card-top">
+        <div>
+          <span class="rank">${groupRank}.${itemIndex + 1}</span>
+          <h3>${item.destination.city}</h3>
+          <p class="country">${item.destination.region || item.destination.country} · ${item.destination.airport}</p>
+        </div>
+        <div class="score">${item.score}<br><span>Score</span></div>
+      </div>
+      <div class="tags">${tags}</div>
+      <p class="why">${item.destination.why}</p>
+      ${renderBestTripPreview(item, context)}
+      <details class="decision-details">
+        <summary>Warum / Kosten kurz prüfen</summary>
+        <div class="tags">${leverTags}</div>
+        <div class="region-glance">
+          <span>ab ${euro(item.total)} gesamt</span>
+          <span>${formatDate(item.startDate)} · ${item.nights} Nächte</span>
+          <span>${item.transport.label}, ca. ${formatHours(item.transport.hours)} pro Strecke</span>
+          <span>Alltag ${euro(item.effectiveDaily)} p. P./Tag</span>
+          ${item.familyPricing?.children ? `<span>${item.familyPricing.label}</span>` : ""}
+        </div>
+      </details>
+      <button type="button" class="region-toggle" aria-expanded="false">Reisevarianten und Links anzeigen</button>
+      <div class="trip-options is-hidden">
+        ${variants.map((variant, variantIndex) => renderTripOption(variant, variantIndex, context)).join("")}
+      </div>
+    </article>
+  `;
 }
 
 function stayTypeLabel(type) {
@@ -2060,11 +2849,131 @@ function averagePriceNote(item) {
     : "";
 }
 
+function specialExperience(item) {
+  if (item.travelProfile !== "unusual" || !item.destination.unusual) return "";
+  const special = item.destination.unusual;
+  return `
+    <div class="special-experience">
+      <span>Besondere Idee</span>
+      <strong>${special.label}</strong>
+      <p>${special.note}. Suchbegriff: ${special.search}</p>
+    </div>
+  `;
+}
+
+function cruiseExperience(item) {
+  if (item.travelProfile !== "cruise" || !item.destination.cruise) return "";
+  const cruise = item.destination.cruise;
+  return `
+    <div class="cruise-advisor">
+      <div class="cruise-advisor__head">
+        <span>${cruise.type}</span>
+        <strong>${cruise.label}</strong>
+      </div>
+      <div class="cruise-advisor__grid">
+        <div><span>Passt für</span><p>${cruise.bestFor}</p></div>
+        <div><span>Zuerst prüfen</span><p>${cruise.bookFirst}</p></div>
+        <div><span>Gegencheck</span><p>${cruise.compare}</p></div>
+        <div><span>Nicht ideal wenn</span><p>${cruise.avoidIf}</p></div>
+      </div>
+      <p class="cruise-advisor__note">${cruise.included}. Extra prüfen: ${cruise.caution}. Deal-Fokus: ${cruise.dealWatch}.</p>
+    </div>
+  `;
+}
+
+function tripVerdict(item) {
+  const strengths = [];
+  const cautions = [];
+  const timeMode = item.timePreference?.mode || "balanced";
+  const tolerance = item.timePreference?.toleranceHours || 10;
+  const risk = item.stay.quality.risk;
+  const rating = item.stay.quality.rating;
+
+  if (!item.overBudget) strengths.push("passt ins Budget");
+  if (item.overBudget) cautions.push("liegt ueber Budget");
+
+  if (item.transport.mode === "bus" && item.transport.hours > 14 && timeMode !== "cheap") {
+    cautions.push("sehr lange Busfahrt");
+  } else if (item.transport.mode === "bus" && timeMode === "cheap") {
+    strengths.push("Sparfuchs-Anreise");
+  } else if (item.transport.hours <= tolerance) {
+    strengths.push("Reisezeit passt");
+  } else if (item.transport.hours > tolerance + 4) {
+    cautions.push("lange Anreise");
+  }
+
+  if (item.transport.mode === "flight" && item.transport.advisory) {
+    strengths.push("Flug-Alternative lohnt Pruefung");
+  }
+
+  if (risk <= 35 && rating >= 4.3) strengths.push("Unterkunft wirkt solide");
+  if (risk > 50 || rating < 3.6) cautions.push("Unterkunft genauer pruefen");
+  if (item.effectiveDaily <= 45) strengths.push("Alltag guenstig");
+  if (item.effectiveDaily >= 75) cautions.push("Alltag teuer");
+  if (item.averagePriceEstimate) cautions.push("Durchschnittspreis statt Livepreis");
+
+  const seriousCaution = item.overBudget || risk > 55 || (item.transport.mode === "bus" && item.transport.hours > 18 && timeMode !== "cheap");
+  const label = seriousCaution
+    ? "Eher pruefen"
+    : item.score >= 110 && cautions.length <= 1
+      ? "Top-Kandidat"
+      : "Guter Kandidat";
+  const tone = seriousCaution ? "warn" : label === "Top-Kandidat" ? "good" : "check";
+  const reason = [...strengths.slice(0, 2), ...cautions.slice(0, 2)].slice(0, 3).join(" · ");
+  return { label, tone, reason: reason || "gutes Preis-Leistungs-Verhaeltnis, Details bitte gegenpruefen" };
+}
+
+function transportAlternativeStrip(item) {
+  const variants = item.variants || [];
+  const alternatives = variants
+    .filter((variant, index, all) => all.findIndex((other) => other.transport.mode === variant.transport.mode) === index)
+    .slice(0, 4);
+  if (alternatives.length <= 1) return "";
+  return `
+    <div class="transport-strip" aria-label="Anreisevergleich">
+      ${alternatives.map((variant) => `
+        <span${variant.transport.mode === item.transport.mode ? " class=\"is-best\"" : ""}>
+          ${variant.transport.airportRole ? `${variant.transport.airportRole.label}: ` : ""}${variant.transport.label}: ${euro(variant.transportTotal)}, ${formatHours(variant.transport.hours)}
+        </span>
+      `).join("")}
+    </div>
+  `;
+}
+
+function flightAirportComparison(item) {
+  const variants = item.variants?.length ? item.variants : [item];
+  const flights = variants
+    .filter((variant) => variant.transport.mode === "flight" && variant.transport.originAirport)
+    .filter((variant, index, all) => all.findIndex((other) => other.transport.originAirport?.code === variant.transport.originAirport?.code) === index)
+    .slice(0, 3);
+  if (!flights.length) return "";
+  const nearby = flights.find((variant) => variant.transport.airportRole?.type === "nearby");
+  const deals = flights.filter((variant) => variant.transport.airportRole?.type === "deal");
+  const others = flights.filter((variant) => !["nearby", "deal"].includes(variant.transport.airportRole?.type));
+  return `
+    <div class="airport-strip" aria-label="Flughafenvergleich">
+      ${nearby ? `
+        <span class="airport-strip__nearby">Nah: ${nearby.transport.originAirport.label} · ${euro(nearby.transportTotal)} · ${formatHours(nearby.transport.hours)}</span>
+      ` : ""}
+      ${deals.map((variant) => `
+        <span class="airport-strip__deal">Günstig: ${variant.transport.originAirport.label} · ${euro(variant.transportTotal)} · ${formatHours(variant.transport.hours)}</span>
+      `).join("")}
+      ${others.map((variant) => `
+        <span>Alternative: ${variant.transport.originAirport.label} · ${euro(variant.transportTotal)} · ${formatHours(variant.transport.hours)}</span>
+      `).join("")}
+    </div>
+  `;
+}
+
 function renderBestTripPreview(item, context) {
   const stayPlan = concreteStayPlan(item);
   const transportPlan = concreteTransportPlan(item, context);
   const nightlyPrice = euro(Math.round(item.lodgingTotal / Math.max(1, item.nights)));
   const priceNote = averagePriceNote(item);
+  const verdict = tripVerdict(item);
+  const transportNotes = item.transport.notes?.length
+    ? `<p class="mini-note">${item.transport.notes.slice(0, 3).join(" · ")}</p>`
+    : "";
   return `
     <div class="best-trip">
       <div class="best-trip__head">
@@ -2073,16 +2982,25 @@ function renderBestTripPreview(item, context) {
       </div>
       <div class="best-trip__grid">
         <div>
-          <span>Unterkunft</span>
-          <strong>${stayTypeLabel(item.stay.type)} · ${stayPlan.area}</strong>
+          <span>${item.destination.cruise ? "Kabine / Route" : "Unterkunft"}</span>
+          <strong>${item.destination.cruise ? stayPlan.title : stayTypeLabel(item.stay.type)} · ${stayPlan.area}</strong>
           <p>${stayPlan.bedsLabel}, Zielpreis ca. ${nightlyPrice}/Nacht.</p>
         </div>
         <div>
           <span>Anreise</span>
           <strong>${transportPlan.title}</strong>
           <p>${euro(item.transportTotal)} gesamt, ca. ${formatHours(item.transport.hours)} pro Strecke.</p>
+          ${transportNotes}
         </div>
       </div>
+      ${specialExperience(item)}
+      ${cruiseExperience(item)}
+      <div class="trip-verdict trip-verdict--${verdict.tone}">
+        <strong>${verdict.label}</strong>
+        <span>${verdict.reason}</span>
+      </div>
+      ${transportAlternativeStrip(item)}
+      ${flightAirportComparison(item)}
       ${priceNote ? `<p class="price-note">${priceNote}</p>` : ""}
     </div>
   `;
@@ -2091,6 +3009,16 @@ function renderBestTripPreview(item, context) {
 function concreteStayPlan(item) {
   const city = item.destination.city;
   const lodgingNeeds = item.lodgingNeeds || { beds: 1, bedrooms: 1 };
+  if (item.destination.cruise) {
+    return {
+      title: "Kabine auf Kreuzfahrtschiff",
+      focus: "Innen-/Außenkabine oder Aktionskabine mit klarer Route",
+      area: item.destination.region || item.destination.city,
+      note: `${item.destination.cruise.included}; ${item.destination.cruise.caution}`,
+      price: euro(Math.round(item.lodgingTotal / Math.max(1, item.nights))),
+      bedsLabel: `Kabine für ${item.familyPricing?.adults || 2} Erw.${item.familyPricing?.children ? ` und ${item.familyPricing.children} Kind${item.familyPricing.children > 1 ? "er" : ""}` : ""}`,
+    };
+  }
   const byType = {
     airbnb: {
       title: "Ferienwohnung mit Küche",
@@ -2147,10 +3075,14 @@ function concreteStayPlan(item) {
 function concreteTransportPlan(item, context) {
   const destination = item.destination.city;
   const airport = item.destination.airport;
+  const flightAirport = item.transport.originAirport;
+  const airportRole = item.transport.airportRole;
   const plans = {
     flight: {
-      title: `Flug ${context.origin} → ${airport}`,
-      detail: "Direktflug oder Umstieg prüfen, danach ÖPNV/Transfer zur Unterkunft einplanen",
+      title: flightAirport ? `Flug ab ${flightAirport.label} (${flightAirport.code}) → ${airport}` : `Flug ${context.origin} → ${airport}`,
+      detail: flightAirport
+        ? `${airportRole ? `${airportRole.label}: ${airportRole.reason} ` : ""}Zubringer ab ${context.origin} per ${flightAirport.accessMode} ca. ${formatHours(flightAirport.accessHours)} plus Flugzeit; ${item.transport.notes?.find((note) => note.includes("Direktflug") || note.includes("Umstieg")) || "Verbindung prüfen"}`
+        : "Direktflug oder Umstieg prüfen, danach ÖPNV/Transfer zur Unterkunft einplanen",
     },
     train: {
       title: `Bahn ${context.origin} → ${destination}`,
@@ -2177,6 +3109,8 @@ function renderTripOption(item, index, context) {
   const stayName = stayTypeLabel(item.stay.type);
   const stayPlan = concreteStayPlan(item);
   const transportPlan = concreteTransportPlan(item, context);
+  const verdict = tripVerdict(item);
+  const hasFlightCodes = item.transport.mode === "flight" && (item.transport.originAirport?.code || originAirportCode(context.origin)) && destinationAirportCodes(item.destination).length;
   const transportLink = item.transport.mode === "flight"
     ? links.flights
     : item.transport.mode === "train"
@@ -2186,11 +3120,20 @@ function renderTripOption(item, index, context) {
         : item.transport.mode === "car"
           ? links.car
           : links.bus;
-  const transportLinkLabel = item.transport.mode === "bus" ? "Bus bei Omio suchen" : `${item.transport.label} prüfen`;
-  const primaryStayLink = ["airbnb", "budget-room"].includes(item.stay.type) ? links.airbnb : links.booking;
+  const transportLinkLabel = item.transport.mode === "bus"
+    ? "Bus bei Omio suchen"
+    : item.transport.mode === "flight"
+      ? "Konkrete Flüge suchen"
+      : `${item.transport.label} prüfen`;
+  const primaryStayLink = item.destination.cruise ? links.cruise.primary : ["airbnb", "budget-room"].includes(item.stay.type) ? links.airbnb : links.booking;
+  const primaryStayLabel = item.destination.cruise ? links.cruise.primaryLabel : "Diese Unterkunft suchen";
+  const stayCostLabel = item.destination.cruise ? "Kabine" : stayName;
   const transportPriceLabel = `${euro(item.transportTotal)} gesamt`;
   const busLinkNote = item.transport.mode === "bus"
     ? `<p class="link-note">FlixBus zeigt konkrete Plätze/Sitzplatzreservierung erst nach gewählter Verbindung im Buchungsprozess. Deshalb zuerst Busvergleich öffnen und FlixBus danach dort oder direkt gegenprüfen.</p>`
+    : "";
+  const flightLinkNote = item.transport.mode === "flight"
+    ? `<p class="link-note">${item.transport.advisory ? "Flug war nicht als Hauptanreise ausgewählt, wird hier aber als prüfenswerte Alternative gezeigt, weil Preis/Reisezeit mithalten können. " : ""}${hasFlightCodes ? "Der Fluglink nutzt erkannte Flughafen-Codes und öffnet eine konkrete Hin-/Rückflug-Suche. Kinderpreise, Gepäck und alternative Flughäfen bitte in der Buchungsseite final prüfen." : "Für diese Start-/Zielkombination fehlt noch ein sicherer Flughafen-Code; der Link öffnet deshalb eine gezielte Websuche statt einer leeren Flugseite."}</p>`
     : "";
   const priceNote = averagePriceNote(item);
   return `
@@ -2211,10 +3154,16 @@ function renderTripOption(item, index, context) {
           <p>${transportPlan.detail}. Geschätzt: ${euro(item.transportTotal)} gesamt, ca. ${formatHours(item.transport.hours)} pro Strecke.</p>
         </div>
       </div>
+      ${specialExperience(item)}
+      ${cruiseExperience(item)}
+      <div class="trip-verdict trip-verdict--${verdict.tone}">
+        <strong>${verdict.label}</strong>
+        <span>${verdict.reason}</span>
+      </div>
       <div class="costs costs--compact">
         <div><span>Anreise</span><strong>${item.transport.label} ${transportPriceLabel}</strong></div>
-        <div><span>Unterkunft</span><strong>${stayName} ${euro(Math.round(item.lodgingTotal / item.nights))}/Nacht</strong></div>
-        <div><span>Alltag</span><strong>${euro(item.effectiveDaily)} p. P./Tag</strong></div>
+        <div><span>${item.destination.cruise ? "Kabine" : "Unterkunft"}</span><strong>${stayCostLabel} ${euro(Math.round(item.lodgingTotal / item.nights))}/Nacht</strong></div>
+        <div><span>${item.destination.cruise ? "Bordextras" : "Alltag"}</span><strong>${euro(item.effectiveDaily)} p. P./Tag</strong></div>
       </div>
       <div class="quality-line">
         <span>${item.stay.quality.rating.toFixed(1)}★</span>
@@ -2241,12 +3190,12 @@ function renderTripOption(item, index, context) {
       ${priceNote ? `<p class="price-note">${priceNote}</p>` : ""}
       <nav class="links" aria-label="Buchungslinks für ${item.destination.city}, Reise ${index + 1}">
         <a href="${transportLink}" target="_blank" rel="noreferrer">${transportLinkLabel}</a>
-        <a href="${primaryStayLink}" target="_blank" rel="noreferrer">Diese Unterkunft suchen</a>
+        <a href="${primaryStayLink}" target="_blank" rel="noreferrer">${primaryStayLabel}</a>
         ${item.transport.mode === "bus" ? `<a href="${links.flixbus}" target="_blank" rel="noreferrer">FlixBus direkt öffnen</a>` : ""}
-        <a href="${links.booking}" target="_blank" rel="noreferrer">Hotels/Pensionen</a>
-        <a href="${links.airbnb}" target="_blank" rel="noreferrer">Airbnb/Fewo</a>
+        ${item.destination.cruise ? links.cruise.compare.map((link) => `<a href="${link.href}" target="_blank" rel="noreferrer">${link.label}</a>`).join("") : `<a href="${links.booking}" target="_blank" rel="noreferrer">Hotels/Pensionen</a><a href="${links.airbnb}" target="_blank" rel="noreferrer">Airbnb/Fewo</a>`}
         <a href="${links.maps}" target="_blank" rel="noreferrer">Karte öffnen</a>
       </nav>
+      ${flightLinkNote}
       ${busLinkNote}
     </section>
   `;
@@ -2322,6 +3271,8 @@ function updateTripMode() {
 function applyTravelProfile() {
   const profile = document.querySelector("#travel-profile").value;
   document.querySelector("#profile-note").textContent = profileNotes[profile] || profileNotes.custom;
+  resetConflictingPlaceFilterForProfile(profile);
+  resetProfileKeywordForProfile(profile);
 
   if (profile === "custom") {
     saveFormState();
@@ -2385,6 +3336,38 @@ function applyTravelProfile() {
     document.querySelector("#comfort-factor").value = "70";
     document.querySelector("#max-travel-hours").value = "7";
     document.querySelector("#time-value").value = "strict";
+  }
+
+  if (profile === "unusual") {
+    document.querySelector("#trip-mode").value = "general";
+    setCheckedValues("#transport-options", allTransportModes);
+    setCheckedValues("#vibe-options", ["strand", "natur", "berge", "kultur"]);
+    setRadioValue("board", "auto");
+    document.querySelector("#hidden-factor").value = "95";
+    document.querySelector("#comfort-factor").value = "45";
+    document.querySelector("#max-travel-hours").value = "14";
+    document.querySelector("#time-value").value = "balanced";
+    if (!document.querySelector("#keyword-input").value.trim()) {
+      document.querySelector("#keyword-input").value = "ungewöhnlich wasser boot spontan";
+    }
+  }
+
+  if (profile === "cruise") {
+    document.querySelector("#trip-mode").value = "general";
+    setCheckedValues("#transport-options", allTransportModes);
+    setCheckedValues("#vibe-options", ["strand", "stadt", "natur", "kultur", "essen"]);
+    setCheckedValues("#stay-options", ["hotel", "pension"]);
+    setRadioValue("board", "auto");
+    document.querySelector("#hidden-factor").value = "45";
+    document.querySelector("#comfort-factor").value = "82";
+    document.querySelector("#max-travel-hours").value = "10";
+    document.querySelector("#time-value").value = "relaxed";
+    document.querySelector("#min-rating").value = "4.2";
+    document.querySelector("#min-trust").value = "45";
+    document.querySelector("#max-stay-risk").value = "40";
+    if (!document.querySelector("#keyword-input").value.trim()) {
+      document.querySelector("#keyword-input").value = "kreuzfahrt komfort wasser kultur";
+    }
   }
 
   if (profile === "ski") {
@@ -2489,11 +3472,14 @@ results.addEventListener("click", (event) => {
   const isOpening = options.classList.contains("is-hidden");
   options.classList.toggle("is-hidden", !isOpening);
   toggle.setAttribute("aria-expanded", String(isOpening));
-  toggle.textContent = isOpening ? "Reisen ausblenden" : "Weitere Reisevarianten anzeigen";
+  toggle.textContent = isOpening ? "Reisen ausblenden" : "Reisevarianten und Links anzeigen";
 });
 updateHolidayNote();
 if (restoredState) {
-  document.querySelector("#profile-note").textContent = profileNotes[document.querySelector("#travel-profile").value] || profileNotes.custom;
+  const restoredProfile = document.querySelector("#travel-profile").value;
+  resetConflictingPlaceFilterForProfile(restoredProfile);
+  resetProfileKeywordForProfile(restoredProfile);
+  document.querySelector("#profile-note").textContent = profileNotes[restoredProfile] || profileNotes.custom;
   document.querySelector("#ski-options").classList.toggle("is-hidden", document.querySelector("#trip-mode").value !== "ski");
   planTrip();
 } else {

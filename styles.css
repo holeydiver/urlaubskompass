@@ -377,8 +377,65 @@ dd {
 
 .results {
   display: grid;
+  grid-template-columns: 1fr;
+  gap: 18px;
+}
+
+.result-group {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 18px;
+  background: #fff;
+  display: grid;
+  gap: 14px;
+}
+
+.result-group__top {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(180px, 260px);
+  gap: 18px;
+  align-items: start;
+}
+
+.result-group__top h3 {
+  margin: 2px 0 6px;
+  font-size: clamp(1.4rem, 2.4vw, 2rem);
+}
+
+.result-group__top p {
+  max-width: 760px;
+  color: #334239;
+  line-height: 1.45;
+  margin: 0;
+}
+
+.result-group__facts {
+  display: grid;
+  gap: 8px;
+}
+
+.result-group__facts span,
+.place-strip {
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 9px 10px;
+  background: #f8faf7;
+  color: #334239;
+  font-size: 0.88rem;
+  font-weight: 800;
+}
+
+.place-strip {
+  margin: 0;
+  color: var(--blue);
+  background: #eef7f8;
+  border-color: #d3e5ea;
+}
+
+.result-group__cards {
+  display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 16px;
+  gap: 14px;
 }
 
 .destination-card {
@@ -389,6 +446,11 @@ dd {
   align-content: start;
 }
 
+.destination-card--preview {
+  border: 1px solid var(--line);
+  background: #fff;
+}
+
 .card-top {
   display: flex;
   justify-content: space-between;
@@ -396,11 +458,12 @@ dd {
 }
 
 .rank {
-  width: 40px;
+  min-width: 40px;
   height: 40px;
   border-radius: 50%;
   display: inline-grid;
   place-items: center;
+  padding: 0 8px;
   color: #fff;
   background: var(--green);
   font-weight: 900;
@@ -485,6 +548,22 @@ dd {
   font-weight: 760;
 }
 
+.decision-details {
+  display: grid;
+  gap: 10px;
+}
+
+.decision-details summary {
+  cursor: pointer;
+  color: var(--blue);
+  font-weight: 850;
+}
+
+.decision-details[open] {
+  border-top: 1px solid var(--line);
+  padding-top: 10px;
+}
+
 .best-trip {
   border: 1px solid #c7ddd4;
   border-radius: 7px;
@@ -538,6 +617,178 @@ dd {
   color: #405044;
   font-size: 0.86rem;
   line-height: 1.35;
+}
+
+.trip-verdict {
+  display: grid;
+  gap: 3px;
+  border: 1px solid #d8e5df;
+  border-left-width: 4px;
+  border-radius: 6px;
+  padding: 9px 10px;
+  background: #fff;
+}
+
+.trip-verdict strong {
+  color: var(--ink);
+  font-size: 0.9rem;
+}
+
+.trip-verdict span {
+  color: #405044;
+  font-size: 0.82rem;
+  line-height: 1.35;
+}
+
+.trip-verdict--good {
+  border-left-color: #3d8a63;
+  background: #f2faf5;
+}
+
+.trip-verdict--check {
+  border-left-color: #16728a;
+  background: #f3fbfc;
+}
+
+.trip-verdict--warn {
+  border-left-color: #bd7a28;
+  background: #fff8eb;
+}
+
+.special-experience {
+  border: 1px solid #d6dccb;
+  border-radius: 6px;
+  padding: 10px;
+  background: #fbfcf5;
+}
+
+.special-experience span {
+  display: block;
+  color: #687157;
+  font-size: 0.74rem;
+  font-weight: 850;
+}
+
+.special-experience strong {
+  display: block;
+  margin-top: 3px;
+  color: var(--ink);
+  line-height: 1.25;
+}
+
+.special-experience p {
+  margin: 5px 0 0;
+  color: #405044;
+  font-size: 0.84rem;
+  line-height: 1.35;
+}
+
+.special-experience--cruise {
+  border-color: #c5d7e2;
+  background: #f3f9fc;
+}
+
+.cruise-advisor {
+  display: grid;
+  gap: 10px;
+  border: 1px solid #c5d7e2;
+  border-left: 4px solid #2f7896;
+  border-radius: 7px;
+  padding: 11px;
+  background: #f3f9fc;
+}
+
+.cruise-advisor__head span,
+.cruise-advisor__grid span {
+  display: block;
+  color: #44606c;
+  font-size: 0.74rem;
+  font-weight: 850;
+}
+
+.cruise-advisor__head strong {
+  display: block;
+  margin-top: 3px;
+  color: var(--ink);
+}
+
+.cruise-advisor__grid {
+  display: grid;
+  gap: 7px;
+}
+
+.cruise-advisor__grid div {
+  border: 1px solid #d6e3e9;
+  border-radius: 6px;
+  padding: 8px;
+  background: #fff;
+}
+
+.cruise-advisor p {
+  margin: 3px 0 0;
+  color: #405044;
+  font-size: 0.84rem;
+  line-height: 1.35;
+}
+
+.cruise-advisor__note {
+  border-top: 1px solid #d6e3e9;
+  padding-top: 8px;
+}
+
+.mini-note {
+  color: var(--blue);
+  font-weight: 800;
+}
+
+.transport-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.transport-strip span {
+  border: 1px solid #d8e5df;
+  border-radius: 999px;
+  padding: 6px 9px;
+  background: #fff;
+  color: #405044;
+  font-size: 0.78rem;
+  font-weight: 850;
+}
+
+.transport-strip .is-best {
+  border-color: #9fc7b7;
+  background: #eef7f1;
+  color: #24523f;
+}
+
+.airport-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.airport-strip span {
+  border: 1px solid #d8e5df;
+  border-radius: 6px;
+  padding: 7px 9px;
+  background: #fff;
+  color: #405044;
+  font-size: 0.78rem;
+  font-weight: 850;
+}
+
+.airport-strip__nearby {
+  border-color: #b7d0dd !important;
+  background: #f1f8fb !important;
+  color: #14566b !important;
+}
+
+.airport-strip__deal {
+  border-color: #d6c487 !important;
+  background: #fff9df !important;
+  color: #674e06 !important;
 }
 
 .price-note {
@@ -738,6 +989,12 @@ dd {
   .form-grid,
   .results {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .results,
+  .result-group__top,
+  .result-group__cards {
+    grid-template-columns: 1fr;
   }
 
   .traveler-row {
