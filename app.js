@@ -3783,8 +3783,11 @@ function renderDestinationCard(item, groupRank, itemIndex, context) {
   const variants = item.variants || [item];
   const totalText = item.liveLodgingRequired && !item.verifiedLodging ? `${euro(item.total)} Planwert` : `${euro(item.total)} gesamt`;
   const budgetIsOpen = item.liveLodgingRequired && !item.verifiedLodging;
+  const dealbreaker = budgetDealbreaker(item);
   const budgetStatus = budgetIsOpen
     ? `<div class="budget-status budget-status--over"><strong>Budget offen</strong><span>${totalText}, Unterkunft noch nicht live belegt</span></div>`
+    : dealbreaker
+    ? `<div class="budget-status budget-status--over"><strong>Budget-Dealbreaker</strong><span>${euro(item.overBudgetAmount)} über Budget (${Math.round(item.overBudgetRatio * 100)}% drüber)</span></div>`
     : item.overBudget
     ? `<div class="budget-status budget-status--over"><strong>${euro(item.overBudgetAmount)} über Budget</strong><span>${Math.round(item.overBudgetRatio * 100)}% drüber, nur als Prüfidee</span></div>`
     : `<div class="budget-status budget-status--fit"><strong>Im Budget</strong><span>${totalText}</span></div>`;
@@ -3883,6 +3886,13 @@ function cruiseExperience(item) {
 }
 
 function bookingReadiness(item) {
+  if (item.verifiedLodging && budgetDealbreaker(item)) {
+    return {
+      tone: "check",
+      label: "Belegter Treffer, aber Budget-Dealbreaker",
+      text: "Unterkunft und Datum sind konkret belegt, aber das Gesamtpaket liegt deutlich über Budget. Nur weiterverfolgen, wenn Budget, Nächte oder Anreise geändert werden.",
+    };
+  }
   if (item.verifiedLodging && !item.overBudget) {
     return {
       tone: "ready",
@@ -3909,6 +3919,10 @@ function bookingReadiness(item) {
     label: "Kuratiertes Reiseziel",
     text: "Der Zeitraum ist eher planbar über Durchschnittswerte. Vor der Buchung Livepreise und Bewertungen beim Anbieter prüfen.",
   };
+}
+
+function budgetDealbreaker(item) {
+  return Boolean(item.overBudget && item.verifiedLodging && item.overBudgetRatio >= 0.2);
 }
 
 function unitNumber(value) {
@@ -3976,10 +3990,13 @@ function tripVerdict(item) {
   const risk = item.stay.quality.risk;
   const rating = item.stay.quality.rating;
   const budgetIsOpen = item.liveLodgingRequired && !item.verifiedLodging;
+  const dealbreaker = budgetDealbreaker(item);
 
   if (!item.overBudget && !budgetIsOpen) strengths.push("passt ins Budget");
   if (budgetIsOpen) {
     cautions.push("Budget erst nach Livepreis belastbar");
+  } else if (dealbreaker) {
+    cautions.push(`Budget-Dealbreaker: ${euro(item.overBudgetAmount)} drüber`);
   } else if (item.overBudget) {
     const percent = Math.round(item.overBudgetRatio * 100);
     cautions.push(`${euro(item.overBudgetAmount)} über Budget${percent >= 8 ? ` (${percent}%)` : ""}`);
@@ -4009,6 +4026,8 @@ function tripVerdict(item) {
   const seriousCaution = item.overBudget || budgetIsOpen || risk > 55 || (item.transport.mode === "bus" && item.transport.hours > 18 && timeMode !== "cheap");
   const label = budgetIsOpen
     ? "Budget offen"
+    : dealbreaker
+    ? "Budget-Dealbreaker"
     : item.overBudget
     ? "Über Budget"
     : seriousCaution
@@ -4073,9 +4092,12 @@ function renderBestTripPreview(item, context) {
   const stayTitle = item.destination.cruise ? stayPlan.title : item.verifiedLodging ? item.verifiedLodging.label : directStay?.label || stayTypeLabel(item.stay.type);
   const totalLabel = item.liveLodgingRequired && !item.verifiedLodging ? `${euro(item.total)} Planwert` : `${euro(item.total)} gesamt`;
   const budgetIsOpen = item.liveLodgingRequired && !item.verifiedLodging;
-  const headline = budgetIsOpen ? "Suchvorschlag mit offenem Budget" : item.overBudget ? "Günstigste Prüfidee" : "Beste konkrete Reise";
+  const dealbreaker = budgetDealbreaker(item);
+  const headline = budgetIsOpen ? "Suchvorschlag mit offenem Budget" : dealbreaker ? "Belegter Treffer, aber Budget-Dealbreaker" : item.overBudget ? "Günstigste Prüfidee" : "Beste konkrete Reise";
   const budgetNote = !budgetIsOpen && item.overBudget
-    ? `<p class="mini-note mini-note--budget">${euro(item.overBudgetAmount)} über Budget. Diese Variante nur buchen, wenn Budget, Nächte, Anreisezeit oder Unterkunft bewusst gelockert werden.</p>`
+    ? dealbreaker
+      ? `<p class="mini-note mini-note--budget">${euro(item.overBudgetAmount)} über Budget (${Math.round(item.overBudgetRatio * 100)}% drüber). Das ist kein kleiner Ausreißer, sondern ein Dealbreaker, wenn ${euro(item.total)} nicht realistisch sind.</p>`
+      : `<p class="mini-note mini-note--budget">${euro(item.overBudgetAmount)} über Budget. Diese Variante nur buchen, wenn Budget, Nächte, Anreisezeit oder Unterkunft bewusst gelockert werden.</p>`
     : "";
   const liveLodgingNote = item.liveLodgingRequired && !item.verifiedLodging
     ? `<p class="mini-note mini-note--budget">Unterkunftspreis ist für diesen nahen Zeitraum nicht live bestätigt. Der Betrag ist nur ein Planwert, bis Airbnb/Booking ein echtes Angebot zeigt.</p>`
@@ -4276,6 +4298,7 @@ function renderTripOption(item, index, context) {
   const directNote = hasDirectStay ? directStayNote(item) : "";
   const directStay = directStayFor(item.destination, item.stay.type);
   const stayTitle = item.verifiedLodging ? item.verifiedLodging.label : directStay?.label || stayPlan.title;
+  const dealbreaker = budgetDealbreaker(item);
   return `
     <section class="trip-option">
       <div class="trip-option__top">
@@ -4327,7 +4350,7 @@ function renderTripOption(item, index, context) {
         <span>Skipass ca. ${euro(item.skiCosts.adultPassEstimate)} p. Erw.</span>
       </div>
       ` : ""}
-      <p class="trip-combo">${item.nights} Nächte · ${item.transport.label}, ca. ${formatHours(item.transport.hours)} pro Strecke · Reisezeit ${item.timePreference?.label || "bewertet"}${item.liveLodgingRequired && !item.verifiedLodging ? " · Budget offen, Unterkunft live prüfen" : item.overBudget ? " · über Budget, aber als Vergleich nützlich" : ""}${priceNote ? " · Durchschnittspreise" : ""}</p>
+      <p class="trip-combo">${item.nights} Nächte · ${item.transport.label}, ca. ${formatHours(item.transport.hours)} pro Strecke · Reisezeit ${item.timePreference?.label || "bewertet"}${item.liveLodgingRequired && !item.verifiedLodging ? " · Budget offen, Unterkunft live prüfen" : dealbreaker ? " · Budget-Dealbreaker" : item.overBudget ? " · über Budget, aber als Vergleich nützlich" : ""}${priceNote ? " · Durchschnittspreise" : ""}</p>
       ${priceNote ? `<p class="price-note">${priceNote}</p>` : ""}
       <nav class="links" aria-label="Buchungslinks für ${item.destination.city}, Reise ${index + 1}">
         <a href="${transportLink}" target="_blank" rel="noreferrer">${transportLinkLabel}</a>
