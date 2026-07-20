@@ -3546,13 +3546,35 @@ function favoriteStayQuery(item) {
 function bookingSearchUrl(query, item, context) {
   const family = item.familyPricing || { adults: context.travelers, children: 0 };
   const lodgingNeeds = item.lodgingNeeds || { bedrooms: 1 };
-  return searchUrl("https://www.booking.com/searchresults.html", {
+  const adults = Math.max(1, family.adults || 1);
+  const children = Math.max(0, family.children || 0);
+  const childAges = family.childAges || [];
+  const roomGuests = [
+    ...Array.from({ length: adults }, () => "A"),
+    ...childAges.map((age) => String(age)),
+  ].join(",");
+  const params = {
     ss: query,
-    group_adults: family.adults,
-    group_children: family.children,
-    no_rooms: lodgingNeeds.bedrooms,
+    group_adults: adults,
+    group_children: children,
+    no_rooms: Math.max(1, lodgingNeeds.bedrooms || 1),
+    req_adults: adults,
+    req_children: children,
+    room1: roomGuests || "A",
     checkin: item.startDate,
     checkout: item.checkout,
+    selected_currency: "EUR",
+    lang: "de",
+    sb: 1,
+    src: "searchresults",
+    src_elem: "sb",
+    order: "price",
+  };
+  childAges.forEach((age, index) => {
+    params[`age${index + 1}`] = age;
+  });
+  return searchUrl("https://www.booking.com/searchresults.html", {
+    ...params,
   });
 }
 
@@ -3757,7 +3779,7 @@ function renderResults(items, context) {
               <p>${countryPitch(group.country, group.items)}</p>
             </div>
             <div class="result-group__facts">
-              <span>ab ${group.minHasOpenLiveLodging ? `${euro(group.minTotal)} Planwert` : `${euro(group.minTotal)} gesamt`}</span>
+              <span>ab ${group.minHasOpenLiveLodging ? `ca. ${euro(group.minTotal)} Planwert` : `${euro(group.minTotal)} gesamt`}</span>
               <span>${group.items.length} konkrete Ort${group.items.length > 1 ? "e" : ""}</span>
               <span>Top: ${group.best.destination.city}</span>
             </div>
@@ -3781,11 +3803,11 @@ function renderDestinationCard(item, groupRank, itemIndex, context) {
   const tags = item.destination.vibes.map((tag) => `<span class="tag">${tag}</span>`).join("");
   const leverTags = item.leverNotes.slice(0, 8).map((tag) => `<span class="tag tag--lever">${tag}</span>`).join("");
   const variants = item.variants || [item];
-  const totalText = item.liveLodgingRequired && !item.verifiedLodging ? `${euro(item.total)} Planwert` : `${euro(item.total)} gesamt`;
+  const totalText = item.liveLodgingRequired && !item.verifiedLodging ? `ca. ${euro(item.total)} Planwert` : `${euro(item.total)} gesamt`;
   const budgetIsOpen = item.liveLodgingRequired && !item.verifiedLodging;
   const dealbreaker = budgetDealbreaker(item);
   const budgetStatus = budgetIsOpen
-    ? `<div class="budget-status budget-status--over"><strong>Budget offen</strong><span>${totalText}, Unterkunft noch nicht live belegt</span></div>`
+    ? `<div class="budget-status budget-status--over"><strong>Budget offen</strong><span>${totalText}, Unterkunft noch nicht live belegt; Booking/Airbnb kann teurer sein</span></div>`
     : dealbreaker
     ? `<div class="budget-status budget-status--over"><strong>Budget-Dealbreaker</strong><span>${euro(item.overBudgetAmount)} über Budget (${Math.round(item.overBudgetRatio * 100)}% drüber)</span></div>`
     : item.overBudget
@@ -3938,7 +3960,7 @@ function costBreakdownRows(item) {
       formula: item.verifiedLodging
         ? `${item.verifiedLodging.label}, live geprüft`
         : item.liveLodgingRequired
-          ? "Planwert, Livepreis offen"
+          ? "ca. Planwert, Livepreis offen"
           : "Saison-/Durchschnittswert",
     },
     {
@@ -4090,7 +4112,7 @@ function renderBestTripPreview(item, context) {
   const readiness = bookingReadiness(item);
   const directStay = directStayFor(item.destination, item.stay.type);
   const stayTitle = item.destination.cruise ? stayPlan.title : item.verifiedLodging ? item.verifiedLodging.label : directStay?.label || stayTypeLabel(item.stay.type);
-  const totalLabel = item.liveLodgingRequired && !item.verifiedLodging ? `${euro(item.total)} Planwert` : `${euro(item.total)} gesamt`;
+  const totalLabel = item.liveLodgingRequired && !item.verifiedLodging ? `ca. ${euro(item.total)} Planwert` : `${euro(item.total)} gesamt`;
   const budgetIsOpen = item.liveLodgingRequired && !item.verifiedLodging;
   const dealbreaker = budgetDealbreaker(item);
   const headline = budgetIsOpen ? "Suchvorschlag mit offenem Budget" : dealbreaker ? "Belegter Treffer, aber Budget-Dealbreaker" : item.overBudget ? "Günstigste Prüfidee" : "Beste konkrete Reise";
@@ -4100,7 +4122,7 @@ function renderBestTripPreview(item, context) {
       : `<p class="mini-note mini-note--budget">${euro(item.overBudgetAmount)} über Budget. Diese Variante nur buchen, wenn Budget, Nächte, Anreisezeit oder Unterkunft bewusst gelockert werden.</p>`
     : "";
   const liveLodgingNote = item.liveLodgingRequired && !item.verifiedLodging
-    ? `<p class="mini-note mini-note--budget">Unterkunftspreis ist für diesen nahen Zeitraum nicht live bestätigt. Der Betrag ist nur ein Planwert, bis Airbnb/Booking ein echtes Angebot zeigt.</p>`
+    ? `<p class="mini-note mini-note--budget">Unterkunftspreis ist für diesen nahen Zeitraum nicht live bestätigt. Der Betrag ist nur ein ca. Planwert; wenn Booking/Airbnb teurer ist, zählt der Livepreis.</p>`
     : "";
   const transportNotes = item.transport.notes?.length
     ? `<p class="mini-note">${item.transport.notes.slice(0, 3).join(" · ")}</p>`
@@ -4282,7 +4304,7 @@ function renderTripOption(item, index, context) {
         : "Favorisierte Suche öffnen";
   const stayCostLabel = item.destination.cruise ? "Kabine" : stayName;
   const transportPriceLabel = `${euro(item.transportTotal)} gesamt`;
-  const totalLabel = item.liveLodgingRequired && !item.verifiedLodging ? `${euro(item.total)} Planwert` : `${euro(item.total)} gesamt`;
+  const totalLabel = item.liveLodgingRequired && !item.verifiedLodging ? `ca. ${euro(item.total)} Planwert` : `${euro(item.total)} gesamt`;
   const lodgingPriceLabel = item.verifiedLodging
     ? `${stayCostLabel}: ${euro(item.lodgingTotal)} live geprüft`
     : item.liveLodgingRequired
