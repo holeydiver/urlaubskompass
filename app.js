@@ -3492,24 +3492,37 @@ function directStayUrl(item) {
   const direct = directStayFor(item.destination, item.stay.type);
   if (!direct?.url) return "";
   const url = new URL(direct.url);
-  const family = item.familyPricing || { adults: 1 };
-  const lodgingNeeds = item.lodgingNeeds || { bedrooms: 1 };
+  const family = item.familyPricing || { adults: 1, children: 0, childAges: [] };
+  const lodgingNeeds = item.lodgingNeeds || { beds: 1, bedrooms: 1 };
+  const adults = Math.max(1, family.adults || 1);
+  const children = Math.max(0, family.children || 0);
+  const childAges = family.childAges || [];
   if (direct.platform === "airbnb") {
-    url.searchParams.set("adults", String(Math.max(1, family.adults || 1)));
+    url.searchParams.set("adults", String(adults));
+    url.searchParams.set("children", String(childAges.filter((age) => age >= 2).length));
+    url.searchParams.set("infants", String(childAges.filter((age) => age < 2).length));
+    url.searchParams.set("min_beds", String(Math.max(1, lodgingNeeds.beds || 1)));
+    url.searchParams.set("min_bedrooms", String(Math.max(1, lodgingNeeds.bedrooms || 1)));
     url.searchParams.set("check_in", item.startDate);
     url.searchParams.set("check_out", item.checkout);
   }
   if (direct.platform === "booking") {
     url.searchParams.set("checkin", item.startDate);
     url.searchParams.set("checkout", item.checkout);
-    url.searchParams.set("group_adults", String(Math.max(1, family.adults || 1)));
-    url.searchParams.set("group_children", String(family.children || 0));
+    url.searchParams.set("group_adults", String(adults));
+    url.searchParams.set("group_children", String(children));
     url.searchParams.set("no_rooms", String(Math.max(1, lodgingNeeds.bedrooms || 1)));
-    url.searchParams.set("req_adults", String(Math.max(1, family.adults || 1)));
-    url.searchParams.set("req_children", String(family.children || 0));
-    url.searchParams.set("room1", Array.from({ length: Math.max(1, family.adults || 1) }, () => "A").join(","));
+    url.searchParams.set("req_adults", String(adults));
+    url.searchParams.set("req_children", String(children));
+    url.searchParams.set("room1", [
+      ...Array.from({ length: adults }, () => "A"),
+      ...childAges.map((age) => String(age)),
+    ].join(","));
     url.searchParams.set("selected_currency", "EUR");
     url.searchParams.set("lang", "de");
+    childAges.forEach((age, index) => {
+      url.searchParams.set(`age${index + 1}`, String(age));
+    });
   }
   return url.toString();
 }
@@ -3528,9 +3541,11 @@ function verifiedDirectStayPrice(destination, stayType, startDate, checkout, fam
   const verified = direct?.verified;
   if (!verified) return null;
   const adults = Math.max(1, family?.adults || 1);
+  const children = Math.max(0, family?.children || 0);
   const matchesDates = verified.checkin === startDate && verified.checkout === checkout;
   const matchesAdults = Number(verified.adults || adults) === adults;
-  if (!matchesDates || !matchesAdults) return null;
+  const matchesChildren = verified.children === undefined || Number(verified.children) === children;
+  if (!matchesDates || !matchesAdults || !matchesChildren) return null;
   return {
     total: verified.total,
     checked: verified.checked,
@@ -3612,6 +3627,75 @@ function bookingPriceFilter(item) {
 
 function bookingTargetLabel(item) {
   return `bis ca. ${euro(item.lodgingTotal)} Unterkunft`;
+}
+
+function lodgingStatus(item) {
+  if (item.verifiedLodging) {
+    return {
+      level: "verified",
+      label: "Unterkunft live geprüft",
+      amountLabel: `${euro(item.lodgingTotal)} live geprüft`,
+      formula: `${item.verifiedLodging.label}, live geprüft am ${formatDate(item.verifiedLodging.checked)}`,
+      note: item.verifiedLodging.note || "Direktangebot mit Datum und Personen hinterlegt.",
+    };
+  }
+  if (item.liveLodgingRequired) {
+    return {
+      level: "open",
+      label: "Unterkunft Livepreis offen",
+      amountLabel: "Livepreis offen",
+      formula: "ca. Planwert, noch kein echtes Angebot",
+      note: "Für diesen nahen Zeitraum muss Airbnb/Booking einen echten Preis zeigen, bevor das Budget belastbar ist.",
+    };
+  }
+  return {
+    level: "estimate",
+    label: "Unterkunft Schätzwert",
+    amountLabel: `${euro(item.lodgingTotal)} Schätzwert`,
+    formula: "Saison-/Durchschnittswert",
+    note: "Für weiter entfernte Reisen ist der Betrag ein Durchschnittswert bis echte Angebote verfügbar sind.",
+  };
+}
+
+function transportStatus(item) {
+  if (item.verifiedTransport) {
+    return {
+      level: "verified",
+      label: "Anreise live geprüft",
+      amountLabel: `${euro(item.transportTotal)} live geprüft`,
+      formula: `${item.verifiedTransport.label}, geprüft am ${formatDate(item.verifiedTransport.checked)}`,
+      note: item.verifiedTransport.note || "Direkte Verbindung mit Datum und Personen hinterlegt.",
+    };
+  }
+  const mode = item.transport.mode;
+  const concrete = mode === "flight"
+    ? Boolean((item.transport.originAirport?.code || "") && destinationAirportCodes(item.destination).length)
+    : mode === "train" || mode === "night-train"
+      ? true
+      : mode === "bus"
+        ? Boolean(item.transport.originHub?.city || item.transport.destinationHub?.city)
+        : mode === "car";
+  const provider = {
+    flight: "Flugsuche",
+    train: "Bahn-Suche",
+    "night-train": "Nachtzug-/Bahn-Suche",
+    bus: "FlixBus-/Bus-Strecke",
+    car: "Routenplaner",
+  }[mode] || "Anreise-Suche";
+  const note = {
+    flight: "Flugsuche ist verlinkt; echte Ticketpreise, Gepäck, Sitzplätze, Umstiege und Flughafen-Zubringer direkt beim Anbieter prüfen.",
+    train: "Bahn-Suche ist verlinkt; echte Sparpreise, Auslastung, Sitzplätze, BahnCard/Deutschlandticket und Umstiege direkt bei der Bahn prüfen.",
+    "night-train": "Nachtzug-/Bahn-Suche ist verlinkt; echte Liege-/Schlafwagenpreise, Ankunftszeit und Verfügbarkeit direkt beim Anbieter prüfen.",
+    bus: "FlixBus-/Bus-Strecke ist verlinkt; echte Plätze, Tagespreise, Gepäckregeln, Rückfahrt und Abfahrtsbahnhof direkt beim Anbieter prüfen.",
+    car: "Routenplaner ist verlinkt; Sprit, Parken, Maut, Umweltzonen und Fahrzeit bleiben Schätzwerte.",
+  }[mode] || "Anreise-Suche ist verlinkt; echten Preis und Verfügbarkeit direkt beim Anbieter prüfen.";
+  return {
+    level: concrete ? "provider-search" : "estimate",
+    label: concrete ? "Anreise-Suche, Preis geschätzt" : "Anreise grob geschätzt",
+    amountLabel: `${euro(item.transportTotal)} Schätzwert`,
+    formula: `${item.transport.label}, Schätzwert für Hin/Rück bzw. Reisegruppe`,
+    note: concrete ? note : `Noch kein stabiler ${provider}-Link möglich; der Betrag ist nur ein grober Budget-Anker.`,
+  };
 }
 
 function bookingLinks(item, context) {
@@ -3989,20 +4073,18 @@ function unitNumber(value) {
 
 function costBreakdownRows(item) {
   const family = item.familyPricing || { livingUnits: 1 };
+  const stayStatus = lodgingStatus(item);
+  const routeStatus = transportStatus(item);
   const rows = [
     {
       label: item.destination.cruise ? "Kabine/Route" : "Unterkunft",
       amount: item.lodgingTotal,
-      formula: item.verifiedLodging
-        ? `${item.verifiedLodging.label}, live geprüft`
-        : item.liveLodgingRequired
-          ? "ca. Planwert, Livepreis offen"
-          : "Saison-/Durchschnittswert",
+      formula: stayStatus.formula,
     },
     {
       label: "Anreise",
       amount: item.transportTotal,
-      formula: `${item.transport.label}, Gesamtansatz für Hin/Rück bzw. Reisegruppe`,
+      formula: routeStatus.formula,
     },
     {
       label: item.destination.cruise ? "Bordextras" : "Alltag vor Ort",
@@ -4146,6 +4228,8 @@ function renderBestTripPreview(item, context) {
   const priceNote = averagePriceNote(item);
   const verdict = tripVerdict(item);
   const readiness = bookingReadiness(item);
+  const stayStatus = lodgingStatus(item);
+  const routeStatus = transportStatus(item);
   const directStay = directStayFor(item.destination, item.stay.type);
   const stayTitle = item.destination.cruise ? stayPlan.title : item.verifiedLodging ? item.verifiedLodging.label : directStay?.label || stayTypeLabel(item.stay.type);
   const totalLabel = item.liveLodgingRequired && !item.verifiedLodging ? `ca. ${euro(item.total)} Planwert` : `${euro(item.total)} gesamt`;
@@ -4179,12 +4263,12 @@ function renderBestTripPreview(item, context) {
         <div>
           <span>${item.destination.cruise ? "Kabine / Route" : "Unterkunft"}</span>
           <strong>${stayTitle} · ${stayPlan.area}</strong>
-          <p>${stayPlan.bedsLabel}, ${lodgingBudgetText(item)}.</p>
+          <p>${stayPlan.bedsLabel}, ${lodgingBudgetText(item)}. ${stayStatus.note}</p>
         </div>
         <div>
           <span>Anreise</span>
           <strong>${transportPlan.title}</strong>
-          <p>${euro(item.transportTotal)} gesamt, ca. ${formatHours(item.transport.hours)} pro Strecke.</p>
+          <p>${routeStatus.amountLabel}, ca. ${formatHours(item.transport.hours)} pro Strecke. ${routeStatus.note}</p>
           ${transportNotes}
         </div>
       </div>
@@ -4311,6 +4395,8 @@ function renderTripOption(item, index, context) {
   const stayPlan = concreteStayPlan(item);
   const transportPlan = concreteTransportPlan(item, context);
   const verdict = tripVerdict(item);
+  const stayStatus = lodgingStatus(item);
+  const routeStatus = transportStatus(item);
   const hasFlightCodes = item.transport.mode === "flight" && (item.transport.originAirport?.code || originAirportCode(context.origin)) && destinationAirportCodes(item.destination).length;
   const transportLink = item.transport.mode === "flight"
     ? links.flights
@@ -4325,10 +4411,12 @@ function renderTripOption(item, index, context) {
     ? euro(Math.round(item.transport.price))
     : "";
   const transportLinkLabel = item.transport.mode === "bus"
-    ? `FlixBus-Strecke ab ca. ${busPerPerson} p. P.`
+    ? `FlixBus/Bus ab ca. ${busPerPerson} p. P. prüfen`
     : item.transport.mode === "flight"
-      ? "Konkrete Flüge suchen"
-      : `${item.transport.label} prüfen`;
+      ? `Flüge ab ca. ${euro(item.transportTotal)} prüfen`
+      : item.transport.mode === "train" || item.transport.mode === "night-train"
+        ? `${item.transport.label} ab ca. ${euro(item.transportTotal)} prüfen`
+        : `${item.transport.label} ca. ${euro(item.transportTotal)} prüfen`;
   const hasDirectStay = Boolean(links.directStay);
   const primaryStayLink = item.destination.cruise ? links.cruise.primary : hasDirectStay ? links.directStay : links.favoriteStay;
   const bookingLabel = `Booking ${bookingTargetLabel(item)}`;
@@ -4345,15 +4433,15 @@ function renderTripOption(item, index, context) {
   const transportPriceLabel = `${euro(item.transportTotal)} gesamt`;
   const totalLabel = item.liveLodgingRequired && !item.verifiedLodging ? `ca. ${euro(item.total)} Planwert` : `${euro(item.total)} gesamt`;
   const lodgingPriceLabel = item.verifiedLodging
-    ? `${stayCostLabel}: ${euro(item.lodgingTotal)} live geprüft`
+    ? `${stayCostLabel}: ${stayStatus.amountLabel}`
     : item.liveLodgingRequired
       ? `${stayCostLabel}: Livepreis offen`
       : `${stayCostLabel}: Schätzwert`;
   const busLinkNote = item.transport.mode === "bus"
-    ? `<p class="link-note">Bus-Schätzung: ${item.transport.notes.join(" · ")}. Der Link öffnet die stabile FlixBus-Streckenseite; Datum, Rückfahrt und verfügbare Plätze dort final wählen.</p>`
+    ? `<p class="link-note">${routeStatus.note} ${item.transport.notes.length ? `Route: ${item.transport.notes.join(" · ")}.` : ""}</p>`
     : "";
   const flightLinkNote = item.transport.mode === "flight"
-    ? `<p class="link-note">${item.transport.advisory ? "Flug war nicht als Hauptanreise ausgewählt, wird hier aber als prüfenswerte Alternative gezeigt, weil Preis/Reisezeit mithalten können. " : ""}${hasFlightCodes ? "Der Fluglink nutzt erkannte Flughafen-Codes und öffnet eine konkrete Hin-/Rückflug-Suche. Kinderpreise, Gepäck und alternative Flughäfen bitte in der Buchungsseite final prüfen." : "Für diese Start-/Zielkombination fehlt noch ein sicherer Flughafen-Code; der Link öffnet deshalb eine gezielte Websuche statt einer leeren Flugseite."}</p>`
+    ? `<p class="link-note">${item.transport.advisory ? "Flug war nicht als Hauptanreise ausgewählt, wird hier aber als prüfenswerte Alternative gezeigt, weil Preis/Reisezeit mithalten können. " : ""}${routeStatus.note}</p>`
     : "";
   const priceNote = averagePriceNote(item);
   const directNote = hasDirectStay ? directStayNote(item) : "";
@@ -4375,7 +4463,7 @@ function renderTripOption(item, index, context) {
         <div>
           <span>Konkrete Anreise</span>
           <strong>${transportPlan.title}</strong>
-          <p>${transportPlan.detail}. Geschätzt: ${euro(item.transportTotal)} gesamt, ca. ${formatHours(item.transport.hours)} pro Strecke.</p>
+          <p>${transportPlan.detail}. ${routeStatus.amountLabel}, ca. ${formatHours(item.transport.hours)} pro Strecke. ${routeStatus.note}</p>
         </div>
       </div>
       ${specialExperience(item)}
@@ -4388,6 +4476,10 @@ function renderTripOption(item, index, context) {
         <div><span>Anreise</span><strong>${item.transport.label} ${transportPriceLabel}</strong></div>
         <div><span>${item.destination.cruise ? "Kabine" : "Unterkunft"}</span><strong>${lodgingPriceLabel}</strong></div>
         <div><span>${item.destination.cruise ? "Bordextras" : "Alltag"}</span><strong>${euro(item.effectiveDaily)} p. P./Tag</strong></div>
+      </div>
+      <div class="verification-line" aria-label="Prüfstatus">
+        <span>${stayStatus.label}</span>
+        <span>${routeStatus.label}</span>
       </div>
       ${renderCostBreakdown(item)}
       <div class="quality-line">

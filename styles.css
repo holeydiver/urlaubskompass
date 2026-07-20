@@ -1143,7 +1143,8 @@ dd {
 
 .quality-line,
 .living-line,
-.ski-line {
+.ski-line,
+.verification-line {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
@@ -1151,7 +1152,8 @@ dd {
 
 .quality-line span,
 .living-line span,
-.ski-line span {
+.ski-line span,
+.verification-line span {
   min-height: 30px;
   display: inline-flex;
   align-items: center;
@@ -1174,6 +1176,12 @@ dd {
   border-color: #d3e5ea;
   color: #184f63;
   background: #f0f8fb;
+}
+
+.verification-line span {
+  border-color: #d9d2c4;
+  color: #59421d;
+  background: #fffaf0;
 }
 
 .mode-panel {
