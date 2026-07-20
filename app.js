@@ -846,7 +846,7 @@ const destinations = [
     kitchenSavings: 17,
     localSavings: 10,
     nearbyAirport: true,
-    ski: { resort: "Schladming-Dachstein", pass: 73, rental: 34, transfer: 18, snow: 86, terrain: 88, beginner: 76 },
+    ski: { resort: "Schladming-Dachstein", pass: 79, rental: 34, transfer: 18, snow: 86, terrain: 88, beginner: 76 },
     why: "Teurer, aber qualitativ stark: großes Skigebiet, hohe Zuverlässigkeit und gute Pensionen mit Frühstück oder Halbpension.",
   },
   {
@@ -903,7 +903,7 @@ const destinations = [
     kitchenSavings: 15,
     localSavings: 10,
     nearbyAirport: true,
-    ski: { resort: "Ski amadé Gastein", pass: 70, rental: 32, transfer: 16, snow: 80, terrain: 80, beginner: 72 },
+    ski: { resort: "Ski amadé Gastein", pass: 79, rental: 32, transfer: 16, snow: 80, terrain: 80, beginner: 72 },
     why: "Oft etwas weniger überlaufen als die ganz lauten Namen, mit Thermen-Option und guter Pension-Auswahl.",
   },
   {
@@ -2490,6 +2490,8 @@ function skiCostBreakdown(destination, options, nights) {
   const skiDays = Math.min(options.ski.days, nights);
   const rentalPerDay = options.ski.rental === "needed" ? destination.ski.rental : 0;
   const family = options.familyPricing;
+  const adultPassEstimate = destination.ski.pass * skiDays;
+  const rentalPerPersonEstimate = rentalPerDay * skiDays;
   const passTotal = destination.ski.pass * skiDays * family.skiPassUnits;
   const rentalTotal = rentalPerDay * skiDays * family.skiRentalUnits;
   const transferTotal = destination.ski.transfer * family.transportUnits;
@@ -2497,9 +2499,20 @@ function skiCostBreakdown(destination, options, nights) {
   const levelScore = options.ski.level === "beginner" ? destination.ski.beginner : options.ski.level === "advanced" ? destination.ski.terrain : (destination.ski.beginner + destination.ski.terrain) / 2;
   const snowScore = destination.ski.snow * options.ski.snowWeight;
   const score = levelScore * 0.18 + snowScore * 0.16 - Math.max(0, total / Math.max(family.skiPassUnits, 1) - 420) * 0.035;
-  const notes = [`Skipass ${euro(destination.ski.pass)}/Tag`, `${destination.ski.resort}`, `${destination.ski.snow}/100 Schnee`];
-  if (rentalPerDay) notes.push(`Leihe ${euro(rentalPerDay)}/Tag`);
-  return { total: Math.round(total), passTotal: Math.round(passTotal), rentalTotal: Math.round(rentalTotal), transferTotal: Math.round(transferTotal), dailyEquivalent: Math.round(total / Math.max(nights * family.skiPassUnits, 1)), notes, score, skiDays };
+  const notes = [`Skipass-Schätzung ca. ${euro(adultPassEstimate)} p. Erw. für ${skiDays} Skitage`, `${destination.ski.resort}`, `${destination.ski.snow}/100 Schnee`];
+  if (rentalPerDay) notes.push(`Leihe ca. ${euro(rentalPerPersonEstimate)} p. Person`);
+  return {
+    total: Math.round(total),
+    passTotal: Math.round(passTotal),
+    rentalTotal: Math.round(rentalTotal),
+    transferTotal: Math.round(transferTotal),
+    adultPassEstimate: Math.round(adultPassEstimate),
+    rentalPerPersonEstimate: Math.round(rentalPerPersonEstimate),
+    dailyEquivalent: Math.round(total / Math.max(nights * family.skiPassUnits, 1)),
+    notes,
+    score,
+    skiDays,
+  };
 }
 
 function normalizeDisplayPlace(value) {
@@ -4051,7 +4064,7 @@ function renderTripOption(item, index, context) {
         <span>${item.destination.ski.resort}</span>
         <span>${item.skiCosts.skiDays} Skitage</span>
         <span>Ski ${euro(item.skiTotal)}</span>
-        <span>Skipass ${euro(item.destination.ski.pass)}/Tag</span>
+        <span>Skipass ca. ${euro(item.skiCosts.adultPassEstimate)} p. Erw.</span>
       </div>
       ` : ""}
       <p class="trip-combo">${item.nights} Nächte · ${item.transport.label}, ca. ${formatHours(item.transport.hours)} pro Strecke · Reisezeit ${item.timePreference?.label || "bewertet"}${item.overBudget ? " · über Budget, aber als Vergleich nützlich" : ""}${priceNote ? " · Durchschnittspreise" : ""}</p>
