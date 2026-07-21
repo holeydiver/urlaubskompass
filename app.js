@@ -821,6 +821,24 @@ const destinations = [
     kitchenSavings: 7,
     localSavings: 8,
     nearbyAirport: false,
+    directStays: [
+      {
+        platform: "booking",
+        stayTypes: ["airbnb", "budget-room", "pension", "hotel"],
+        label: "Guest Rooms Grachenovi",
+        url: "https://www.booking.com/hotel/bg/guest-house-grachenovi.de.html",
+        note: "Einfaches Gästehaus mit sehr guter Bewertung; Zimmerart, Bad, Storno und Lage vor Buchung direkt bei Booking prüfen.",
+        verified: {
+          checked: "2026-07-21",
+          checkin: "2026-10-14",
+          checkout: "2026-10-17",
+          adults: 1,
+          children: 1,
+          total: 87,
+          note: "Booking zeigte am 21.07.2026 für 14.-17.10.2026, 1 Erw. und 1 Kind (13) 87 EUR Gesamtpreis; Bewertung 9,2 bei 62 Bewertungen.",
+        },
+      },
+    ],
     ski: { resort: "Bansko", pass: 48, rental: 20, transfer: 10, snow: 70, terrain: 68, beginner: 78 },
     why: "Sehr gutes Preis-Leistungs-Verhältnis für Skiurlaub, Thermalbäder und niedrige Alltagskosten im Ort.",
   },
@@ -3663,7 +3681,7 @@ function bookingPriceFilter(item) {
 }
 
 function bookingTargetLabel(item) {
-  return `bis ca. ${euro(item.lodgingTotal)} Unterkunft`;
+  return "Suche mit Budgetfilter öffnen";
 }
 
 function lodgingStatus(item) {
@@ -4134,8 +4152,8 @@ function bookingReadiness(item) {
   if (item.liveLodgingRequired) {
     return {
       tone: "search",
-      label: "Suchvorschlag statt Angebot",
-      text: `Für diesen nahen Zeitraum fehlt noch ein echter ${item.destination.cruise ? "Kabinen-/Routenpreis" : "Unterkunftspreis"}. Erst buchen, wenn ${item.destination.cruise ? "Reederei/Portal" : "Airbnb/Booking"} einen passenden Livepreis zeigt.`,
+      label: "Live-Unterkunft noch auswählen",
+      text: `Für diesen nahen Zeitraum öffnet die App eine konkrete ${item.destination.cruise ? "Kabinen-/Routensuche" : "Booking/Airbnb-Suche"} mit Datum und Personen. Erst wenn dort ein Treffer ausgewählt ist, ist das Budget belastbar.`,
     };
   }
   return {
@@ -4313,11 +4331,16 @@ function renderBestTripPreview(item, context) {
   const stayStatus = lodgingStatus(item);
   const routeStatus = transportStatus(item);
   const directStay = directStayFor(item.destination, item.stay.type);
+  const staySectionLabel = item.destination.cruise
+    ? "Kabine / Route"
+    : item.verifiedLodging || directStay
+      ? "Favorisierte Unterkunft"
+      : "Favorisierte Unterkunftssuche";
   const stayTitle = item.destination.cruise ? stayPlan.title : item.verifiedLodging ? item.verifiedLodging.label : directStay?.label || stayTypeLabel(item.stay.type);
   const totalLabel = totalPriceLabel(item);
   const budgetIsOpen = item.liveLodgingRequired && !item.verifiedLodging;
   const dealbreaker = budgetDealbreaker(item);
-  const headline = budgetIsOpen ? "Suchvorschlag mit offenem Budget" : dealbreaker ? "Belegter Treffer, aber Budget-Dealbreaker" : item.overBudget ? "Günstigste Prüfidee" : item.verifiedLodging ? "Stärkster belegter Treffer" : "Stärkste Prüfidee";
+  const headline = budgetIsOpen ? "Favorisierte Suche, Livepreis offen" : dealbreaker ? "Belegter Treffer, aber Budget-Dealbreaker" : item.overBudget ? "Günstigste Prüfidee" : item.verifiedLodging ? "Stärkster belegter Treffer" : "Stärkste Prüfidee";
   const budgetNote = !budgetIsOpen && item.overBudget
     ? dealbreaker
       ? `<p class="mini-note mini-note--budget">${euro(item.overBudgetAmount)} über Budget (${Math.round(item.overBudgetRatio * 100)}% drüber). Das ist kein kleiner Ausreißer, sondern ein Dealbreaker, wenn ${euro(item.total)} nicht realistisch sind.</p>`
@@ -4343,7 +4366,7 @@ function renderBestTripPreview(item, context) {
       ${liveLodgingNote}
       <div class="best-trip__grid">
         <div>
-          <span>${item.destination.cruise ? "Kabine / Route" : "Unterkunft"}</span>
+          <span>${staySectionLabel}</span>
           <strong>${stayTitle} · ${stayPlan.area}</strong>
           <p>${stayPlan.bedsLabel}, ${lodgingBudgetText(item)}. ${stayStatus.note}</p>
         </div>
@@ -4520,7 +4543,7 @@ function renderTripOption(item, index, context) {
           : item.stay.type === "budget-room"
             ? "Booking-Suche mit Datum öffnen"
             : "Airbnb-Suche mit Datum öffnen";
-  const stayCostLabel = item.destination.cruise ? "Kabine" : stayName;
+  const stayCostLabel = item.destination.cruise ? "Kabine" : item.verifiedLodging ? "Unterkunft" : stayName;
   const transportPriceLabel = `${euro(item.transportTotal)} gesamt`;
   const totalLabel = totalPriceLabel(item);
   const lodgingPriceLabel = item.verifiedLodging
@@ -4546,7 +4569,7 @@ function renderTripOption(item, index, context) {
       </div>
       <div class="concrete-plan">
         <div>
-          <span>${hasDirectStay ? "Unterkunfts-Direktlink" : "Unterkunftssuche"}</span>
+          <span>${hasDirectStay ? "Favorisierte Unterkunft" : "Favorisierte Unterkunftssuche"}</span>
           <strong>${stayTitle} · ${stayPlan.area}</strong>
           <p>${stayPlan.focus}, ${stayPlan.bedsLabel}, ${lodgingBudgetText(item)}. ${hasDirectStay ? `Direktangebot hinterlegt.${directNote ? ` ${directNote}` : ""}` : `${stayPlan.note}. Den echten Preis immer im Buchungsportal prüfen.`}</p>
         </div>
