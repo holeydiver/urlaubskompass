@@ -3328,16 +3328,26 @@ function transportDestinationName(item) {
   return destination.city;
 }
 
+function bahnDestinationName(item) {
+  if (item.destination.cruise) return transportDestinationName(item);
+  return busDestinationGateway(item.destination).city || transportDestinationName(item);
+}
+
 function bahnSearchUrl(item, context) {
+  const origin = normalizeDisplayPlace(context.origin) || context.origin;
+  const destination = bahnDestinationName(item);
   const params = new URLSearchParams({
     sts: "true",
-    so: context.origin,
-    zo: transportDestinationName(item),
+    so: origin,
+    zo: destination,
+    soid: `O=${origin}`,
+    zoid: `O=${destination}`,
     hd: `${item.startDate}T08:00:00`,
     hza: "D",
     ar: "false",
     s: "true",
     d: "false",
+    kl: "2",
   });
   return `https://www.bahn.de/buchung/fahrplan/suche#${params.toString()}`;
 }
@@ -4424,6 +4434,8 @@ function concreteStayPlan(item) {
 
 function concreteTransportPlan(item, context) {
   const destination = transportDestinationName(item);
+  const railDestination = bahnDestinationName(item);
+  const origin = normalizeDisplayPlace(context.origin) || context.origin;
   const airport = item.destination.airport;
   const flightAirport = item.transport.originAirport;
   const airportRole = item.transport.airportRole;
@@ -4435,12 +4447,16 @@ function concreteTransportPlan(item, context) {
         : "Direktflug oder Umstieg prüfen, danach ÖPNV/Transfer zur Unterkunft einplanen",
     },
     train: {
-      title: `Bahn ${context.origin} → ${destination}`,
-      detail: "Verbindung mit wenig Umstiegen bevorzugen; Sitzplatz/Deutschlandticket/BahnCard gegenprüfen",
+      title: `Bahn ${origin} → ${railDestination}`,
+      detail: railDestination !== destination
+        ? `Bahn bis ${railDestination} prüfen, danach Weiterfahrt nach ${destination} einplanen; Verbindung mit wenig Umstiegen bevorzugen`
+        : "Verbindung mit wenig Umstiegen bevorzugen; Sitzplatz/Deutschlandticket/BahnCard gegenprüfen",
     },
     "night-train": {
-      title: `Nachtzug ${context.origin} → ${destination}`,
-      detail: "Liege-/Schlafwagen und Ankunftszeit prüfen; spart ggf. eine Hotelnacht, kostet aber Komfort",
+      title: `Nachtzug ${origin} → ${railDestination}`,
+      detail: railDestination !== destination
+        ? `Nachtzug/Bahn bis ${railDestination} prüfen, danach Weiterfahrt nach ${destination} einplanen; Liege-/Schlafwagen und Ankunftszeit prüfen`
+        : "Liege-/Schlafwagen und Ankunftszeit prüfen; spart ggf. eine Hotelnacht, kostet aber Komfort",
     },
     bus: {
       title: item.transport.originHub || item.transport.destinationHub
