@@ -3445,6 +3445,7 @@ function destinationAirportCodes(destination) {
     "Zeeland & Südholland Küste": ["AMS", "RTM"],
     "Polnische Ostsee": ["GDN", "SZZ"],
     Sarajevo: ["SJJ"],
+    Bansko: ["SOF"],
     Naxos: ["JNX", "ATH"],
     "Rijeka & Cres": ["RJK", "ZAG"],
     Plovdiv: ["SOF"],
@@ -3587,20 +3588,11 @@ function lodgingSearchLabel(item, type) {
   return prefix;
 }
 
-function favoriteStayQuery(item) {
-  const plan = concreteStayPlan(item);
-  const place = `${item.destination.city} ${item.destination.country}`;
-  const stayTerms = {
-    airbnb: "Ferienwohnung Küche",
-    "budget-room": "Budgetzimmer Privatzimmer",
-    hotel: "Hotel",
-    pension: "Pension Gästehaus",
-  };
-  const area = plan.area.replace(/\boder\b/gi, " ").replace(/[·,]/g, " ");
-  return `${place} ${area} ${stayTerms[item.stay.type] || "Unterkunft"}`.replace(/\s+/g, " ").trim();
+function bookingStayQuery(item) {
+  return basePlaceQuery(item);
 }
 
-function bookingStayQuery(item) {
+function airbnbStayQuery(item) {
   return basePlaceQuery(item);
 }
 
@@ -3761,7 +3753,7 @@ function totalPriceNote(item) {
 
 function bookingLinks(item, context) {
   const placeQuery = basePlaceQuery(item);
-  const favoriteQuery = favoriteStayQuery(item);
+  const airbnbQuery = airbnbStayQuery(item);
   const bookingQuery = bookingStayQuery(item);
   const specialQuery = specialSearchQuery(item);
   const query = item.travelProfile === "cruise" && item.destination.cruise?.search
@@ -3783,7 +3775,7 @@ function bookingLinks(item, context) {
     booking: bookingSearchUrl(bookingQuery, item, context),
     directStay: directStayUrl(item),
     favoriteStay: item.stay.type === "airbnb"
-      ? airbnbSearchUrl(favoriteQuery, item)
+      ? airbnbSearchUrl(airbnbQuery, item)
       : bookingSearchUrl(bookingQuery, item, context),
     special: specialQuery ? searchUrl("https://www.google.com/search", { q: specialQuery }) : "",
     cruise: cruiseLineLinks(item),
