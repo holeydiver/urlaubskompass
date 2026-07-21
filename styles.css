@@ -552,6 +552,29 @@ dd {
   font-weight: 750;
 }
 
+.region-budget-tips {
+  border: 1px solid #d7e0e3;
+  border-radius: 7px;
+  padding: 10px 12px;
+  background: #f7fbfb;
+}
+
+.region-budget-tips summary {
+  cursor: pointer;
+  color: var(--blue);
+  font-size: 0.88rem;
+  font-weight: 850;
+}
+
+.region-budget-tips ul {
+  margin: 9px 0 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 6px;
+  color: #334239;
+  font-size: 0.86rem;
+}
+
 .result-group__cards {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));

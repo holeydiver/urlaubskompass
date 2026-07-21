@@ -4012,6 +4012,69 @@ function regionSpecialIdeas(group) {
   `;
 }
 
+function regionBudgetTips(group) {
+  const tips = [];
+  const items = group.items || [];
+  const best = group.best || items[0];
+  const hasBeach = items.some((item) => item.destination.vibes.includes("strand"));
+  const hasCity = items.some((item) => item.destination.vibes.includes("stadt"));
+  const hasMountain = items.some((item) => item.destination.vibes.includes("berge"));
+  const hasCruise = items.some((item) => item.destination.cruise);
+  const hasSki = items.some((item) => item.skiCosts);
+  const hasFlight = items.some((item) => item.variants?.some((variant) => variant.transport.mode === "flight") || item.transport.mode === "flight");
+  const hasTrain = items.some((item) => item.variants?.some((variant) => ["train", "night-train"].includes(variant.transport.mode)) || ["train", "night-train"].includes(item.transport.mode));
+  const hasBus = items.some((item) => item.variants?.some((variant) => variant.transport.mode === "bus") || item.transport.mode === "bus");
+  const allOverBudget = !group.hasBudgetFit;
+  const openLive = group.items.some((item) => item.liveLodgingRequired && !item.verifiedLodging);
+  const highDaily = items.some((item) => item.effectiveDaily >= 65);
+
+  const countryTips = {
+    Deutschland: ["Deutschlandticket-Anteil testen und dafür Ort an Regionalbahn wählen", "Kurzurlaub mit 1-2 Nächten gegen längere Reise vergleichen"],
+    Niederlande: ["nicht Zentrum, sondern Bahn-/Metroachse wie Sloterdijk, Noord, Zaandam oder Amstelveen testen", "Rad/ÖPNV statt Mietwagen und teure Parkplätze einplanen"],
+    Polen: ["Ostsee-Orte abseits der Promenade und Danzig/Stettin als Anker testen", "Milchbars, Märkte und Apartmentküche drücken Alltagskosten"],
+    Österreich: ["Nachbarort mit Skibus/Bahn statt Lift-Hotspot testen", "Frühstückspension plus Supermarkt kann günstiger als Halbpension sein"],
+    Schweiz: ["nur mit Selbstversorgung rechnen und Supermarkt-/Küchenlage prüfen", "Grenzorte oder Nachbarland als Schlafbasis vergleichen"],
+    Bulgarien: ["Sofia-Flug plus Transfer gegen langen Bus vergleichen", "Gästehaus/Pension mit sehr guten Reviews zuerst prüfen"],
+    Montenegro: ["nicht nur Kotor: Bar, Ulcinj, Herceg Novi und Durmitor separat vergleichen", "Apartment mit Küche und Strand/Bus in Laufnähe suchen"],
+    Portugal: ["Porto/kleinere Küstenorte gegen Lissabon/Algarve vergleichen", "Nebensaison und Unterkünfte mit Küche sind oft entscheidend"],
+    Marokko: ["Riad/Pension in gut bewerteter Lage prüfen, aber Transfers nachts einpreisen", "Restaurants günstig, deshalb Frühstück/Halbpension nicht automatisch buchen"],
+    Türkei: ["Pension/Apartment und lokale Lokale gegen Resortpakete rechnen", "Flughafenwahl IST/SAW/AYT/DLM kann viel ändern"],
+    Kreuzfahrt: ["Grundpreis nie allein bewerten: Getränke, Ausflüge, Trinkgeld, Internet und Hafenanreise addieren", "Innen-/Außenkabine, Nebensaison und Abfahrt ab Deutschland gegenrechnen"],
+  };
+
+  tips.push(...(countryTips[group.country] || []));
+  if (hasBeach) tips.push("zweite Reihe oder Nachbarort statt direkte Wasserlage testen");
+  if (hasCity) tips.push("Randlage mit schneller ÖPNV-Achse statt Zentrumshotspot prüfen");
+  if (hasMountain) tips.push("Talort mit Bus/Bahn statt direkt am Lift oder Wander-Hotspot vergleichen");
+  if (hasSki) tips.push("Skipass, Leihe und Skibus immer getrennt addieren");
+  if (hasCruise) tips.push("Bordextras und Hafenanreise vor dem Kabinenpreis gegenrechnen");
+  if (hasFlight) tips.push("nahe Flughäfen gegen günstige Alternativen mit Zubringerzeit vergleichen");
+  if (hasTrain) tips.push("Bahn früh/spät, BahnCard, Deutschlandticket-Anteil und Nachtzug separat testen");
+  if (hasBus) tips.push("Fernbus nur wählen, wenn Preisvorteil die lange Reisezeit wirklich rechtfertigt");
+  if (best?.deal?.lastMinute) tips.push("Last-Minute nur mit Storno-/Bewertungscheck nutzen");
+  if (best?.deal?.flashSale) tips.push("Preisaktion gegen Normalpreis und Stornokosten prüfen");
+  if (highDaily) tips.push("Supermarkt, Küche und Picknick/Marktmahlzeiten in die Alltagskosten einplanen");
+  if (openLive) tips.push("bei nahen Daten zuerst echten Unterkunftspreis öffnen, dann Budget bewerten");
+  if (allOverBudget) tips.push("Budgetrettung: weniger Nächte, einfachere Unterkunft oder anderer Startort testen");
+  const coreTips = [
+    "Anbieter-Direktseite gegen Booking/Airbnb gegenprüfen",
+    "Gepäck, Sitzplatz, Transfer, Kurtaxe und Reinigung als Extra-Kosten suchen",
+  ];
+  const unique = [...new Set(tips.filter(Boolean))].slice(0, 5);
+  coreTips.forEach((tip) => {
+    if (!unique.includes(tip)) unique.push(tip);
+  });
+  if (!unique.length) return "";
+  return `
+    <details class="region-budget-tips">
+      <summary>Preis-Hebel testen</summary>
+      <ul>
+        ${unique.map((tip) => `<li>${tip}</li>`).join("")}
+      </ul>
+    </details>
+  `;
+}
+
 function renderResults(items, context) {
   if (!items.length) {
     results.innerHTML = `<p class="warning">Keine Treffer mit diesen Filtern. Lockere den Ort, die Anreisezeit oder Qualitätsgrenzen etwas. Du kannst Mindeststerne bewusst senken, solltest dann aber aktuelle Reviews genauer prüfen.</p>`;
@@ -4044,6 +4107,7 @@ function renderResults(items, context) {
           </div>
           <p class="place-strip">${places}</p>
           ${regionSpecialIdeas(group)}
+          ${regionBudgetTips(group)}
           <div class="result-group__cards">
             ${group.items.slice(0, 4).map((item, itemIndex) => renderDestinationCard(item, groupIndex + 1, itemIndex, context)).join("")}
           </div>
