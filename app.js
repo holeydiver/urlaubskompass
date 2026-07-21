@@ -4000,11 +4000,11 @@ function regionSpecialIdeas(group) {
     if (item.destination.vibes.includes("berge")) ideas.push("Talort statt direkt am Lift oder Hotspot prüfen");
     if (item.destination.vibes.includes("natur")) ideas.push("einfache Unterkunft mit guter Anbindung an Naturziele");
   });
-  const unique = [...new Set(ideas.filter(Boolean))].slice(0, 4);
+  const unique = [...new Set(ideas.filter(Boolean))].slice(0, 3);
   if (!unique.length) return "";
   return `
     <div class="region-ideas" aria-label="Besondere Ideen für ${group.country}">
-      <strong>Besonders vor Ort</strong>
+      <strong>Besondere Idee</strong>
       <div>
         ${unique.map((idea) => `<span>${idea}</span>`).join("")}
       </div>
@@ -4060,14 +4060,14 @@ function regionBudgetTips(group) {
     "Anbieter-Direktseite gegen Booking/Airbnb gegenprüfen",
     "Gepäck, Sitzplatz, Transfer, Kurtaxe und Reinigung als Extra-Kosten suchen",
   ];
-  const unique = [...new Set(tips.filter(Boolean))].slice(0, 5);
+  const unique = [...new Set(tips.filter(Boolean))].slice(0, 4);
   coreTips.forEach((tip) => {
     if (!unique.includes(tip)) unique.push(tip);
   });
   if (!unique.length) return "";
   return `
     <details class="region-budget-tips">
-      <summary>Preis-Hebel testen</summary>
+      <summary>Günstiger machen</summary>
       <ul>
         ${unique.map((tip) => `<li>${tip}</li>`).join("")}
       </ul>
@@ -4152,7 +4152,8 @@ function renderDestinationCard(item, groupRank, itemIndex, context) {
       ${budgetStatus}
       ${renderBestTripPreview(item, context)}
       <details class="decision-details">
-        <summary>Warum / Kosten kurz prüfen</summary>
+        <summary>Details prüfen</summary>
+        ${renderCostBreakdown(item)}
         <div class="tags">${leverTags}</div>
         <div class="region-glance">
           <span>ab ${totalText}</span>
@@ -4161,6 +4162,11 @@ function renderDestinationCard(item, groupRank, itemIndex, context) {
           <span>Alltag ${euro(item.effectiveDaily)} p. P./Tag</span>
           ${item.familyPricing?.children ? `<span>${item.familyPricing.label}</span>` : ""}
         </div>
+        ${specialExperience(item)}
+        ${cruiseExperience(item)}
+        ${transportAlternativeStrip(item)}
+        ${flightAirportComparison(item)}
+        ${averagePriceNote(item) ? `<p class="price-note">${averagePriceNote(item)}</p>` : ""}
       </details>
       <button type="button" class="region-toggle" aria-expanded="false">Reisevarianten und Links anzeigen</button>
       <div class="trip-options is-hidden">
@@ -4430,7 +4436,6 @@ function flightAirportComparison(item) {
 function renderBestTripPreview(item, context) {
   const stayPlan = concreteStayPlan(item);
   const transportPlan = concreteTransportPlan(item, context);
-  const priceNote = averagePriceNote(item);
   const verdict = tripVerdict(item);
   const readiness = bookingReadiness(item);
   const stayStatus = lodgingStatus(item);
@@ -4478,16 +4483,10 @@ function renderBestTripPreview(item, context) {
           ${transportNotes}
         </div>
       </div>
-      ${renderCostBreakdown(item)}
-      ${specialExperience(item)}
-      ${cruiseExperience(item)}
       <div class="trip-verdict trip-verdict--${verdict.tone}">
         <strong>${verdict.label}</strong>
         <span>${verdict.reason}</span>
       </div>
-      ${transportAlternativeStrip(item)}
-      ${flightAirportComparison(item)}
-      ${priceNote ? `<p class="price-note">${priceNote}</p>` : ""}
     </div>
   `;
 }

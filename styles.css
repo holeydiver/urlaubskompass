@@ -555,7 +555,7 @@ dd {
 .region-budget-tips {
   border: 1px solid #d7e0e3;
   border-radius: 7px;
-  padding: 10px 12px;
+  padding: 8px 11px;
   background: #f7fbfb;
 }
 
@@ -567,12 +567,12 @@ dd {
 }
 
 .region-budget-tips ul {
-  margin: 9px 0 0;
+  margin: 8px 0 0;
   padding-left: 18px;
   display: grid;
-  gap: 6px;
+  gap: 5px;
   color: #334239;
-  font-size: 0.86rem;
+  font-size: 0.84rem;
 }
 
 .result-group__cards {
@@ -583,9 +583,9 @@ dd {
 
 .destination-card {
   border-radius: 8px;
-  padding: 18px;
+  padding: 16px;
   display: grid;
-  gap: 14px;
+  gap: 12px;
   align-content: start;
 }
 
@@ -620,7 +620,7 @@ dd {
 
 .destination-card h3 {
   margin: 0 0 4px;
-  font-size: 1.3rem;
+  font-size: 1.22rem;
 }
 
 .country {
@@ -732,17 +732,40 @@ dd {
 .decision-details {
   display: grid;
   gap: 10px;
+  border: 1px solid #dbe5df;
+  border-radius: 7px;
+  background: #fbfdfb;
 }
 
 .decision-details summary {
   cursor: pointer;
   color: var(--blue);
   font-weight: 850;
+  padding: 10px 12px;
 }
 
 .decision-details[open] {
-  border-top: 1px solid var(--line);
-  padding-top: 10px;
+  padding: 0 12px 12px;
+}
+
+.decision-details[open] summary {
+  margin: 0 -12px;
+  border-bottom: 1px solid var(--line);
+}
+
+.decision-details .cost-breakdown,
+.decision-details .region-glance,
+.decision-details .tags,
+.decision-details .special-experience,
+.decision-details .cruise-advisor,
+.decision-details .transport-strip,
+.decision-details .airport-strip,
+.decision-details .price-note {
+  margin-top: 10px;
+}
+
+.decision-details .tags + .region-glance {
+  margin-top: 8px;
 }
 
 .best-trip {
