@@ -834,6 +834,7 @@ const destinations = [
           checkout: "2026-10-17",
           adults: 1,
           children: 1,
+          childAges: [13],
           total: 87,
           note: "Booking zeigte am 21.07.2026 für 14.-17.10.2026, 1 Erw. und 1 Kind (13) 87 EUR Gesamtpreis; Bewertung 9,2 bei 62 Bewertungen.",
         },
@@ -2046,6 +2047,7 @@ function familyPricing(travelers, childAges) {
   const children = childAges.length;
   const adults = Math.max(1, travelers - children);
   const transportUnits = adults + childAges.reduce((sum, age) => sum + (age < 2 ? 0.1 : age < 6 ? 0.35 : age < 12 ? 0.55 : age < 16 ? 0.75 : 0.9), 0);
+  const flightUnits = adults + childAges.reduce((sum, age) => sum + (age < 2 ? 0.12 : age < 12 ? 0.85 : 1), 0);
   const livingUnits = adults + childAges.reduce((sum, age) => sum + (age < 2 ? 0.15 : age < 6 ? 0.45 : age < 12 ? 0.65 : age < 16 ? 0.85 : 0.95), 0);
   const skiPassUnits = adults + childAges.reduce((sum, age) => sum + (age < 6 ? 0.2 : age < 12 ? 0.55 : age < 16 ? 0.75 : 0.9), 0);
   const skiRentalUnits = adults + childAges.reduce((sum, age) => sum + (age < 6 ? 0.3 : age < 12 ? 0.65 : age < 16 ? 0.85 : 0.95), 0);
@@ -2057,6 +2059,7 @@ function familyPricing(travelers, childAges) {
     children,
     childAges,
     transportUnits,
+    flightUnits,
     livingUnits,
     timeUnits: transportUnits,
     skiPassUnits,
@@ -2683,6 +2686,7 @@ function transportOptions(destination, startDate, nights, allowedModes, maxTrave
         mode: "flight",
         label: preferredModes.includes("flight") ? `Flug ab ${airport.label}` : `Flug-Alternative ab ${airport.label}`,
         price,
+        pricingUnits: familyPricing.flightUnits,
         hours,
         comfort: clamp(74 - adjustment.stops * 9 - airport.accessHours * 1.3 + (airport.nearbyRank === 1 ? 2 : 0), 42, 82),
         originAirport: airport,
@@ -2693,8 +2697,9 @@ function transportOptions(destination, startDate, nights, allowedModes, maxTrave
           `Abflug ${airport.code}`,
           `Zubringer ${airport.accessMode}`,
           directness,
+          familyPricing.children ? "Kinder-/Jugendtarif im Portal prüfen" : "",
           ...(!preferredModes.includes("flight") ? ["Flug als Alternative einbeziehen"] : []),
-        ],
+        ].filter(Boolean),
       };
     }).filter((flight) => flight.hours <= maxTravelHours && (!nearSurfaceBeatsFlight || flight.price < (profile.train || profile.car || 999) * 0.55));
     const nearest = rawFlights.find((flight) => flight.originAirport.nearbyRank === 1);
@@ -3335,6 +3340,20 @@ function routeSearchText(item, context) {
   return `${context.origin} nach ${transportDestinationName(item)} am ${formatDate(item.startDate)} ${travelers} Person${travelers > 1 ? "en" : ""}`;
 }
 
+function kayakPassengerPath(family, fallbackTravelers = 1) {
+  const adults = Math.max(1, family?.adults || fallbackTravelers || 1);
+  const childAges = family?.childAges || [];
+  const children = childAges.filter((age) => age >= 2 && age < 12).length;
+  const youths = childAges.filter((age) => age >= 12 && age < 18).length;
+  const infants = childAges.filter((age) => age < 2).length;
+  return [
+    `${adults}adults`,
+    youths ? `${youths}youths` : "",
+    children ? `${children}children` : "",
+    infants ? `${infants}infants` : "",
+  ].filter(Boolean).join("/");
+}
+
 function transportDestinationName(item) {
   const destination = item.destination;
   if (!destination.cruise) return destination.city;
@@ -3500,8 +3519,8 @@ function flightSearchUrl(item, context) {
   const destinationCode = destinationAirportCodes(item.destination)[0];
   const family = item.familyPricing || { adults: context.travelers || 1, children: 0 };
   if (originCode && destinationCode) {
-    const adults = Math.max(1, family.adults || context.travelers || 1);
-    const base = `https://www.kayak.de/flights/${originCode}-${destinationCode}/${item.startDate}/${item.checkout}/${adults}adults`;
+    const passengers = kayakPassengerPath(family, context.travelers || 1);
+    const base = `https://www.kayak.de/flights/${originCode}-${destinationCode}/${item.startDate}/${item.checkout}/${passengers}`;
     return searchUrl(base, { sort: "bestflight_a" });
   }
   return searchUrl("https://www.google.com/search", {
@@ -3592,10 +3611,15 @@ function verifiedDirectStayPrice(destination, stayType, startDate, checkout, fam
   if (!verified) return null;
   const adults = Math.max(1, family?.adults || 1);
   const children = Math.max(0, family?.children || 0);
+  const childAges = family?.childAges || [];
   const matchesDates = verified.checkin === startDate && verified.checkout === checkout;
   const matchesAdults = Number(verified.adults || adults) === adults;
   const matchesChildren = verified.children === undefined || Number(verified.children) === children;
-  if (!matchesDates || !matchesAdults || !matchesChildren) return null;
+  const matchesChildAges = !verified.childAges || (
+    verified.childAges.length === childAges.length &&
+    verified.childAges.every((age, index) => Number(age) === Number(childAges[index]))
+  );
+  if (!matchesDates || !matchesAdults || !matchesChildren || !matchesChildAges) return null;
   return {
     total: verified.total,
     checked: verified.checked,
@@ -3757,7 +3781,7 @@ function transportStatus(item) {
     car: "Routenplaner",
   }[mode] || "Anreise-Suche";
   const note = {
-    flight: "Flugsuche ist verlinkt; echte Ticketpreise, Gepäck, Sitzplätze, Umstiege und Flughafen-Zubringer direkt beim Anbieter prüfen.",
+    flight: "Flugsuche ist verlinkt; echte Ticketpreise, Kinder-/Jugendtarife, Gepäck, Sitzplätze, Umstiege und Flughafen-Zubringer direkt beim Anbieter prüfen.",
     train: "Bahn-Suche ist verlinkt; echte Sparpreise, Auslastung, Sitzplätze, BahnCard/Deutschlandticket und Umstiege direkt bei der Bahn prüfen.",
     "night-train": "Nachtzug-/Bahn-Suche ist verlinkt; echte Liege-/Schlafwagenpreise, Ankunftszeit und Verfügbarkeit direkt beim Anbieter prüfen.",
     bus: "FlixBus-/Bus-Strecke ist verlinkt; echte Plätze, Tagespreise, Gepäckregeln, Rückfahrt und Abfahrtsbahnhof direkt beim Anbieter prüfen.",
