@@ -94,7 +94,7 @@ const destinations = [
       label: "Berghuette und Schluchten-Abenteuer",
       search: "Žabljak Durmitor mountain cabin rafting Montenegro",
       fit: 85,
-      note: "fuer Wildnis, Seen und einfache Huetten statt Strandroute",
+      note: "für Wildnis, Seen und einfache Hütten statt Strandroute",
     },
     why: "Ganz anderes Montenegro: Schluchten, Seen und Berge statt Küste. Sehr guter Gegenwert für Aktivurlaub, aber ohne klassische Strandlogik.",
   },
@@ -319,7 +319,7 @@ const destinations = [
       label: "Segeltoern oder einfaches Boot-Wochenende",
       search: "Ostsee Schleswig-Holstein Segeltoern Mitsegeln Boot Wochenende Unterkunft",
       fit: 76,
-      note: "gut fuer kurze, spontane Wasser-Abenteuer ohne Flug",
+      note: "gut für kurze, spontane Wasser-Abenteuer ohne Flug",
     },
     why: "Klassischer Nah-Strand ohne Flugpflicht: gute Bahn- und Autooptionen, Ferienwohnungen mit Küche und außerhalb der Hotspots oft deutlich besserer Gegenwert.",
   },
@@ -361,7 +361,7 @@ const destinations = [
       label: "Floß, Hausboot oder Naturcamp an der Ostsee",
       search: "Mecklenburgische Ostsee Hausboot Floß Naturcamp Unterkunft",
       fit: 82,
-      note: "spannend fuer Wasser, Natur und unkomplizierte Anreise",
+      note: "spannend für Wasser, Natur und unkomplizierte Anreise",
     },
     why: "Ostseegefühl oft günstiger als die ganz bekannten Schleswig-Holstein-Orte: viel Natur, breite Strände und gute Ferienwohnungs-Chancen.",
   },
@@ -566,13 +566,13 @@ const destinations = [
     localSavings: 4,
     nearbyAirport: true,
     cruise: {
-      label: "Mittelmeerroute mit Aktionspreisen",
+      label: "Mittelmeerroute mit Preisaktionen",
       search: "Mittelmeer Kreuzfahrt ab Genua Savona Last Minute Angebot",
       fit: 78,
       dailyExtras: 50,
       type: "Sparpreis mit Hafenanreise",
       bestFor: "Preisbewusste Reisende, wenn Flug oder Bahn zum Hafen günstig klappt",
-      bookFirst: "MSC und Costa zuerst prüfen; im Mittelmeer sind dort oft starke Aktionspreise zu finden",
+      bookFirst: "MSC und Costa zuerst prüfen; im Mittelmeer tauchen dort oft prüfbare Preisaktionen auf",
       compare: "AIDA/Mein Schiff gegenhalten, wenn deutschsprachiger Komfort oder Getränkepaket wichtiger ist",
       avoidIf: "eher nicht, wenn die Anreise nach Genua/Savona teuer, lang oder mit vielen Umstiegen wird",
       dealWatch: "Last-Minute, Innenkabine, Transferpaket und Gepäckkosten beim Flug hart gegenrechnen",
@@ -644,7 +644,7 @@ const destinations = [
           checkout: "2026-07-26",
           adults: 2,
           total: 408,
-          note: "Airbnb zeigte am 20.07.2026 fuer 2 Naechte / 2 Gaeste 408 EUR Gesamtpreis.",
+          note: "Airbnb zeigte am 20.07.2026 für 2 Nächte / 2 Gäste 408 EUR Gesamtpreis.",
         },
       },
       {
@@ -659,7 +659,7 @@ const destinations = [
           checkout: "2026-07-26",
           adults: 2,
           total: 329,
-          note: "Booking zeigte am 20.07.2026 329 EUR fuer 2 Naechte inkl. Fruehstueck, Steuern und Gebuehren.",
+          note: "Booking zeigte am 20.07.2026 329 EUR für 2 Nächte inkl. Frühstück, Steuern und Gebühren.",
         },
       },
     ],
@@ -667,7 +667,7 @@ const destinations = [
       label: "Hostelboot, Kanalboot oder Randlage am Wasser",
       search: "Amsterdam hostel boat houseboat budget room",
       fit: 72,
-      note: "ungewoehnlicher als Standard-Hotel, aber Bewertungen und Lage sehr genau pruefen",
+      note: "ungewöhnlicher als Standard-Hotel, aber Bewertungen und Lage sehr genau prüfen",
     },
     why: "Wenn Amsterdam gewünscht ist, wird Amsterdam gesucht: teuer im Zentrum, aber mit Randlagen, Zimmern oder Orten an guter Bahn-/Metro-Achse oft deutlich günstiger.",
   },
@@ -702,7 +702,7 @@ const destinations = [
           checkout: "2026-07-26",
           adults: 2,
           total: 178,
-          note: "Booking zeigte am 20.07.2026 ca. 178 EUR fuer 2 Naechte / 2 Erwachsene; Hostel, Altersregel 18 bis 40.",
+          note: "Booking zeigte am 20.07.2026 ca. 178 EUR für 2 Nächte / 2 Erwachsene; Hostel, Altersregel 18 bis 40.",
         },
       },
     ],
@@ -710,7 +710,7 @@ const destinations = [
       label: "Hausboot, Kanalzimmer oder Rad-und-Wasser-Trip",
       search: "Zeeland Südholland Hausboot Kanal Unterkunft Radurlaub",
       fit: 86,
-      note: "ungewoehnlich, aber mit guter Infrastruktur und Bahn-/Auto-Anreise",
+      note: "ungewöhnlich, aber mit guter Infrastruktur und Bahn-/Auto-Anreise",
     },
     why: "Gute Mischung aus Meer, Radwegen und Städten. Für Nordwestdeutschland oft eine echte Bahn-/Auto-Alternative zur Flugreise.",
   },
@@ -774,10 +774,10 @@ const destinations = [
     localSavings: 16,
     nearbyAirport: true,
     unusual: {
-      label: "Inselhopping mit Faehre statt Pauschalstrand",
+      label: "Inselhopping mit Fähre statt Pauschalstrand",
       search: "Naxos Inselhopping Fähre Pension Griechenland",
       fit: 80,
-      note: "fuehlt sich spontaner an, braucht aber Faehren- und Transferpuffer",
+      note: "fühlt sich spontaner an, braucht aber Fähren- und Transferpuffer",
     },
     why: "Kykladen-Gefühl, aber bodenständiger als Santorini oder Mykonos. Gute Strände und Dörfer.",
   },
@@ -798,10 +798,10 @@ const destinations = [
     localSavings: 13,
     nearbyAirport: true,
     unusual: {
-      label: "Faehre nach Cres oder kleines Boot in der Kvarner Bucht",
+      label: "Fähre nach Cres oder kleines Boot in der Kvarner Bucht",
       search: "Cres Kroatien Fähre Boot Unterkunft Kvarner",
       fit: 78,
-      note: "Inselgefuehl ohne ganz so prominente Kroatien-Route",
+      note: "Inselgefühl ohne ganz so prominente Kroatien-Route",
     },
     why: "Mehr Alltag als Dubrovnik, Inseloptionen direkt vor der Tür und gute Chancen auf bessere Unterkunftspreise.",
   },
@@ -858,7 +858,7 @@ const destinations = [
     kitchenSavings: 8,
     localSavings: 12,
     nearbyAirport: true,
-    why: "Atlantik, Medina, Fisch, Wind und deutlich entspannter als Marrakesch. Gute Wahl fuer milde Temperaturen.",
+    why: "Atlantik, Medina, Fisch, Wind und deutlich entspannter als Marrakesch. Gute Wahl für milde Temperaturen.",
   },
   {
     city: "Zakopane",
@@ -2465,7 +2465,7 @@ function dealProfile(startDate, nights, levers) {
   if (flashSale) {
     lodgingDiscount *= 0.93;
     transportDiscount *= 0.95;
-    notes.push("Aktionspreis einplanen");
+    notes.push("Aktionspreis prüfen");
   }
 
   return { lodgingDiscount, transportDiscount, notes, lastMinute, flashSale };
@@ -3268,7 +3268,7 @@ function makeLeverNotes(destination, state) {
   if (state.kitchen && destination.kitchenSavings >= 10) notes.push("Küche spart Alltag");
   if (state.local) notes.push(destination.touristLoad < 45 ? "wenig Touri-Druck" : "lokale Viertel suchen");
   if (state.nearbyAirport) notes.push("alternative Flughäfen prüfen");
-  if (state.weather >= 82) notes.push("gutes Wetterfenster");
+  if (state.weather >= 82) notes.push("passendes Wetterfenster");
   if (state.stayQuality) notes.push(`${state.stayQuality.rating.toFixed(1)}★ Unterkunft`);
   if (state.budgetFlexibleQuality && state.stayQuality?.rating < 4.3) notes.push("Budget-Unterkunft bewusst geprüft");
   if (state.stayQuality && state.stayQuality.risk <= 15) notes.push("niedriges Unterkunftsrisiko");
@@ -3718,7 +3718,7 @@ function lodgingStatus(item) {
       level: "open",
       label: `${subject} Livepreis offen`,
       amountLabel: "Livepreis offen",
-      formula: "ca. Planwert, noch kein echtes Angebot",
+      formula: "Planwert, kein live bepreister Unterkunftsfavorit",
       note: `Für diesen nahen Zeitraum muss ${portal} einen echten Preis zeigen, bevor das Budget belastbar ist.`,
     };
   }
@@ -3862,7 +3862,7 @@ function cruiseLineLinks(item) {
       primary: baseLinks.msc,
       primaryLabel: "MSC Mittelmeer öffnen",
       compare: [
-        { label: "Costa Angebote", href: baseLinks.costa },
+        { label: "Costa prüfen", href: baseLinks.costa },
         { label: "AIDA gegenprüfen", href: baseLinks.aida },
       ],
       all: baseLinks,
@@ -3913,7 +3913,7 @@ function countryPitch(country, items) {
     Österreich: "Stark für Ski, Berge und planbare Qualität. Oft lohnt der Blick auf Nachbarorte statt bekannte Hotspots.",
     Niederlande: "Gut für Stadt, Küste und kurze Wege aus Norddeutschland. Randlagen an Bahn-/Metroachsen drücken Unterkunftskosten.",
     Polen: "Sehr stark bei Budget und Ostsee-/Städtemix. Besonders interessant, wenn Alltagspreise wichtiger sind als klassische Pauschalziele.",
-    Kreuzfahrt: "Kreuzfahrten bündeln Kabine, Route und Verpflegung. Entscheidend sind Hafenanreise, Bordextras, Ausflüge und echte Aktionspreise.",
+    Kreuzfahrt: "Kreuzfahrten bündeln Kabine, Route und Verpflegung. Entscheidend sind Hafenanreise, Bordextras, Ausflüge und echte Preisaktionen.",
   };
   return pitches[country] || `${country} passt hier vor allem wegen ${vibes || "Preis, Anreise und Gesamtpaket"}. Fokus-Ort: ${top.destination.city}.`;
 }
@@ -3998,7 +3998,7 @@ function renderResults(items, context) {
   const groups = groupResultsByCountry(items);
   const cheapest = items.reduce((best, item) => item.total < best.total ? item : best, items[0]);
   const budgetAlert = cheapest.total > context.budget
-    ? `<p class="warning warning--budget">Mit den aktuellen Vorgaben liegt selbst der günstigste Treffer bei ${euro(cheapest.total)} und damit ${euro(cheapest.total - context.budget)} über deinem Budget. Die App zeigt deshalb nur Prüfideen. Mehr Budget, weniger Nächte, mehr Anreisezeit oder einfachere Unterkunft könnten es passend machen.</p>`
+    ? `<p class="warning warning--budget">Mit den aktuellen Vorgaben liegt selbst die günstigste Variante bei ${euro(cheapest.total)} und damit ${euro(cheapest.total - context.budget)} über deinem Budget. Die App zeigt deshalb nur Prüfideen. Mehr Budget, weniger Nächte, mehr Anreisezeit oder einfachere Unterkunft könnten es passend machen.</p>`
     : "";
   const cards = groups
     .map((group, groupIndex) => {
@@ -4014,7 +4014,7 @@ function renderResults(items, context) {
             </div>
             <div class="result-group__facts">
               <span>ab ${group.minHasOpenOrEstimatedCost ? `ca. ${euro(group.minTotal)}` : euro(group.minTotal)}</span>
-              <span>${group.items.length} konkrete Ort${group.items.length > 1 ? "e" : ""}</span>
+              <span>${group.items.length} ${group.items.length === 1 ? "konkreter Ort" : "konkrete Orte"}</span>
               <span>Fokus: ${group.best.destination.city}</span>
             </div>
           </div>
@@ -4139,7 +4139,7 @@ function cruiseExperience(item) {
         <div><span>Gegencheck</span><p>${cruise.compare}</p></div>
         <div><span>Nicht ideal wenn</span><p>${cruise.avoidIf}</p></div>
       </div>
-      <p class="cruise-advisor__note">${cruise.included}. Extra prüfen: ${cruise.caution}. Deal-Fokus: ${cruise.dealWatch}.</p>
+      <p class="cruise-advisor__note">${cruise.included}. Extra prüfen: ${cruise.caution}. Preisfenster prüfen: ${cruise.dealWatch}.</p>
     </div>
   `;
 }
@@ -4148,21 +4148,21 @@ function bookingReadiness(item) {
   if (item.verifiedLodging && budgetDealbreaker(item)) {
     return {
       tone: "check",
-      label: "Belegter Treffer, aber Budget-Dealbreaker",
+      label: "Belegter Preis, aber Budget-Dealbreaker",
       text: "Unterkunft und Datum sind konkret belegt, aber das Gesamtpaket liegt deutlich über Budget. Nur weiterverfolgen, wenn Budget, Nächte oder Anreise geändert werden.",
     };
   }
   if (item.verifiedLodging && !item.overBudget) {
     return {
       tone: "ready",
-      label: "Prüfbarer Unterkunftstreffer",
+      label: "Prüfbarer Unterkunftspreis",
       text: "Unterkunft ist mit Datum, Personen und Livepreis hinterlegt. Anreise, Gepäck, Storno und finale Verfügbarkeit direkt beim Anbieter gegenprüfen.",
     };
   }
   if (item.verifiedLodging) {
     return {
       tone: "check",
-      label: "Konkretes Angebot, aber Budget prüfen",
+      label: "Konkreter Unterkunftspreis, Budget prüfen",
       text: "Die Unterkunft ist live bepreist, das Gesamtpaket liegt aber über Budget oder hängt stark von der Anreise ab.",
     };
   }
@@ -4170,7 +4170,7 @@ function bookingReadiness(item) {
     return {
       tone: "search",
       label: "Live-Unterkunft noch auswählen",
-      text: `Für diesen nahen Zeitraum öffnet die App eine konkrete ${item.destination.cruise ? "Kabinen-/Routensuche" : "Booking/Airbnb-Suche"} mit Datum und Personen. Erst wenn dort ein Treffer ausgewählt ist, ist das Budget belastbar.`,
+      text: `Für diesen nahen Zeitraum öffnet die App eine konkrete ${item.destination.cruise ? "Kabinen-/Routensuche" : "Booking/Airbnb-Suche"} mit Datum und Personen. Erst wenn dort ein echter Preis für Unterkunft oder Kabine sichtbar ist, ist das Budget belastbar.`,
     };
   }
   return {
@@ -4290,11 +4290,11 @@ function tripVerdict(item) {
     : seriousCaution
     ? "Eher prüfen"
     : item.score >= 110 && cautions.length <= 1
-      ? "Starker Kandidat"
+      ? "Plausibler Kandidat"
       : "Prüfidee";
-  const tone = seriousCaution ? "warn" : label === "Starker Kandidat" ? "good" : "check";
+  const tone = seriousCaution ? "warn" : label === "Plausibler Kandidat" ? "good" : "check";
   const reason = [...strengths.slice(0, 2), ...cautions.slice(0, 2)].slice(0, 3).join(" · ");
-  return { label, tone, reason: reason || "gutes Preis-Leistungs-Verhältnis, Details bitte gegenprüfen" };
+  return { label, tone, reason: reason || "plausibles Preis-Leistungs-Verhältnis, Details bitte gegenprüfen" };
 }
 
 function transportAlternativeStrip(item) {
@@ -4353,7 +4353,7 @@ function renderBestTripPreview(item, context) {
   const totalLabel = totalPriceLabel(item);
   const budgetIsOpen = item.liveLodgingRequired && !item.verifiedLodging;
   const dealbreaker = budgetDealbreaker(item);
-  const headline = budgetIsOpen ? "Favorisierte Suche, Livepreis offen" : dealbreaker ? "Belegter Treffer, aber Budget-Dealbreaker" : item.overBudget ? "Günstigste Prüfidee" : item.verifiedLodging ? "Stärkster belegter Treffer" : "Stärkste Prüfidee";
+  const headline = budgetIsOpen ? "Favorisierte Suche, Livepreis offen" : dealbreaker ? "Belegter Preis, aber Budget-Dealbreaker" : item.overBudget ? "Günstigste Prüfidee" : item.verifiedLodging ? "Belegter Unterkunftspreis" : "Plausibelste Prüfidee";
   const budgetNote = !budgetIsOpen && item.overBudget
     ? dealbreaker
       ? `<p class="mini-note mini-note--budget">${euro(item.overBudgetAmount)} über Budget (${Math.round(item.overBudgetRatio * 100)}% drüber). Das ist kein kleiner Ausreißer, sondern ein Dealbreaker, wenn ${euro(item.total)} nicht realistisch sind.</p>`
