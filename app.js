@@ -3600,6 +3600,10 @@ function favoriteStayQuery(item) {
   return `${place} ${area} ${stayTerms[item.stay.type] || "Unterkunft"}`.replace(/\s+/g, " ").trim();
 }
 
+function bookingStayQuery(item) {
+  return basePlaceQuery(item);
+}
+
 function bookingSearchUrl(query, item, context) {
   const family = item.familyPricing || { adults: context.travelers, children: 0 };
   const lodgingNeeds = item.lodgingNeeds || { bedrooms: 1 };
@@ -3620,18 +3624,28 @@ function bookingSearchUrl(query, item, context) {
     room1: roomGuests || "A",
     checkin: item.startDate,
     checkout: item.checkout,
+    checkin_year: item.startDate.slice(0, 4),
+    checkin_month: String(Number(item.startDate.slice(5, 7))),
+    checkin_monthday: String(Number(item.startDate.slice(8, 10))),
+    checkout_year: item.checkout.slice(0, 4),
+    checkout_month: String(Number(item.checkout.slice(5, 7))),
+    checkout_monthday: String(Number(item.checkout.slice(8, 10))),
     selected_currency: "EUR",
     lang: "de",
     sb: 1,
     src: "searchresults",
     src_elem: "sb",
+    ssne: query,
+    ssne_untouched: query,
+    efdco: 1,
+    rows: 25,
     order: "price",
     nflt: bookingPriceFilter(item),
   };
   childAges.forEach((age, index) => {
     params[`age${index + 1}`] = age;
   });
-  return searchUrl("https://www.booking.com/searchresults.html", {
+  return searchUrl("https://www.booking.com/searchresults.de.html", {
     ...params,
   });
 }
@@ -3748,6 +3762,7 @@ function totalPriceNote(item) {
 function bookingLinks(item, context) {
   const placeQuery = basePlaceQuery(item);
   const favoriteQuery = favoriteStayQuery(item);
+  const bookingQuery = bookingStayQuery(item);
   const specialQuery = specialSearchQuery(item);
   const query = item.travelProfile === "cruise" && item.destination.cruise?.search
     ? item.destination.cruise.search
@@ -3765,11 +3780,11 @@ function bookingLinks(item, context) {
       travelmode: "driving",
     }),
     airbnb: airbnbSearchUrl(placeQuery, item),
-    booking: bookingSearchUrl(placeQuery, item, context),
+    booking: bookingSearchUrl(bookingQuery, item, context),
     directStay: directStayUrl(item),
-    favoriteStay: ["airbnb", "budget-room"].includes(item.stay.type)
+    favoriteStay: item.stay.type === "airbnb"
       ? airbnbSearchUrl(favoriteQuery, item)
-      : bookingSearchUrl(favoriteQuery, item, context),
+      : bookingSearchUrl(bookingQuery, item, context),
     special: specialQuery ? searchUrl("https://www.google.com/search", { q: specialQuery }) : "",
     cruise: cruiseLineLinks(item),
     maps: searchUrl("https://www.google.com/maps/search/", {
@@ -4469,17 +4484,20 @@ function renderTripOption(item, index, context) {
         ? `${item.transport.label} ab ca. ${euro(item.transportTotal)} prüfen`
         : `${item.transport.label} ca. ${euro(item.transportTotal)} prüfen`;
   const hasDirectStay = Boolean(links.directStay);
+  const directStay = directStayFor(item.destination, item.stay.type);
   const primaryStayLink = item.destination.cruise ? links.cruise.primary : hasDirectStay ? links.directStay : links.favoriteStay;
   const bookingLabel = `Booking ${bookingTargetLabel(item)}`;
   const primaryStayLabel = item.destination.cruise
     ? links.cruise.primaryLabel
     : item.verifiedLodging
-      ? "Geprüfte Unterkunft öffnen"
+      ? `${item.verifiedLodging.platform === "booking" ? "Booking" : "Airbnb"}-Unterkunft öffnen`
       : hasDirectStay
-        ? "Unterkunfts-Direktlink prüfen"
+        ? `${directStay?.platform === "booking" ? "Booking" : "Airbnb"}-Unterkunft öffnen`
         : ["hotel", "pension"].includes(item.stay.type)
           ? bookingLabel
-          : "Favorisierte Suche öffnen";
+          : item.stay.type === "budget-room"
+            ? "Booking-Suche mit Datum öffnen"
+            : "Airbnb-Suche mit Datum öffnen";
   const stayCostLabel = item.destination.cruise ? "Kabine" : stayName;
   const transportPriceLabel = `${euro(item.transportTotal)} gesamt`;
   const totalLabel = totalPriceLabel(item);
@@ -4496,7 +4514,6 @@ function renderTripOption(item, index, context) {
     : "";
   const priceNote = averagePriceNote(item);
   const directNote = hasDirectStay ? directStayNote(item) : "";
-  const directStay = directStayFor(item.destination, item.stay.type);
   const stayTitle = item.verifiedLodging ? item.verifiedLodging.label : directStay?.label || stayPlan.title;
   const dealbreaker = budgetDealbreaker(item);
   return `
