@@ -85,6 +85,7 @@ select {
 
 .eyebrow--plain {
   color: var(--green);
+  text-transform: none;
 }
 
 h1,

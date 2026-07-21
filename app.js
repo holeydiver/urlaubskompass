@@ -3853,9 +3853,23 @@ function cruiseLineLinks(item) {
   };
 }
 
+function displayVibeList(vibes) {
+  const labels = {
+    strand: "Strand",
+    stadt: "Stadt",
+    berge: "Berge",
+    natur: "Natur",
+    essen: "Essen",
+    kultur: "Kultur",
+    aktiv: "Aktivurlaub",
+    wasser: "Wasser",
+  };
+  return vibes.map((vibe) => labels[vibe] || vibe).join(", ");
+}
+
 function countryPitch(country, items) {
   const top = items[0];
-  const vibes = [...new Set(items.flatMap((item) => item.destination.vibes || []))].slice(0, 4).join(", ");
+  const vibes = displayVibeList([...new Set(items.flatMap((item) => item.destination.vibes || []))].slice(0, 4));
   const pitches = {
     Montenegro: "Nicht nur Kotor: Bucht, Riviera, Südküste und Durmitor sind sehr unterschiedliche Reisen mit anderem Preis-/Erlebnisprofil.",
     Deutschland: "Gut für kurze Anreise, Bahn/Deutschlandticket und Kurzurlaub. Sinnvolle Treffer hängen stark von Stadt, Küste oder Bergen ab.",
@@ -3957,7 +3971,7 @@ function renderResults(items, context) {
         <section class="result-group${extraClass}">
           <div class="result-group__top">
             <div>
-              <span class="eyebrow">Land / Großregion ${groupIndex + 1}</span>
+              <span class="eyebrow eyebrow--plain">Land / Großregion ${groupIndex + 1}</span>
               <h3>${group.country}</h3>
               <p>${countryPitch(group.country, group.items)}</p>
             </div>
