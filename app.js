@@ -3684,6 +3684,23 @@ function bookingTargetLabel(item) {
   return "Suche mit Budgetfilter öffnen";
 }
 
+function stayProofLabel(item) {
+  if (item.destination.cruise) return "Kabine / Route";
+  if (item.verifiedLodging) return "Favorisierte Unterkunft";
+  if (directStayFor(item.destination, item.stay.type)) return "Direkt-Favorit, Livepreis prüfen";
+  return "Favorisierte Unterkunftssuche";
+}
+
+function stayProofText(item, stayPlan, directNote) {
+  if (item.verifiedLodging) {
+    return `${stayPlan.focus}, ${stayPlan.bedsLabel}, ${lodgingBudgetText(item)}. Direktangebot mit genauem Datum und Personen hinterlegt.${directNote ? ` ${directNote}` : ""}`;
+  }
+  if (directStayFor(item.destination, item.stay.type)) {
+    return `${stayPlan.focus}, ${stayPlan.bedsLabel}, ${lodgingBudgetText(item)}. Direkt-Favorit hinterlegt, aber Preis und Verfügbarkeit für genau diese Daten direkt im Portal prüfen.${directNote ? ` ${directNote}` : ""}`;
+  }
+  return `${stayPlan.focus}, ${stayPlan.bedsLabel}, ${lodgingBudgetText(item)}. ${stayPlan.note}. Den echten Preis immer im Buchungsportal prüfen.`;
+}
+
 function lodgingStatus(item) {
   const subject = item.destination.cruise ? "Kabine/Route" : "Unterkunft";
   const portal = item.destination.cruise ? "Reederei/Portal" : "Airbnb/Booking";
@@ -4331,11 +4348,7 @@ function renderBestTripPreview(item, context) {
   const stayStatus = lodgingStatus(item);
   const routeStatus = transportStatus(item);
   const directStay = directStayFor(item.destination, item.stay.type);
-  const staySectionLabel = item.destination.cruise
-    ? "Kabine / Route"
-    : item.verifiedLodging || directStay
-      ? "Favorisierte Unterkunft"
-      : "Favorisierte Unterkunftssuche";
+  const staySectionLabel = stayProofLabel(item);
   const stayTitle = item.destination.cruise ? stayPlan.title : item.verifiedLodging ? item.verifiedLodging.label : directStay?.label || stayTypeLabel(item.stay.type);
   const totalLabel = totalPriceLabel(item);
   const budgetIsOpen = item.liveLodgingRequired && !item.verifiedLodging;
@@ -4537,12 +4550,12 @@ function renderTripOption(item, index, context) {
     : item.verifiedLodging
       ? `${item.verifiedLodging.platform === "booking" ? "Booking" : "Airbnb"}-Unterkunft öffnen`
       : hasDirectStay
-        ? `${directStay?.platform === "booking" ? "Booking" : "Airbnb"}-Unterkunft öffnen`
+        ? `${directStay?.platform === "booking" ? "Booking" : "Airbnb"}-Direkt-Favorit prüfen`
         : ["hotel", "pension"].includes(item.stay.type)
           ? bookingLabel
           : item.stay.type === "budget-room"
-            ? "Booking-Suche mit Datum öffnen"
-            : "Airbnb-Suche mit Datum öffnen";
+            ? "Favorisierte Booking-Suche öffnen"
+            : "Favorisierte Airbnb-Suche öffnen";
   const stayCostLabel = item.destination.cruise ? "Kabine" : item.verifiedLodging ? "Unterkunft" : stayName;
   const transportPriceLabel = `${euro(item.transportTotal)} gesamt`;
   const totalLabel = totalPriceLabel(item);
@@ -4561,6 +4574,8 @@ function renderTripOption(item, index, context) {
   const directNote = hasDirectStay ? directStayNote(item) : "";
   const stayTitle = item.verifiedLodging ? item.verifiedLodging.label : directStay?.label || stayPlan.title;
   const dealbreaker = budgetDealbreaker(item);
+  const showBookingAlternative = !item.destination.cruise && links.booking !== primaryStayLink;
+  const showAirbnbAlternative = !item.destination.cruise && links.airbnb !== primaryStayLink;
   return `
     <section class="trip-option">
       <div class="trip-option__top">
@@ -4569,9 +4584,9 @@ function renderTripOption(item, index, context) {
       </div>
       <div class="concrete-plan">
         <div>
-          <span>${hasDirectStay ? "Favorisierte Unterkunft" : "Favorisierte Unterkunftssuche"}</span>
+          <span>${stayProofLabel(item)}</span>
           <strong>${stayTitle} · ${stayPlan.area}</strong>
-          <p>${stayPlan.focus}, ${stayPlan.bedsLabel}, ${lodgingBudgetText(item)}. ${hasDirectStay ? `Direktangebot hinterlegt.${directNote ? ` ${directNote}` : ""}` : `${stayPlan.note}. Den echten Preis immer im Buchungsportal prüfen.`}</p>
+          <p>${stayProofText(item, stayPlan, directNote)}</p>
         </div>
         <div>
           <span>Anreisevorschlag</span>
@@ -4587,7 +4602,7 @@ function renderTripOption(item, index, context) {
       </div>
       <div class="costs costs--compact">
         <div><span>Anreise</span><strong>${item.transport.label} ${transportPriceLabel}</strong></div>
-        <div><span>${item.destination.cruise ? "Kabine" : "Unterkunft"}</span><strong>${lodgingPriceLabel}</strong></div>
+        <div><span>${item.destination.cruise ? "Kabine" : item.verifiedLodging ? "Favorit" : "Unterkunft"}</span><strong>${lodgingPriceLabel}</strong></div>
         <div><span>${item.destination.cruise ? "Bordextras" : "Alltag"}</span><strong>${euro(item.effectiveDaily)} p. P./Tag</strong></div>
       </div>
       <div class="verification-line" aria-label="Prüfstatus">
@@ -4622,7 +4637,7 @@ function renderTripOption(item, index, context) {
         <a href="${transportLink}" target="_blank" rel="noreferrer">${transportLinkLabel}</a>
         <a href="${primaryStayLink}" target="_blank" rel="noreferrer">${primaryStayLabel}</a>
         ${item.transport.mode === "bus" && links.flixbus !== transportLink ? `<a href="${links.flixbus}" target="_blank" rel="noreferrer">FlixBus direkt öffnen</a>` : ""}
-        ${item.destination.cruise ? links.cruise.compare.map((link) => `<a href="${link.href}" target="_blank" rel="noreferrer">${link.label}</a>`).join("") : `<a href="${links.booking}" target="_blank" rel="noreferrer">${bookingLabel}</a><a href="${links.airbnb}" target="_blank" rel="noreferrer">Airbnb-Alternativen</a>`}
+        ${item.destination.cruise ? links.cruise.compare.map((link) => `<a href="${link.href}" target="_blank" rel="noreferrer">${link.label}</a>`).join("") : `${showBookingAlternative ? `<a href="${links.booking}" target="_blank" rel="noreferrer">${bookingLabel}</a>` : ""}${showAirbnbAlternative ? `<a href="${links.airbnb}" target="_blank" rel="noreferrer">Airbnb-Alternativen</a>` : ""}`}
         ${links.special ? `<a href="${links.special}" target="_blank" rel="noreferrer">Besondere Idee suchen</a>` : ""}
         <a href="${links.maps}" target="_blank" rel="noreferrer">Karte öffnen</a>
       </nav>
